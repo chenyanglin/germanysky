@@ -1,0 +1,297 @@
+<div class="ui grid content-section" style="margin-top:0px;padding-top:0px;">
+  <div class="three wide column" style="margin-right:-15px;padding-top:0px;">
+      <div id="control_panel" class="ui sticky control-menu">
+        <div class="ui fluid vertical large menu">
+          <div class="header item">
+            <h3 class="site-font ui teal header">
+              留言管理
+            </h3>
+          </div>
+         
+          <div class="header item">
+            搜尋
+          </div>
+          <div class="ui item">
+            <div class="ui transparent icon input">
+              <input id="filter" type="text" placeholder="Search...">
+                <div id="empty_msg" class="ui popup transition hidden">
+                  <span style="color:#db2828;">請輸入條件</span>
+                </div>
+              <i id="search_go" class="search link icon"></i>
+            </div>
+          </div>
+         
+        </div>
+      </div>
+  </div>
+  <div id="content_part" class="thirteen wide column" style="margin-top:5px;">
+    <div class="ui inverted dimmer main">
+      <div class="ui text loader">讀取中</div>
+    </div>
+    <div class="ui compact segment">
+      <div class="ui horizontal mini blue statistic" style="margin:0;">
+        <div class="value">
+          <%= number_with_delimiter(@messages_size, :delimiter => ',') %>
+        </div>
+        <div class="site-font label">
+          留言總數
+        </div>
+      </div>
+    </div>
+    <% if @messages.present? %>
+      <% if @messages.size != 0 %>
+        <div class="infinite-table">
+          <table id="payments_table" class="site-font ui sortable selectable teal table">
+            <thead>
+              <tr>
+                <th>編號</th>
+                <th>使用者名稱</th>
+                <th>主旨</th>
+                <th>日期</th>
+                <th>是否回覆</th>
+                <th style="margin: 0 10px 0 10px;">Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <%= render :partial => 'messages', :object => @messages %>
+            </tbody>
+          </table>
+          <p class="pagination">
+            <%= link_to_next_page @messages, 'Next Page', :params => {:filter => @search_param}%>
+          </p>
+        </div>
+      <% else %>
+        <h3>未建立！</h3>
+      <% end %>
+    <% end %>
+    
+          </tbody>
+        </table>
+  </div>
+
+</div>
+
+<div class="ui small modal edit-account" style="padding-top:0px;">
+  <i class="close icon"></i>
+  <div id="edit_from" style="padding:10px;">
+  </div>
+</div>
+
+<div class="ui basic modal delete-check">
+  <i class="close icon"></i>
+  <div class="header">
+    刪除留言 <span class="primary-orange target_message"></span>
+  </div>
+  <div class="image content">
+    <div class="image">
+      <i class="announcement icon"></i>
+    </div>
+    <div class="description">
+      <p>確定要刪除留言<span class="primary-orange target_message"></span>嗎?</p>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="two fluid ui inverted buttons">
+      <div class="ui ok red basic inverted button">
+        <i class="remove icon"></i>
+        刪除
+      </div>
+      <div class="ui cancel blue basic inverted button">
+        <i class="checkmark icon"></i>
+        取消
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+$(function(){
+  $('.ui.sticky.control-menu')
+  .sticky({
+    offset            : 81,
+    observeChanges    : true,
+    context: '#content_part'
+  });
+
+// search functions
+  var search_msg = $('#filter')
+    .popup({
+      inline   : true,
+      hoverable: false,
+      position : 'top center',
+      delay: {
+        show: 100,
+        hide: 800
+      },
+      on: 'manual'
+    })
+  ;
+
+  $("#search_go").click(function(){
+    start_search();
+  });
+
+  $(document).on('keypress', function(e) {
+    if(e.which == 13) {
+      start_search();
+    }
+  });
+
+  $( "#filter" ).focus(function() {
+    search_msg.popup('hide');
+  });
+
+  function start_search(){
+    var search_string = $("#filter").val();
+    if(search_string == ""){
+      search_msg.popup('toggle');
+    }else{
+      var target_url = "";
+      if(window.location.href == "http://"+location.host+"/messages"){
+        target_url = window.location.href+"?filter="+search_string;
+      }else if(window.location.href.indexOf('filter') > -1){
+        target_url = "http://"+location.host+"/messages?filter="+search_string;
+      }else{
+        target_url = window.location.href+"&filter="+search_string;
+      }
+      window.location.replace(target_url);
+    }
+  }
+// search functions
+
+  $('#messages_table').tablesort();
+
+  $('body').on('click','.message_edit',function(){
+    $('.ui.dimmer.main').dimmer('show');
+
+    var row_id = $(this).data("value");
+    $.get( "/messages/"+row_id+"/edit", function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $('.ui.dimmer.main').dimmer('hide');
+
+      $('.ui.modal.edit-account').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $('.ui.dimmer.main').dimmer('hide');
+      alert( "error" );
+    });
+  });
+
+  $('body').on('click', '.message_del',function(){
+    var href = this.href;
+    var orign_link = $(this);
+    var message_id = $(this).data("id");
+    console.log(message_id);
+
+    $(".target_message").text(message_id);
+
+    $('.delete-check').modal({
+        onApprove : function() {
+          $.ajax({
+            type: "get",
+            method: "delete",
+            url: href
+          });
+          $('.ui.dimmer.main').dimmer('show');
+          location.reload();
+        }
+      }).modal('refresh').modal('show');
+
+    return false;
+  });
+
+
+    $('body').on('click','.message_content',function(){
+    $('.ui.dimmer.main').dimmer('show');
+
+    var row_id = $(this).data("value");
+    $.get( "/messages/"+row_id, function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $('.ui.dimmer.main').dimmer('hide');
+
+      $('.ui.modal.edit-account').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $('.ui.dimmer.main').dimmer('hide');
+      alert( "error" );
+    });
+  });
+
+  //   $('body').on('click','.reply-btn',function(){
+  //     alert("dd");
+  //   $.ajax({
+  //       url: $(this).attr('action'), //sumbits it to the given url of the form
+  //       type: 'POST',
+  //       processData: false,
+  //       contentType: false,
+  //       data: new FormData(this)
+  //   }).success(function(upload_result){
+  //       console.log(upload_result);
+  //       if(upload_result == "success" ){
+  //         $("#edit_from").empty();
+  //         $("#edit_from").append(html);
+  //         $('.ui.dimmer.main').dimmer('hide');
+
+  //         $('.ui.modal.edit-account').modal({
+  //           observeChanges: true
+  //     }).modal('refresh').modal('show');
+  //       }
+  //   }).fail(function(e) {
+  //     $('.ui.dimmer.main').dimmer('hide');
+  //       console.log(e);
+  //   }).done(function(){
+      
+  //   });
+  //   return false; // prevents normal behaviour
+  // });
+
+$('body').on('click','#edit-admin',function(){
+    $('.ui.dimmer.site').dimmer('show');
+
+    var row_id = $(this).data("value");
+    $.get( "/accounts/"+row_id+"/edit", function(html) {
+      $("#admin_from").empty();
+      $("#admin_from").append(html);
+      $('.ui.dimmer.site').dimmer('hide');
+
+      $('.ui.small.modal.admin').modal({
+        observeChanges: true
+      }).modal('setting', 'closable', false)
+      .modal('refresh').modal('show');
+
+    }).fail(function() {
+      $('.ui.dimmer.site').dimmer('hide');
+      alert( "error" );
+    });
+  });
+
+
+  $("#btn_new_message").click(function(){
+    $("#btn_new_message").addClass("loading");
+    $.get( "/messages/new", function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $("#btn_new_message").removeClass("loading");
+
+      $('.ui.modal.edit-account').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $("#btn_new_message").removeClass("loading");
+      alert( "error" );
+    });
+
+  });
+
+
+
+});
+</script>

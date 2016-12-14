@@ -1,0 +1,199 @@
+<% if @current_user != nil && @current_user.role == 1 %>
+<div id="top_nav" class="ui top fixed large labeled icon menu grid" style="padding: 0 10px 0 10px;">
+ <div class="grid menu row">
+    <%= link_to console_index_path, class: "item" do %>
+      <i class="home icon"></i>首頁
+    <% end %>
+    <%= link_to newsboards_path, class: "item" do %>
+        <i class="user icon"></i>公佈欄設定
+      <% end %>
+    <%= link_to console_index_products_path, class: "item" do %>
+      <i class="in cart icon"></i>商品管理
+    <% end %>
+
+    <div id="type_and_brand" class="ui icon dropdown item">
+        <i class="clone icon"></i>
+        分類與品牌
+      </div>
+      <div id="profile_menu" class="ui popup transition hidden">
+        <div class="ui secondary vertical icon menu">
+           <%= link_to type_ones_path, class: "item" do %>
+      <i class="list layout icon"></i>分類管理
+    <% end %>
+      <%= link_to brands_path, class: "item" do %>
+          <i class="bookmark icon"></i>品牌管理
+    <% end %>
+        </div>
+        </div>
+   <div id="pay_and_delivery" class="ui icon dropdown item" >
+        <i class="clone icon"></i>
+        付款與運送
+      </div>
+      <div id="profile_menu" class="ui popup transition hidden">
+        <div class="ui secondary vertical icon menu">
+            <%= link_to payments_path, class: "item" do %>
+      <i class="calculator icon"></i>付款管理
+    <% end %>
+      <%= link_to deliveries_path, class: "item" do %>
+        <i class="shipping icon"></i>運送管理
+      <% end %>
+        </div>
+        </div>
+   
+
+      <%= link_to orders_path, class: "item" do %>
+        <i class="sticky note icon"></i>訂單管理
+      <% end %>
+      <div id="user_manage" class="ui icon dropdown item" >
+        <i class="clone icon"></i>
+        使用者管理
+      </div>
+      <div id="profile_menu" class="ui popup transition hidden">
+        <div class="ui secondary vertical icon menu">
+        <%= link_to accounts_path, class: "item" do %>
+        <i class="user icon"></i>會員帳號管理
+      <% end %>
+      <%= link_to account_levels_path, class: "item" do %>
+        <i class="child icon"></i>等級管理
+      <% end %>
+      <%= link_to messages_path, class: "item" do %>
+        <i class="talk icon"></i>問答管理
+      <% end %>
+        </div>
+        </div>
+
+      
+    
+
+    <div class="right menu">
+      <div id="user_profile" class="ui icon dropdown blue item" style="color:#1678c2;">
+        <i class="user icon"></i>
+        管理者
+      </div>
+      <div id="profile_menu" class="ui popup transition hidden">
+        <div class="ui secondary vertical icon menu">
+          <%= link_to edit_account_path(@current_user), class: 'item' do %>
+            <i class="primary-blue edit icon"></i>編輯帳號
+          <% end %>
+      
+            <%= link_to orders_path, class: 'item' do %>
+              <i class="primary-orange street view icon"></i>訂單管理
+            <% end %>
+        </div>
+      </div>
+
+      <%= link_to logout_console_index_path, class: "item", style: "color:#f2711c;" do %>
+        <i class="sign out icon"></i>登出
+      <% end %>
+    </div>
+    </div>
+<% else %>
+<div id="top_nav" class="ui top fixed large labeled icon menu grid" style="padding: 0 10px 0 10px;">
+ <div class="grid menu row">
+    <%= link_to console_index_path, class: "item" do %>
+      <i class="home icon"></i>首頁
+    <% end %>
+    <%= link_to aboutus_console_index_path, class: "item" do %>
+      <i class="in cart icon"></i>關於我們
+    <% end %>
+
+   <%= link_to newsboards_path, class: "item" do %>
+      <i class="list layout icon"></i>最新消息
+
+    <%= link_to products_path, class: "item" do %>
+      <i class="calculator icon"></i>商品列表
+    <% end %>
+    <% if @current_user.present? %>
+    <a class="inline item" href="/products/shoppingcart" data-html="您的購物車商品列表<br><%=@barcarts.first.product.name%>">
+        <i class="shipping icon"></i>購物車
+      </a>  
+   <%end%>
+      <%= link_to shopprocess_products_path, class: "item" do %>
+        <i class="retweet icon"></i>購物流程
+      <% end %>
+
+      <%= link_to new_message_path, class: "item" do %>
+        <i class="sticky note icon"></i>留言版
+      <% end %>
+    <div class="right menu">
+
+      <div id="user_profile" class="ui icon dropdown blue item" style="color:#1678c2;">
+        <i class="user icon"></i>
+        <% if @current_user != nil %>
+
+        <%= @current_user.account_name %>
+        </div>
+        <div id="profile_menu" class="ui popup transition hidden">
+        <div class="ui secondary vertical icon menu">
+          <%= link_to edit_account_path(@current_user), class: 'item' do %>
+            <i class="primary-blue edit icon"></i>編輯帳號
+          <% end %>
+      
+            <%= link_to orders_path, class: 'item' do %>
+              <i class="primary-blue sticky note outline icon"></i></br>我的訂單
+            <% end %>
+            <%= link_to messages_path, class: 'item' do %>
+              <i class="primary-blue talk outline icon"></i></br>我的留言
+            <% end %>
+            
+         </div>
+      </div>
+        <% else %>
+        未登入
+        </div>
+        <% end %>
+      
+              <% if @current_user != nil %>
+      <%= link_to logout_console_index_path, style: "color:red;",class: "item" do %>
+        <i class="sign out icon"></i>登出
+      <% end %>
+        <% else %>
+      <a href="/console/login" class="item" style="color:#f2711c;">
+        <i class="sign in icon"></i>
+        登入
+      </a>
+        <% end %>
+    </div>
+    <%end%>
+    </div>
+<% end %>
+<div class="ui small modal login" style="padding-top:0px;">
+  <i class="close icon"></i>
+  <div id="loginpage" style="padding:10px;">
+  </div>
+</div>
+ <script type="text/javascript">
+ $('.inline.item')
+  .popup({
+    inline: true
+  })
+;
+function shop() {
+  
+}
+
+$(function(){
+
+  $("#login").click(function(){
+    $("#login").addClass("loading");
+    $.get( "/console/login", function(html) {
+      $("#loginpage").empty();
+      $("#loginpage").append(html);
+      $("#login").removeClass("loading");
+
+      $('.ui.modal.login').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $("#login").removeClass("loading");
+      alert( "error" );
+    });
+
+  });
+
+
+
+});
+
+// </script>

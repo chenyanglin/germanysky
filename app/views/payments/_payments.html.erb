@@ -1,0 +1,14 @@
+<% @payments.each do |payment| %>
+<tr>
+  <td><%= payment.name %></td>
+  <td><%= payment.description%></td>
+  <td><%= payment.dayline %>天</td>
+ 
+  <td class="collapsing">
+    <button class="ui blue basic button payment_edit" data-value="<%= payment.id %>">修改</button>
+    <%= link_to payment, class: 'ui orange basic button payment_del', method: :delete, data:{name: payment.name} do %>
+      刪除
+    <% end %>
+  </td>
+</tr>
+<% end %>

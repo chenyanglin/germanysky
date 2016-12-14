@@ -1,0 +1,94 @@
+<!-- 	#pay_status 
+	#1:未付款
+	#2:已付款未確認
+	#3:已確認付款
+	#4:逾期未付款
+	#5:貨到付款
+	#6:完成
+	#delivery_status
+	#1:未出貨
+	#2:已出貨
+	#3:已確認取貨
+	#4:逾期未取貨
+	#5:完成
+	 -->
+
+<% @orders.each do |order| %>
+<tr>
+  <td><%= order.ordernumber %></td>
+  <td><%= order.total_price%></td>
+  <!-- 付款tag -->
+  <td>
+  <%case order.pay_status %>
+  	<% when order.pay_status = 1%>
+  		<a style="text-align:center;">
+        未付款
+      	</a>
+   	<% when order.pay_status = 2%>
+  		<a style="text-align:center;">
+        已付款未確認
+      	</a>
+    <% when order.pay_status = 3%>
+  		<a  style="text-align:center;">
+        已確認付款
+      	</a>
+   	<% when order.pay_status = 4%>
+  		<a style="width:140px;text-align:center;">
+        逾期未付款
+      	</a>
+    <% when order.pay_status = 5%>
+  		<a  style="width:140px;text-align:center;">
+        貨到付款
+      	</a>
+    <% when order.pay_status = 6%>
+  		<a  style="width:140px;text-align:center;">
+        訂單完成
+      	</a>
+    <% end %>
+  </td>
+  <!-- 出貨tag -->
+  <td>
+  <%case order.delivery_status %>
+  	<% when order.delivery_status = 1%>
+  	
+  		<a  style="width:84px;text-align:center;">
+        未出貨
+      	</a>
+      	
+   	<% when order.delivery_status = 2%>
+   	
+  		<a  style="width:140px;text-align:center;">
+        已出貨
+      	</a>
+      	
+    <% when order.delivery_status = 3%>
+  		<a  style="width:140px;text-align:center;">
+        已確認取貨
+      	</a>
+   	<% when order.delivery_status = 4%>
+  		<a  style="width:140px;text-align:center;">
+        逾期未取貨
+      	</a>
+    <% when order.delivery_status = 5%>
+  		<a  style="width:140px;text-align:center;">
+        訂單完成
+      	</a>
+    <% end %>
+  </td>
+  <td>
+  <%=order.payment %>
+  </td>
+  <td>
+  <%=order.delivery%>
+  </td>
+  <td>
+  <%=order.account_name%>
+  </td>
+  <td>
+  <%=order.receiver_name%>
+  </td>
+ <td>
+ <%= order.created_at.strftime("%Y-%m-%d") %>
+ </td>
+</tr>
+<% end %>

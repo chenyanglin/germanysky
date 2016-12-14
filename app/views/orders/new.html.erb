@@ -1,0 +1,244 @@
+<div class="ui container">
+  <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
+ 
+    <div class="content">
+      建立訂單
+    </div>
+  </h1>
+<div class="ui horizontal divider">New Order</div>
+  <%= form_for(@order) do |f| %>
+   <% if @shoppingcarts.present? %>
+      <% if @shoppingcarts.size != 0 %>
+        <div class="infinite-table">
+          <table id="order_table" class="ui celled table" style="table-layout:fixed">
+            <thead>
+              <tr>
+                <th style="background-color:#2894FF"><label>商品名稱</label></th>
+                <th style="background-color:#2894FF"><label>規格</label></th>
+                <th style="background-color:#2894FF"><label>圖片</label></th>
+                <th style="background-color:#2894FF"><label>單價</label></th>
+                <th style="background-color:#2894FF"><label>數量</label></th>
+                <th style="background-color:#2894FF"><label>總價</label></th>
+              </tr>
+            </thead>
+            <tbody>
+            <% @shoppingcarts.each do |shoppingcart| %>
+            <input type="hidden" id="surplus<%= shoppingcart.id%>" value="<%=shoppingcart.product.product_options.find_by_option1(shoppingcart.option_id).surplus %>">
+            <% price = shoppingcart.product.product_options.find_by_option1(shoppingcart.option_id).price%>
+<tr>
+  <td><%= shoppingcart.product.name %></td>
+  <td><%= shoppingcart.option_id %></td>
+  <td><div class="item">
+      <img class="ui centered tiny image" src="<%= asset_path shoppingcart.product.productimages.first.phourl %>">
+    </div></td>
+  <td>$<%= price%></td>
+  <td><div  id="selectsum">
+      <%= shoppingcart.sum %>
+      </div></td>
+  <td>$<%= price*shoppingcart.sum %></td>
+  
+</tr>
+
+<% end %>
+<tr>
+
+<td align="center" colspan="6" style="background-color:teal" ><label>商品小計：</label><b id='product_price'><%= @product_price%></b></td>
+</tr>
+<tr>
+<td colspan="3">
+          <input type="hidden" id="payment_price" value="0">
+          <label>付款方式：</label>
+          <select class="ui selection dropdown" name="order[payment]" id="payment" onchange="choicepayment(this.options[this.options.selectedIndex].value)"><option value="">請選擇付款方式</option>
+          <% @payments.each do |p| %>
+          <% if p.price>0 %>
+          <option value="<%=p.id%>,<%=p.price%>"><%= p.name %>(加收手續費<%=p.price%>元)</option>
+          <%else%>
+          <option value="<%=p.id%>,<%=p.price%>"><%= p.name %></option>
+          <%end%>
+          <%end %>
+        </select>
+     
+        </td>
+<td colspan="3"> 
+          <input type="hidden" id="delivery_price" value="0">
+          <label>運送方式：</label>
+          <select class="ui selection dropdown" name="order[delivery]" id="delivery" onchange="choicedelivery(this.options[this.options.selectedIndex].value)" ><option value="">請選擇運送方式</option>
+          <% @deliveries.each do |d| %>
+          <option value="<%=d.id%>,<%=d.price%>"><%= d.name+" 運費："+d.price.to_s %></option>
+          <%end %>
+        </select>
+     
+        </td>
+        </tr>
+        <tr>
+        <td colspan="6" >
+      <input type="hidden" id="user_point" value="<%= @current_user.point%>" />
+      <label>使用紅利點數：</label><input type="text" name="order[usepoint]" id="usepoint" onkeyup="return ValidatePoint($(this),value)" value="0"/><b>您目前有<%= @current_user.point%>點(不可大於現有點數，不可大於訂單總價)</b>
+        </td>
+        </tr>
+        <td colspan="6" >
+    <input type="hidden" id="total_price_hide" name="order[total_price]" value="<%= @order_price%>" />
+  <label>總金額：</label><b id='total_price' >付款手續費 ＄0 + 運費 ＄0 +商品總計 ＄<%=@product_price %>  - 使用紅利 0 點 =＄<%= @product_price%></b>
+        </td>
+        </tr>
+        <tr>
+        <th colspan="6" >
+  <label>收貨資料</label>
+        </th>
+
+        </tr>
+      <tr>
+        <td colspan="2" >
+  <label>姓名：</label>
+  <input placeholder="姓名" type="text" name="order[receiver_name]" id="receiver_name" value="<%=@current_user.name%>" />
+        </td>
+        <td colspan="2" >
+  <label>電話：</label><input placeholder="電話" type="text" name="order[receiver_phone]" id="receiver_phone" onkeyup="return ValidateNumber($(this),value)" value="<%=@current_user.phone1%>"/>
+        </td>
+        <td colspan="2" >
+  <label>收貨地址：</label><input placeholder="收貨地址" type="text" name="order[receiver_address]" id="receiver_address" value="<%=@current_user.address%>" />
+        </td>
+        </tr>
+        <tr>
+        <td colspan="6" >
+  <label>備註：</label><textarea name="order[note]" id="content" rows="3" cols="120">
+任何備註。</textarea>
+        </td>
+        </tr>
+        <tr>
+        <td colspan="6" >
+        <button id="to_order"  class="ui blue button">
+        <i class="chevron circle right icon"></i>
+        立即結帳
+      </button>
+        </td>
+        </tr>
+            </tbody>
+          </table>
+          
+        </div>
+
+        <div class="divider"></div>
+          
+
+          
+      <% else %>
+        <h3>購物車沒有商品。</h3>
+      <% end %>
+    
+  </div>
+
+
+<% else %>
+<h3 class="ui center aligned icon header">購物車是空的，快去選購吧！</h3>
+<% end %>
+<%end%>
+</div>
+<script type="text/javascript">
+$(function(){
+  $('select.dropdown')
+    .dropdown()
+  ;
+  $('form').submit(function() {
+    var valuesToSubmit = $(this).serialize();
+    $("#to_order").addClass("loading");
+    console.log($(this).attr('action'));
+    $.ajax({
+        url: $(this).attr('action'), //sumbits it to the given url of the form
+        type: 'POST',
+        processData: false,
+        contentType: false,
+        data: new FormData(this)
+    }).success(function(upload_result){
+        console.log(upload_result);
+        if(upload_result == "success" ){
+          window.location.replace("http://"+location.host+"/orders");
+        }
+    }).fail(function(e) {
+        console.log(e);
+    }).done(function(){
+      $("#to_order").removeClass("loading");
+    });
+    return false; // prevents normal behaviour
+  });
+});
+
+function ValidateNumber(e, pnumber)
+{
+    if (!/^\d+$/.test(pnumber))
+    {
+        $(e).val(/^\d+/.exec($(e).val()));
+    }
+    return false;
+}
+function ValidatePoint(e, point)
+{
+    if (!/^\d+$/.test(point))
+    {
+        $(e).val(/^\d+/.exec($(e).val('0')));
+        return false;
+    }
+    if(Number(point)>Number(document.getElementById("user_point").value) || Number(point)>Number(document.getElementById("total_price").value))
+    {
+       $(e).val('0');
+       var payment_price = Number(document.getElementById('payment_price').value)
+       var product_price=Number(document.getElementById("product_price").innerHTML)
+       var delivery_price = Number(document.getElementById('delivery_price').value)
+       var total = payment_price+product_price+delivery_price-point;
+       document.getElementById('total_price').innerHTML = "付款手續費 ＄"+payment_price+"+運費 ＄"+delivery_price+"+商品總計 ＄"+product_price+" - 使用紅利"+point+"點 =＄"+total;
+       return false;
+    }else
+    {
+    var payment_price = Number(document.getElementById('payment_price').value)
+    var product_price=Number(document.getElementById("product_price").innerHTML)
+    var delivery_price = Number(document.getElementById('delivery_price').value)
+    var total_price = payment_price+product_price+delivery_price-point;
+    document.getElementById('total_price').innerHTML = "付款手續費 ＄"+payment_price+"+運費 ＄"+delivery_price+"+商品總計 ＄"+product_price+" - 使用紅利"+point+"點 =＄"+total_price;
+    document.getElementById('total_price_hide').value = total_price;
+    }
+    return false;
+}
+$("#cart_del").click(function(){
+    var cart_id = $('#cart_del').val();
+    var request = "/products/shoppingcart_del?id="+cart_id;
+    var aj = $.ajax({
+        url: request,
+        type: 'get',
+        data: $(this).serialize(),
+        dataType: 'text'
+    }).done(function (data) {
+      window.location.replace("http://"+location.host+"/products/shoppingcart");
+         
+    }).fail(function (data) {
+      alert(data);
+         
+    });
+
+  });
+
+function choicedelivery(s) 
+{ 
+     var delivery = s.split(",");
+     document.getElementById('delivery_price').value = Number(delivery[1]);
+     var delivery_price = Number(delivery[1]);
+     var payment_price = Number(document.getElementById('payment_price').value)
+     var product_price=Number(document.getElementById("product_price").innerHTML)
+     var point = Number(document.getElementById("usepoint").value)
+     var total_price = payment_price+product_price+delivery_price-point;
+    document.getElementById('total_price').innerHTML = "付款手續費 ＄"+payment_price+"+運費 ＄"+delivery_price+"+商品總計 ＄"+product_price+" - 使用紅利"+point+"點 =＄"+total_price;
+    document.getElementById('total_price_hide').value = total_price;
+} 
+function choicepayment(s) 
+{ 
+     var payment = s.split(",");
+     document.getElementById('payment_price').value = Number(payment[1]);
+     var payment_price = Number(payment[1]);
+     var delivery_price = Number(document.getElementById('delivery_price').value)
+     var product_price=Number(document.getElementById("product_price").innerHTML)
+     var point = Number(document.getElementById("usepoint").value)
+     var total_price = payment_price+product_price+delivery_price-point;
+    document.getElementById('total_price').innerHTML = "付款手續費 ＄"+payment_price+"+運費 ＄"+delivery_price+"+商品總計 ＄"+product_price+" - 使用紅利"+point+"點 =＄"+total_price;
+    document.getElementById('total_price_hide').value = total_price;
+} 
+
+</script>

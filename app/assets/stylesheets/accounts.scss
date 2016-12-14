@@ -1,0 +1,31 @@
+// Place all the styles related to the users controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+#create_account {
+  background-color: whitesmoke;
+  border: 1px solid #000;
+
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+//---login介面
+#email,#password {
+    background-color: #ffe;
+  }
+#loginbox {
+	margin-top:6%;
+}
+#login_form {
+	padding-top:30px;
+}
+#login_column {
+	margin-bottom: 25px;
+	width: 95%;
+	padding-left: 5%;
+}
+
+//---sign
+#create_account {
+	margin-top:20px;
+}

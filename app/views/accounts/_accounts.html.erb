@@ -1,0 +1,16 @@
+<% @accounts.each do |account| %>
+<tr>
+  <td class="collapsing account_info not-icon" data-value="<%= account.id %>"><%= account.account_name %></td>
+  <td class="collapsing account_info not-icon" data-value="<%= account.id %>"><%= account.name %></td>
+  <td class="collapsing account_info not-icon" data-value="<%= account.id %>"><%= account.account_level.level_name%></td>
+  <td class="collapsing account_info not-icon" data-value="<%= account.id %>"><%= account.score %></td>
+  <td class="collapsing account_info not-icon" data-value="<%= account.id %>"><%= account.point %></td>
+ 
+  <td class="collapsing">
+    <button class="ui blue basic button account_edit" data-value="<%= account.id %>">修改</button>
+    <%= link_to account, class: 'ui orange basic button account_del', method: :delete, data:{account_name: account.account_name} do %>
+      刪除
+    <% end %>
+  </td>
+</tr>
+<% end %>

@@ -1,0 +1,36 @@
+<% @types.each do |type| %>
+<tr>
+  <td><%= type.name %></td>
+  <td><%= type.description%></td>
+  <td>
+<%type.type_twos.each do |t| %>
+  <% begin %>
+  	<%= t.name %><br>
+  	<% rescue %>
+  	<%end%>
+  	<%end%>
+  </td>
+  <td>
+  	<%type.type_twos.each do |t| %>
+  <% begin %>
+  	<% t.type_threes.each do |t2| %>
+  	<%begin %>
+  	<%= t2.name %><br>
+  	<%rescue%>
+  	<%end%>
+  	<%end%>
+  	<% rescue %>
+  	<%end%>
+  	<%end%>
+  </td>
+
+  </td>
+ 
+  <td class="collapsing">
+    <button class="ui blue basic button type_edit" data-value="<%= type.id %>">修改</button>
+    <%= link_to type, class: 'ui orange basic button type_del', method: :delete, data:{name: type.name} do %>
+      刪除
+    <% end %>
+  </td>
+</tr>
+<% end %>

@@ -1,0 +1,14 @@
+<% @deliveries.each do |delivery| %>
+<tr>
+  <td><%= delivery.name %></td>
+  <td><%= delivery.description%></td>
+  <td><%= delivery.price %></td>
+ 
+  <td class="collapsing">
+    <button class="ui blue basic button delivery_edit" data-value="<%= delivery.id %>">修改</button>
+    <%= link_to delivery, class: 'ui orange basic button delivery_del', method: :delete, data:{name: delivery.name} do %>
+      刪除
+    <% end %>
+  </td>
+</tr>
+<% end %>

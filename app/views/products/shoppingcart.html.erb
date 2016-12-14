@@ -1,0 +1,159 @@
+<div class="ui container">
+  <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
+ 
+    <div class="content">
+      購物車
+    </div>
+  </h1>
+  <div class="ui horizontal divider">Shopping Cart</div>
+   <% if @shoppingcarts.present? %>
+      <% if @shoppingcarts.size != 0 %>
+        <div class="infinite-table">
+          <table id="products_table" class="ui celled table" style="table-layout:fixed">
+            <thead>
+              <tr>
+                <th>商品名稱</th>
+                <th>單價</th>
+                <th>數量</th>
+                <th>總價</th>
+                <th>Function</th>
+              </tr>
+            </thead>
+            <tbody>
+            <% @shoppingcarts.each do |shoppingcart| %>
+            <input type="hidden" id="surplus<%= shoppingcart.id%>" value="<%=shoppingcart.product.product_options.find_by_option1(shoppingcart.option_id).surplus %>">
+            <% price = shoppingcart.product.product_options.find_by_option1(shoppingcart.option_id).price%>
+<tr>
+  <td><%= shoppingcart.product.name %><br>規格：<%= shoppingcart.option_id %></td>
+  <td>$<%= price %></td>
+  <td><div  id="selectsum">
+       <span class="input-group-btn"><button id ="minus" type="button" class="btn btn-default btn-minus" data-id="<%= shoppingcart.id %>" data-price = "<%= price %>">－</button>  <input id = "sum<%= shoppingcart.id %>" type="text" name="lname" size="2" value ="<%= shoppingcart.sum %> ">  <span class="input-group-btn"><button id = "plus" type="button" class="btn btn-default btn-plus" data-id="<%= shoppingcart.id %>" data-price = "<%= price %>">＋</button>
+      </div></td>
+  <td><b id="option_total_price<%= shoppingcart.id %>">$<%= price*shoppingcart.sum %></b></td>
+  <td>
+    <button class="ui red basic button" id="cart_del" value="<%= shoppingcart.id %>">刪除</button>
+     </td>
+  
+</tr>
+
+<% end %>
+<tr>
+<td align="center" colspan="5" ><label>商品小計：</label><b id='product_price'><%= @order_price%></b></td>
+</tr>
+        <tr>
+        <td colspan="5" >
+    
+        <a id="to_order"  href="/orders/new" class="small ui bottom attached blue button">
+        <i class="chevron circle right icon"></i>
+        結帳去！
+      </a>
+        </td>
+        </tr>
+            </tbody>
+          </table>
+          
+        </div>
+
+        <div class="divider"></div>
+          
+
+          
+      <% else %>
+        <h3>未建立分類！</h3>
+      <% end %>
+    
+  </div>
+
+
+<% else %>
+<h3 class="ui center aligned icon header">購物車是空的，快去選購吧！</h3>
+<% end %>
+
+</div>
+<script type="text/javascript">
+$(function(){
+  $('select.dropdown')
+    .dropdown()
+  ;
+  $('form').submit(function() {
+    var valuesToSubmit = $(this).serialize();
+    $("#payment_form_submit").addClass("loading");
+    console.log($(this).attr('action'));
+    $.ajax({
+        url: $(this).attr('action'), //sumbits it to the given url of the form
+        type: 'POST',
+        processData: false,
+        contentType: false,
+        data: new FormData(this)
+    }).success(function(upload_result){
+        console.log(upload_result);
+        if(upload_result == "success" ){
+          window.location.replace("http://"+location.host+"/payments?recent=true");
+        }
+    }).fail(function(e) {
+        console.log(e);
+    }).done(function(){
+      $("#payment_form_submit").removeClass("loading");
+    });
+    return false; // prevents normal behaviour
+  });
+});
+
+function ValidateNumber(e, pnumber)
+{
+    if (!/^\d+$/.test(pnumber))
+    {
+        $(e).val(/^\d+/.exec($(e).val()));
+    }
+    return false;
+}
+$("#cart_del").click(function(){
+    var cart_id = $('#cart_del').val();
+    var request = "/products/shoppingcart_del?id="+cart_id;
+    var aj = $.ajax({
+        url: request,
+        type: 'get',
+        data: $(this).serialize(),
+        dataType: 'text'
+    }).done(function (data) {
+      window.location.replace("http://"+location.host+"/products/shoppingcart");
+         
+    }).fail(function (data) {
+      alert(data);
+         
+    });
+
+  });
+
+
+  $('body').on('click','.btn-minus',function(){
+    var cart_id = $(this).data("id");
+    var price = $(this).data("price");
+    var sum = Number(document.getElementById("sum"+cart_id).value);
+    $.get( "/products/shoppingcart_minus?cart_id="+cart_id, function(html) {
+      sum = sum-1;
+      document.getElementById("sum"+cart_id).value = sum ;
+      document.getElementById("option_total_price"+cart_id).innerHTML = "$"+sum*price;
+      order_price = Number(document.getElementById("product_price").innerHTML);
+      document.getElementById("product_price").innerHTML = order_price-price;
+    }).fail(function() {
+
+      alert( "error" );
+    });
+  });
+    $('body').on('click','.btn-plus',function(){
+    var cart_id = $(this).data("id");
+    var price = $(this).data("price");
+    var sum = Number(document.getElementById("sum"+cart_id).value);
+    $.get( "/products/shoppingcart_plus?cart_id="+cart_id, function(html) {
+      sum = sum+1;
+      document.getElementById("sum"+cart_id).value = sum ;
+      document.getElementById("option_total_price"+cart_id).innerHTML = "$"+sum*price;
+      order_price = Number(document.getElementById("product_price").innerHTML);
+      document.getElementById("product_price").innerHTML = order_price+price;
+    }).fail(function() {
+
+      alert( "error" );
+    });
+  });
+</script>

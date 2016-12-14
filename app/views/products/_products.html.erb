@@ -1,0 +1,44 @@
+<% @products.each do |product| %>
+<tr>
+  <td class="collapsing product_info not-icon" data-value="<%= product.id %>"><%= product.name %></td>
+  <td class="collapsing product_info not-icon" data-value="<%= product.id %>"><%= product.producttype.name %></td>
+  <td class="collapsing product_info not-icon" data-value="<%= product.id %>"><%= product.type_one.name %></td>
+  <td><div class="item">
+      <img class="ui centered small image" src="<%= asset_path product.productimages.first.phourl %>">
+    </div></td>
+  <td class="collapsing product_info not-icon" data-value="<%= product.id %>"><%= product.briefdescription%></td>
+   <td class="collapsing product_info not-icon" data-value="<%= product.id %>">
+ <% if product.product_options.size > 1 %>
+ <% product.product_options.each do |o| %>
+ <%= o.option1 %></br>
+<%end%>
+ </td>
+ <% else %>
+ <%= product.product_options.first.option1 %></td>
+ <% end %>
+ <td>
+ <% if product.product_options.size > 1 %>
+ <% product.product_options.each do |o| %>
+ <%= o.price %></br>
+<%end%>
+ </td>
+ <% else %>
+ <%= product.product_options.first.price %></td>
+ <% end %>
+ <td> <% if product.product_options.size > 1 %>
+ <% product.product_options.each do |o| %>
+ <%= o.surplus %></br>
+<%end%>
+ </td>
+ <% else %>
+ <%= product.product_options.first.surplus %></td>
+ <% end %>
+  <td class="collapsing">
+    <button class="ui blue basic button product_edit" data-value="<%= product.id %>">修改</button>
+    <%= link_to product, class: 'ui orange basic button product_del', method: :delete, data:{name: product.name} do %>
+      刪除
+    <% end %>
+    <button class="ui teal basic button product_copy" data-value="<%= product.id %>">複製</button>
+  </td>
+</tr>
+<% end %>

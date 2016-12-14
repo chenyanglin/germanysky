@@ -1,0 +1,17 @@
+<% @products.each do |product| %>
+<tr>
+  <td><%= product.name %></td>
+  <td><%= Producttype.find(product.producttype).name %></td>
+  <td><div class="item">
+      <img class="ui centered small image" src="<%= asset_path product.productimages.first.phourl %>">
+    </div></td>
+  <td><%= product.briefdescription%></td>
+ 
+  <td class="collapsing">
+    <button class="ui blue basic button product_edit" data-value="<%= product.id %>">修改</button>
+    <%= link_to product, class: 'ui orange basic button product_del', method: :delete, data:{name: product.name} do %>
+      刪除
+    <% end %>
+  </td>
+</tr>
+<% end %>

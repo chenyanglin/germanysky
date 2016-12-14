@@ -1,0 +1,14 @@
+<% @accountlevels.each do |level| %>
+<tr>
+  <td><%= level.level_name %></td>
+  <td>訂單滿<%= level.order_price %>打<%=level.discount %>折</td>
+  <td><%= level.score%></td>
+ 
+  <td class="collapsing">
+    <button class="ui blue basic button accountlevel_edit" data-value="<%= level.id %>">修改</button>
+    <%= link_to level, class: 'ui orange basic button accountlevel_del', method: :delete, data:{accountlevel_name: level.level_name} do %>
+      刪除
+    <% end %>
+  </td>
+</tr>
+<% end %>

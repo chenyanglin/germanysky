@@ -1,0 +1,29 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  title: MyString
+  name: MyString
+  briefdescription: MyString
+  detaildescription: MyString
+  price: 1
+  surplus: 1
+  phourl: MyString
+  on_store: false
+  available: false
+  tier_one_id: MyString
+  tier_two_id: MyString
+  tier_three_id: MyString
+
+two:
+  title: MyString
+  name: MyString
+  briefdescription: MyString
+  detaildescription: MyString
+  price: 1
+  surplus: 1
+  phourl: MyString
+  on_store: false
+  available: false
+  tier_one_id: MyString
+  tier_two_id: MyString
+  tier_three_id: MyString

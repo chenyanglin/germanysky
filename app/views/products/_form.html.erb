@@ -1,0 +1,375 @@
+<div class="form-check">
+<%= form_for @product,authenticity_token: true do |f| %>
+<div class="ui stackable one column centered grid">
+  <div class="fourteen wide column">
+    <div class="ui large form" style="text-align:left;">
+      
+      <div class="required field">
+        <label>商品名稱 Name：</label>
+        <%= f.text_field :name, placeholder: "請輸入商品名稱." %>
+      </div>
+      <div class="field">
+          <label>商品品牌 Brand：</label>
+          <%= f.select :brand_id, options_for_select(Brand.all.pluck(:name, :id)), {:prompt => '請選擇品牌'}, class: "ui search dropdown", id: 'brand_select', :data => {validate:"brand_select"} %>
+        </div>
+            <div class="field">
+          <label>庫存型態：</label>
+          <%= f.select :producttype, options_for_select(Producttype.all.pluck(:name, :id)), {:prompt => '請選擇型態'}, class: "ui search dropdown", id: 'producttype_select', :data => {validate:"producttype_select"} %>
+        </div>
+      <div class="field">
+          <label>商品分類：</label>
+          <%= f.select :type_one_id, options_for_select(TypeOne.all.pluck(:name, :id)), {:prompt => '請選擇分類'}, class: "ui search dropdown", id: 'type_select', :data => {validate:"type_select"} %>
+          <div id="typetwo_field" class="disabled field">
+      <select name="product[type_two_id]" id="typetwo_select" class="ui search dropdown" data-validate="typeone_select"><option value="">請先選擇上層</option><option value="0">無</option></select>
+      <select name="product[type_three_id]" id="typethree_select" class="ui search dropdown" data-validate="typetwo_select"><option value="">請先選擇上層</option><option value="0">無</option></select>
+     </div>
+
+        </div>
+
+
+    <div class="required field">
+    <button id="option_style" class="ui teal button" type="button" style='display:'>
+      <i class="plus icon"></i>切換商品選項模式
+    </button>
+    <button id="normal_style" class="ui teal button" type="button" style='display:none'>
+      <i class="plus icon"></i>切換一般模式
+    </button>
+    <input type="hidden" id="productstyle" name="productstyle" value="normal" />
+      </div>
+    <div class="normal_field" id="normal_field" style='display:'>
+      <div class="required field">
+        <label>價錢 Price：</label>
+        <%= f.text_field :price, placeholder: "請輸入價錢(台幣數字)" ,onkeyup: "return ValidateNumber($(this),value)"%>
+      </div>
+        <div class="required field">
+        <label>庫存 Surplus：</label>
+        <%= f.text_field :surplus, placeholder: "請輸入庫存量(數字)" ,onkeyup: "return ValidateNumber($(this),value)"%>
+      </div>
+      <div class="required field">
+        <label>紅利點數 point：</label>
+        <%= f.text_field :point, placeholder: "請輸入可得紅利點數(單筆)" ,onkeyup: "return ValidateNumber($(this),value)"%>
+      </div>
+
+      </div>
+
+    <div class="row" type="hidden" id="option_field" style='display:none'>
+    <input type="hidden" name="optioncount" value="1" />
+        <div class="control-group" id="options"> 
+            <div class="controls" id="profs"> 
+                <form class="input-append">
+                <div class="required field" >
+                <label for="option1">商品選項1</label>
+                    <div id="option" class="col-md-7"><input id="optionname1" name="product[options][option1][optionname1]" placeholder="名稱" type="text" /><input id="optionprice1" name="product[options][option1][optionprice1]" placeholder="價錢" type="text" />
+                    <input id="optionsurplus1" name="product[options][option1][optionsurplus1]" placeholder="庫存" type="text" /><button id="add-option" class="btn" type="button">+</button></div>
+                </form>
+            <br>
+            </div>
+            </div>
+        </div>
+  </div>
+
+      <div class="required field">
+        <label>簡短敘述 BriefDescription：</label>
+        <%= f.text_field :briefdescription, placeholder: "請輸入簡短敘述" %>
+      </div>
+<!--       <div class="required field">
+      <label>上傳圖片 Upload Photo</label>
+          <div class="col-md-7">
+            <%= f.file_field :upload, :id => 'image_file' %>
+          </div>
+          </div> -->
+    <div class="file row">
+    <input type="hidden" name="count" value="1" />
+        <div class="control-group" id="fields">
+        <div class="required field">
+            <label for="field1">上傳圖片 Upload Photo</label>
+            <div class="controls" id="fileprofs"> 
+               
+                    <div id="field" class="col-md-7"><input id="field1" name="product[files][file1]" type="file" /><button id="add-more" class="btn add-more" type="button">+</button></div>
+                
+            <br>
+            </div>
+            </div>
+        </div>
+  </div>
+<div class="required field">
+              <label>可用運送方式：</label>
+              <%= select_tag :delivery_id, options_for_select(Delivery.all.pluck(:name, :id), params[:delivery_id]), class: "ui fluid dropdown", id: 'delivery_select', multiple: true,:data => {validate:"delivery_id"} %>
+          </div>
+          <div class="required field">
+              <label>可用付款方式：</label>
+              <%= select_tag :payment_id, options_for_select(Payment.all.pluck(:name, :id), params[:payment_id]), class: "ui fluid dropdown", id: 'payment_select', multiple: true,:data => {validate:"payment_id"} %>
+          </div>
+
+        <div class="field">
+        <div class="ui horizontal segments">
+    <div class="ui blue segment">
+      <div class="ui toggle checkbox">
+              <input type="checkbox" id="on_store" name="on_store" checked="checked">
+              <label>是否上架</label>
+            </div>
+    </div>
+    <div class="ui blue segment">
+      <div class="ui toggle checkbox">
+              <input type="checkbox" id="on_buy" name="on_buy" checked="checked">
+              <label>是否開放購買</label>
+            </div>
+    </div>
+  </div>
+            
+            
+             
+          </div>
+    <div>
+     <div class="required field">
+     <label>內容 Content：</label>
+ <div class="redactor_box">
+  
+</div>
+<div><%= text_area_tag :content, "a", :class => "redactor", :rows => 40, :cols => 120 %></div>
+    </div>
+    </div>
+
+
+    </div>
+
+    <br>
+    <div>
+    <div class="ui divider"></div>
+    <button id="product_form_submit" class="ui teal basic button">
+      <i class="write icon"></i>送出
+    </button>
+
+  </div>
+</div>
+
+
+
+<% end %>
+</div>
+<script type="text/javascript">
+  $('select.dropdown')
+    .dropdown()
+  ;
+// $(function(){
+
+//   $('form').submit(function() {
+//     var valuesToSubmit = $(this).serialize();
+//     $("#product_form_submit").addClass("loading");
+//     console.log($(this).attr('action'));
+//     $.ajax({
+//         url: $(this).attr('action'), //sumbits it to the given url of the form
+//         type: 'POST',
+//         processData: false,
+//         contentType: false,
+//         data: new FormData(this)
+//     }).success(function(upload_result){
+//         console.log(upload_result);
+//         if(upload_result == "success" ){
+//           window.location.replace("http://"+location.host+"/products?recent=true");
+//         }
+//     }).fail(function(e) {
+//         console.log(e);
+//     }).done(function(){
+//       $("#product_form_submit").removeClass("loading");
+//     });
+//     return false; // prevents normal behaviour
+//   });
+// });
+  $('.form-check form')
+    .form({
+      fields: {
+        producttype_select : {
+          identifier: 'producttype_select',
+          rules: [
+            {
+              type   : 'empty',
+              prompt : '請至少選擇一個商品類別'
+            }
+          ]
+        },
+        delivery_select : {
+          identifier: 'delivery_select',
+          rules: [
+            {
+              type   : 'empty',
+              prompt : '請至少選擇一個運送方式'
+            }
+          ]
+        },
+        payment_select : {
+          identifier: 'payment_select',
+          rules: [
+            {
+              type   : 'empty',
+              prompt : '請至少選擇一個付款方式'
+            }
+          ]
+        }      },
+      inline : true,
+      on     : 'submit'
+    });
+  $('.form-check form').submit(function() {
+    var valuesToSubmit = $(this).serialize();
+    var form_check = $('.form-check form').form("is valid");
+    if(form_check){
+      $("#product_form_submit").addClass("loading");
+      $.ajax({
+          url: $(this).attr('action'), //sumbits it to the given url of the form
+          type: 'POST',
+          processData: false,
+          contentType: false,
+          data: new FormData(this)
+      }).success(function(upload_result){
+          if(upload_result == "success" ){
+            window.location.replace("//"+location.host+"/products?recent=true");
+          }
+      }).fail(function(e) {
+          console.log(e);
+      });
+    }
+    return false; // prevents normal behaviour
+  });
+  function ValidateNumber(e, pnumber)
+{
+    if (!/^\d+$/.test(pnumber))
+    {
+        $(e).val(/^\d+/.exec($(e).val()));
+    }
+    return false;
+}
+$(document).ready(function(){
+    var nextfile = 1;
+    var nextoption = 1;
+    $("#add-more").click(function(e){
+        e.preventDefault();
+        var addto = "#field" + nextfile;
+        var addRemove = "#field" + (nextfile);
+        nextfile = nextfile + 1;
+        var newIn = '<input id="field'+nextfile+'" name="product[files][file'+nextfile+']" type="file" />';
+        var newInput = $(newIn);
+        var removeBtn = '<button id="remove' + (nextfile - 1) + '" class="btn btn-danger remove-me" >-</button></div><div id="field">';
+        var removeButton = $(removeBtn);
+        $(addto).after(newInput);
+        $(addRemove).after(removeButton);
+        $("#field" + nextfile).attr('data-source',$(addto).attr('data-source'));
+        $("#count").val(nextfile);  
+        
+            $('.remove-me').click(function(e){
+                e.preventDefault();
+                var fieldNum = this.id.charAt(this.id.length-1);
+                var fieldID = "#field" + fieldNum;
+                $(this).remove();
+                $(fieldID).remove();
+            });
+    });
+        $("#option_style").click(function(e){
+          var i =document.getElementById('option_style');
+            i.style.display='none';
+            var j =document.getElementById('normal_style');
+            j.style.display='';
+          document.getElementById("normal_field").style.display = 'none';
+          document.getElementById('option_field').style.display = '';
+          document.getElementById('productstyle').value = 'option';
+           });
+        $("#normal_style").click(function(e){
+          // document.getElementById("testclass").add();
+            var i =document.getElementById('normal_style');
+            i.style.display='none';
+            var j =document.getElementById('option_style');
+            j.style.display='';
+            document.getElementById('option_field').style.display = 'none';
+            document.getElementById("normal_field").style.display = '';
+            document.getElementById( 'productstyle' ).value = 'normal';
+           });
+        $("#add-option").click(function(e){
+          e.preventDefault();
+        var addto = "#optionsurplus" + nextoption;
+        var addRemove = "#optionsurplus" + (nextoption);
+        nextoption = nextoption + 1;
+        var newIn = '<div class="required field"><label id = "label'+nextoption+'" for="option'+nextoption+'">商品選項'+nextoption+'</label><input id="optionname'+nextoption+'" name="product[options][option'+nextoption+'][optionname'+nextoption+']" placeholder="名稱" type="text" /><input id="optionprice'+nextoption+'" name="product[options][option'+nextoption+'][optionprice'+nextoption+']" placeholder="價錢" type="text" /><input id="optionsurplus'+nextoption+'" name="product[options][option'+nextoption+'][optionsurplus'+nextoption+']" placeholder="庫存" type="text" /></div>';
+        var newInput = $(newIn);
+        var removeBtn = '<button id="remove' + (nextoption - 1) + '" class="btn btn-danger remove-yo" >-</button></div><div id="option">';
+        var removeButton = $(removeBtn);
+        $(addto).after(newInput);
+        $(addRemove).after(removeButton);
+        $("#option" + nextoption).attr('data',$(addto).attr('data'));
+        $("#optioncount").val(nextoption);  
+        
+            $('.remove-yo').click(function(e){
+                e.preventDefault();
+                var optionNum = this.id.charAt(this.id.length-1);
+                var optionname = "#optionname" + optionNum;
+                var optionprice= "#optionprice" + optionNum;
+                var optionsurplus= "#optionsurplus" + optionNum;
+                var o = parseInt(optionNum)+1;
+                var label = "#label"+o;
+                $(this).remove();
+                $(optionname).remove();
+                $(optionprice).remove();
+                $(optionsurplus).remove();
+                $(label).remove();
+            });
+ 
+    });
+    
+
+    
+});
+//商品分類選擇
+ $("#type_select").change(function(){
+    console.log($(this).val());
+    if($(this).val() != ""){
+      $("#typetwo_field").removeClass("disabled");
+    }
+    $("#typetwo_select").dropdown('clear');
+  });
+  $("#typetwo_select").change(function(){
+    console.log($(this).val());
+    if($(this).val() != ""){
+      $("#typethree_field").removeClass("disabled");
+    }
+    $("#typethree_select").dropdown('clear');
+  });
+$(document).on('change','#type_select', function () {
+    $("#typetwo_select").val([]);
+    $("#typetwo_select").empty();
+    var typeone_id = $('#type_select').val();
+    var request = "/type_ones/type_two_get?typeone_id="+ typeone_id;
+    $.get(request, function(data) {
+      $("#typetwo_select").append(//add in an option for each major
+                $("<option></option>").attr("value", '').text('')
+            );
+       if(data.length != 0){
+        for(i = 0;i<data.length;i++){
+           $("#typetwo_select").append(//add in an option for each major
+                $("<option></option>").attr("value", data[i].id).text(data[i].name)
+            );
+          
+          }
+    }
+           
+          });
+});
+$(document).on('change','#typetwo_select', function () {
+
+    $("#typethree_select").val([]);
+    $("#typethree_select").empty();
+    var typetwo_id = $('#typetwo_select').val();
+    var request = "/type_ones/type_three_get?typetwo_id="+ typetwo_id;
+    $.get(request, function(data) {
+      $("#typethree_select").append(//add in an option for each major
+                $("<option></option>").attr("value", '').text('')
+            );
+       if(data.length != 0){
+        for(i = 0;i<data.length;i++){
+           $("#typethree_select").append(//add in an option for each major
+                $("<option></option>").attr("value", data[i].id).text(data[i].name)
+            );
+          
+          }
+    }
+           
+          });
+});
+</script>

@@ -1,0 +1,73 @@
+<%= form_for(@accountlevel) do |f| %>
+<div class="ui stackable one column centered grid">
+  <div class="fourteen wide column">
+    
+      <div class="ui large form" style="text-align:left;">
+      
+        <label>會員等級名稱：</label></br></br>
+        <%= f.text_field :level_name, placeholder: "請輸入等級名稱" %></br></br>
+      
+      
+        <label>所需積分：</label></br></br>
+        <%= f.text_field :score,onkeyup: "return ValidateNumber($(this),value)", placeholder: "請輸入所需積分" %>
+        </div>
+      </br>
+      
+        <label>訂單滿</label>
+        <%= f.text_field :order_price,:size => 5,onkeyup: "return ValidateNumber($(this),value)" %><label>元，折扣</label><%= f.text_field :discount,:size => 5,onkeyup: "return ValidateNumber($(this),value)"%><label>折</label>
+      
+      
+    
+    <br>
+    <div>
+
+
+    <div class="ui divider"></div>
+    <button id="accountlevel_form_submit" class="ui teal basic button">
+      <i class="write icon"></i>送出
+    </button>
+
+  </div>
+</div>
+
+
+
+<% end %>
+<script type="text/javascript">
+$(function(){
+  $('select.dropdown')
+    .dropdown()
+  ;
+  $('form').submit(function() {
+    var valuesToSubmit = $(this).serialize();
+    $("#accountlevel_form_submit").addClass("loading");
+    console.log($(this).attr('action'));
+    $.ajax({
+        url: $(this).attr('action'), //sumbits it to the given url of the form
+        type: 'POST',
+        processData: false,
+        contentType: false,
+        data: new FormData(this)
+    }).success(function(upload_result){
+        console.log(upload_result);
+        if(upload_result == "success" ){
+          window.location.replace("http://"+location.host+"/account_levels");
+        }
+    }).fail(function(e) {
+        console.log(e);
+    }).done(function(){
+      $("#accountlevel_form_submit").removeClass("loading");
+    });
+    return false; // prevents normal behaviour
+  });
+});
+
+function ValidateNumber(e, pnumber)
+{
+    if (!/^\d+$/.test(pnumber))
+    {
+        $(e).val(/^\d+/.exec($(e).val()));
+    }
+    return false;
+}
+</script>

@@ -1,0 +1,75 @@
+<%= form_for(@payment) do |f| %>
+<div class="ui stackable one column centered grid">
+  <div class="fourteen wide column">
+    <div class="ui large form" style="text-align:left;">
+      
+      <div class="required field">
+        <label>名稱 Name：</label>
+        <%= f.text_field :name, placeholder: "請輸入分類名稱." %>
+      </div>
+      <div class="required field">
+        <label>敘述 Description：</label>
+        <%= f.text_field :description, placeholder: "請輸入敘述" %>
+      </div>
+      <div class="required field">
+        <label>付款期限 Dayline</label>
+        <%= f.text_field :dayline, placeholder: "請輸入付款期限(天數)" ,onkeyup: "return ValidateNumber($(this),value)" %>
+      </div>
+      <div class="required field">
+        <label>額外收費 Extra charge</label>
+        <%= f.text_field :price ,onkeyup: "return ValidateNumber($(this),value)", :value => 0  %>
+      </div>
+    </div>
+    <br>
+    <div>
+
+
+    <div class="ui divider"></div>
+    <button id="payment_form_submit" class="ui teal basic button">
+      <i class="write icon"></i>送出
+    </button>
+
+  </div>
+</div>
+
+
+
+<% end %>
+<script type="text/javascript">
+$(function(){
+  $('select.dropdown')
+    .dropdown()
+  ;
+  $('form').submit(function() {
+    var valuesToSubmit = $(this).serialize();
+    $("#payment_form_submit").addClass("loading");
+    console.log($(this).attr('action'));
+    $.ajax({
+        url: $(this).attr('action'), //sumbits it to the given url of the form
+        type: 'POST',
+        processData: false,
+        contentType: false,
+        data: new FormData(this)
+    }).success(function(upload_result){
+        console.log(upload_result);
+        if(upload_result == "success" ){
+          window.location.replace("http://"+location.host+"/payments?recent=true");
+        }
+    }).fail(function(e) {
+        console.log(e);
+    }).done(function(){
+      $("#payment_form_submit").removeClass("loading");
+    });
+    return false; // prevents normal behaviour
+  });
+});
+
+function ValidateNumber(e, pnumber)
+{
+    if (!/^\d+$/.test(pnumber))
+    {
+        $(e).val(/^\d+/.exec($(e).val()));
+    }
+    return false;
+}
+</script>

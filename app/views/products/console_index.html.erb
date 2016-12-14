@@ -1,0 +1,316 @@
+<input type="hidden" id="find_product" value="<%= @product_info %>">
+<div class="ui grid content-section" style="margin-top:0px;padding-top:0px;">
+  <div class="three wide column" style="margin-right:-15px;padding-top:0px;">
+      <div id="control_panel" class="ui sticky control-menu">
+        <div class="ui fluid vertical large menu">
+          <div class="header item">
+            <h3 class="site-font ui teal header">
+              商品管理
+            </h3>
+          </div>
+        
+            <div class="item">
+              <button id="btn_new_product" class="site-font fluid ui teal right labeled icon button">
+                <i class="add icon"></i>
+                新增商品
+              </button>
+            </div>
+          <div class="header item">
+            搜尋
+          </div>
+          <div class="ui item">
+            <div class="ui transparent icon input">
+              <input id="filter" type="text" placeholder="Search...">
+                <div id="empty_msg" class="ui popup transition hidden">
+                  <span style="color:#db2828;">請輸入條件</span>
+                </div>
+              <i id="search_go" class="search link icon"></i>
+            </div>
+          </div>
+         <div class="header item">
+              <h4 class="site-font ui blue horizontal fitted divider header">
+                <a style="color:red;" href="/products">全部商品</a>
+              </h4>
+            </div>
+          <div class="header item">
+            <h4 class="site-font ui blue horizontal fitted divider header">
+              品牌
+            </h4>
+          </div>
+          <% @brands.each do |b|%>
+           <div class="item">
+            <h4 class="ui header">
+            <% if @current_user.role == 1%>
+            <a style="color:black;" href="/products/console_index?brand=<%=b.id%>"><%= b.name%></a>
+            <%else%>
+              <a style="color:black;" href="/products?brand=<%=b.id%>"><%= b.name%></a>
+            <%end%>
+            </h4>
+          </div>
+          <%end%>
+          <div class="header item">
+            <h4 class="site-font ui blue horizontal fitted divider header">
+              分類
+            </h4>
+          </div>
+          <% @type_ones.each do |t|%>
+           <div class="item">
+            <h4 class="ui header">
+            <% if @current_user.role == 1%>
+            <a style="color:black;" href="/products/console_index?type=<%=t.id%>"><%= t.name%></a>
+            <%else%>
+              <a  style="color:black;" href="/products?type=<%=t.id%>"><%= t.name%></a>
+            <%end%>
+            </h4>
+          </div>
+          <%end%>
+          </div>
+      </div>
+  </div>
+  <div id="content_part" class="thirteen wide column" style="margin-top:5px;">
+    <div class="ui inverted dimmer main">
+      <div class="ui text loader">讀取中</div>
+    </div>
+    <div class="ui compact segment">
+      <div class="ui horizontal mini green statistic" style="margin:0;">
+        <div class="value">
+          <%= number_with_delimiter(@products_size, :delimiter => ',') %>
+        </div>
+        <div class="site-font label">
+          商品總數
+        </div>
+      </div>
+    </div>
+    <% if @products.present? %>
+      <% if @products.size != 0 %>
+        <div class="infinite-table">
+          <table id="products_table" class="site-font ui sortable selectable teal table">
+            <thead>
+              <tr>
+                <th>名稱</th>
+                <th>庫存分類</th>
+                <th>商品分類</th>
+                <th>圖片</th>
+                <th>敘述</th>
+                <th>規格</th>
+                <th>售價</th>
+                <th>庫存</th>
+
+                <th style="margin: 0 10px 0 10px;">Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <%= render :partial => 'products', :object => @products %>
+            </tbody>
+          </table>
+          <p class="pagination">
+            <%= link_to_next_page @products, 'Next Page', :params => {:filter => @search_param}%>
+          </p>
+        </div>
+      <% else %>
+        <h3>未建立分類！</h3>
+      <% end %>
+    <% end %>
+    
+          </tbody>
+        </table>
+  </div>
+
+</div>
+
+<div class="ui small modal edit-product" style="padding-top:0px;">
+  <i class="close icon"></i>
+  <div id="edit_from" style="padding:10px;">
+  </div>
+</div>
+
+<div class="ui basic modal delete-check">
+  <i class="close icon"></i>
+  <div class="header">
+    刪除商品 <span class="primary-orange target_product"></span>
+  </div>
+  <div class="image content">
+    <div class="image">
+      <i class="user icon"></i>
+    </div>
+    <div class="description">
+      <p>確定要刪除<span class="primary-orange target_product"></span>嗎?</p>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="two fluid ui inverted buttons">
+      <div class="ui ok red basic inverted button">
+        <i class="remove icon"></i>
+        刪除
+      </div>
+      <div class="ui cancel blue basic inverted button">
+        <i class="checkmark icon"></i>
+        取消
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+$(function(){
+  $('.ui.sticky.control-menu')
+  .sticky({
+    offset            : 81,
+    observeChanges    : true,
+    context: '#content_part'
+  });
+
+// search functions
+  var search_msg = $('#filter')
+    .popup({
+      inline   : true,
+      hoverable: false,
+      position : 'top center',
+      delay: {
+        show: 100,
+        hide: 800
+      },
+      on: 'manual'
+    })
+  ;
+
+  $("#search_go").click(function(){
+    start_search();
+  });
+
+  $(document).on('keypress', function(e) {
+    if(e.which == 13) {
+      start_search();
+    }
+  });
+
+  $( "#filter" ).focus(function() {
+    search_msg.popup('hide');
+  });
+
+  function start_search(){
+    var search_string = $("#filter").val();
+    if(search_string == ""){
+      search_msg.popup('toggle');
+    }else{
+      var target_url = "";
+      if(window.location.href == "http://"+location.host+"/products"){
+        target_url = window.location.href+"?filter="+search_string;
+      }else if(window.location.href.indexOf('filter') > -1){
+        target_url = "http://"+location.host+"/products?filter="+search_string;
+      }else{
+        target_url = window.location.href+"&filter="+search_string;
+      }
+      window.location.replace(target_url);
+    }
+  }
+// search functions
+
+  $('#products_table').tablesort();
+
+  $('body').on('click','.product_edit',function(){
+    $('.ui.dimmer.main').dimmer('show');
+
+    var row_id = $(this).data("value");
+    $.get( "/products/"+row_id+"/edit", function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $('.ui.dimmer.main').dimmer('hide');
+
+      $('.ui.modal.edit-product').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $('.ui.dimmer.main').dimmer('hide');
+      alert( "error" );
+    });
+  });
+
+  $('body').on('click', '.product_del',function(){
+    var href = this.href;
+    var orign_link = $(this);
+    var product_name = $(this).data("name");
+    console.log(product_name);
+
+    $(".target_product").text(product_name);
+
+    $('.delete-check').modal({
+        onApprove : function() {
+          $.ajax({
+            type: "get",
+            method: "delete",
+            url: href
+          });
+          $('.ui.dimmer.main').dimmer('show');
+          location.reload();
+        }
+      }).modal('refresh').modal('show');
+
+    return false;
+  });
+
+    $('body').on('click','.product_copy',function(){
+    var product_id = $(this).data("value");
+    var request = "/products/test?id="+product_id;
+    var aj = $.ajax({
+        url: request,
+        type: 'get',
+        data: $(this).serialize(),
+        dataType: 'text'
+    }).done(function (data) {
+      window.location.reload();
+         
+    }).fail(function (data) {
+        window.location.reload();
+    });
+
+  });
+  //   $("#test").click(function(){
+  //   var area_id = $('#area_select').val();
+  //   var request = "/products/test?id=";
+  //   var aj = $.ajax({
+  //       url: request,
+  //       type: 'get',
+  //       data: $(this).serialize(),
+  //       dataType: 'text'
+  //   }).done(function (data) {
+  //     alert( data );
+  //        document.getElementById('test').innerHTML='abc';
+  //   }).fail(function (data) {
+  //     alert("ss");
+  //        document.getElementById('test2').innerHTML='efg';
+  //   });
+
+  // });
+
+  $("#btn_new_product").click(function(){
+    $("#btn_new_product").addClass("loading");
+    $.get( "/products/new", function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $("#btn_new_product").removeClass("loading");
+
+      $('.ui.modal.edit-product').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $("#btn_new_product").removeClass("loading");
+      alert( "error" );
+    });
+
+  });
+$('body').on('click','.product_info',function(){
+    var row_id = $(this).data("value");
+    show_info(row_id);
+  });
+  function show_info(product_id){
+    
+window.location.href("http://"+location.host+"/products/"+product_id);
+  }
+
+
+});
+</script>

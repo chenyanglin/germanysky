@@ -1,0 +1,21 @@
+default: &default
+  adapter: mysql2
+  encoding: utf8
+
+  pool: 5
+
+development:
+  <<: *default
+  # chenyang local
+  database: germanysky_production
+  host: localhost
+  username: root
+  password: "iii"
+
+production:
+  <<: *default
+  # chenyang local
+  database: germanysky_production
+  host: localhost
+  username: root
+  password: "iii"

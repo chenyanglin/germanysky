@@ -1,0 +1,27 @@
+<% @messages.each do |message| %>
+<tr>
+  <td><%= message.id%></td>
+  <td><%= message.account_name %></td>
+  <td><%= message.title%></td>
+  <td><%= message.created_at.strftime("%Y-%m-%d") %></td>
+  <td>
+  <% if message.status == 1 %>
+  <a class="ui teal tag label" style="width:140px;text-align:center;">
+        已回覆
+      	</a>
+  <% else %>
+  <a class="ui red tag label" style="width:140px;text-align:center;">
+        未回覆
+        </a>
+  <% end %>
+      </td>
+ 
+  <td class="collapsing">
+  <button class="ui brown button message_content" data-value="<%= message.id %>">詳細資料</button>
+    <%= link_to message, class: 'ui orange basic button message_del', method: :delete, data:{id: message.id} do %>
+      刪除
+    <% end %>
+    
+  </td>
+</tr>
+<% end %>

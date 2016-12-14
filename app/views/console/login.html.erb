@@ -1,0 +1,73 @@
+<body style="background-color:#5B5B5B">.
+<div class="center container">
+<div class="ui one column centered grid">
+  <div class="sixteen wide mobile eight wide computer column">
+  <%= form_tag signin_console_index_path, class:"ui huge form", id:"login_form" do %>
+    <div class="ui fluid card">
+      <div class="content">
+        <div class="ui orange header">登入 Sign in</div>
+      </div>
+
+      <div class="content">
+          <div class="field">
+            <label style="color:#1678c2;"> 帳號 account <i class="mail icon"></i></label>
+            <input type="text" name="email" placeholder="Please enter your account name.">
+          </div>
+          <div class="field">
+            <label style="color:#1678c2;"> 密碼 Password <i class="lock icon"></i></label>
+            <input type="password" name="password" placeholder="Please enter your password.">
+          </div>
+          <div class="field">
+            <div class="ui toggle checkbox">
+              <input type="checkbox" id="remember_email" name="remember_email">
+              <label>記住信箱</label>
+            </div>
+          </div>
+          <div class="ui error message"></div>
+      </div>
+      <div class="extra content">
+        <button class="huge ui basic fluid blue button">
+          <i class="sign in icon"></i>
+          登入
+        </button>
+      </div>
+      <div class="extra content">
+             
+         <button id="register" class="huge ui basic fluid red button" type="button">
+          <i class="sign in icon"></i>
+          註冊
+        </button>
+     <%= link_to "Facebook 登入", "auth/facebook"%>
+     
+      </div>
+    </div>
+  <% end %>
+  </div>
+</div>
+
+<script type="text/javascript">
+$(function(){
+
+  $("#register").click(function(){
+    $("#register").addClass("loading");
+    $.get( "/accounts/new", function(html) {
+      $("#loginpage").empty();
+      $("#loginpage").append(html);
+      $("#register").removeClass("loading");
+
+      $('.ui.modal.edit-product').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $("#register").removeClass("loading");
+      alert( "error" );
+    });
+
+  });
+
+
+
+});
+</script>
+</body>

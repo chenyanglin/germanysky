@@ -1,0 +1,83 @@
+<%= form_for(@brand) do |f| %>
+<div class="ui stackable one column centered grid">
+  <div class="fourteen wide column">
+    <div class="ui large form" style="text-align:left;">
+      
+      <div class="required field">
+        <label>名稱 Name：</label>
+        <%= f.text_field :name, placeholder: "請輸入分類名稱." %>
+      </div>
+      <div class="required field">
+        <label>簡述 BriefDescription：</label>
+        <%= f.text_field :briefdescription, placeholder: "請輸入敘述" %>
+      </div>
+      <div class="required field">
+        <label>詳細敘述 Detaildescription</label>
+        <%= f.text_field :detaildescription, placeholder: "請輸入詳細敘述" %>
+      </div>
+      <div class="file row">
+        <div class="control-group" id="fields">
+        <div class="required field">
+            <label for="field1">上傳圖片 Upload Photo</label>
+            <div class="controls" id="fileprofs"> 
+                    <div id="field" class="col-md-7"><input id="field1" name="brand[file]" type="file" /></div>
+                
+            <br>
+            </div>
+            </div>
+        </div>
+  </div>
+    </div>
+    <br>
+    <div>
+
+
+    <div class="ui divider"></div>
+    <button id="brand_form_submit" class="ui teal basic button">
+      <i class="write icon"></i>送出
+    </button>
+
+  </div>
+</div>
+
+
+
+<% end %>
+<script type="text/javascript">
+$(function(){
+  $('select.dropdown')
+    .dropdown()
+  ;
+  $('form').submit(function() {
+    var valuesToSubmit = $(this).serialize();
+    $("#brand_form_submit").addClass("loading");
+    console.log($(this).attr('action'));
+    $.ajax({
+        url: $(this).attr('action'), //sumbits it to the given url of the form
+        type: 'POST',
+        processData: false,
+        contentType: false,
+        data: new FormData(this)
+    }).success(function(upload_result){
+        console.log(upload_result);
+        if(upload_result == "success" ){
+          window.location.replace("http://"+location.host+"/brands?recent=true");
+        }
+    }).fail(function(e) {
+        console.log(e);
+    }).done(function(){
+      $("#brand_form_submit").removeClass("loading");
+    });
+    return false; // prevents normal behaviour
+  });
+});
+
+function ValidateNumber(e, pnumber)
+{
+    if (!/^\d+$/.test(pnumber))
+    {
+        $(e).val(/^\d+/.exec($(e).val()));
+    }
+    return false;
+}
+</script>

@@ -1,0 +1,190 @@
+<div class="ui container">
+  <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 20px 0;">
+    <div class="content">
+      訂單資料
+    </div>
+  </h1>
+  <div class="ui horizontal divider">order detail</div>
+   <%case status = @order.pay_status %>
+    <% when @order.pay_status = 1%>
+      <a class="ui red tag label" style="width:84px;text-align:center;">
+        未付款
+        </a>
+    <% when status = 2%>
+      <a class="ui teal tag label" style="width:140px;text-align:center;">
+        已付款店家未確認
+        </a>
+    <% when @order.pay_status = 3%>
+      <a class="ui green tag label" style="width:140px;text-align:center;">
+        已確認付款
+        </a>
+    <% when @order.pay_status = 4%>
+      <a class="ui red tag label" style="width:140px;text-align:center;">
+        逾期未付款
+        </a>
+    <% when @order.pay_status = 5%>
+      <a class="ui teal tag label" style="width:140px;text-align:center;">
+        貨到付款
+        </a>
+    <% when @order.pay_status = 6%>
+      <a class="ui green tag label" style="width:140px;text-align:center;">
+        訂單完成
+        </a>
+    <% end %>
+    <%case @order.delivery_status %>
+    <% when @order.delivery_status = 1%>
+      <a class="ui red tag label" style="width:84px;text-align:center;">
+        未出貨
+        </a>
+    <% when @order.delivery_status = 2%>
+      <a class="ui teal tag label" style="width:140px;text-align:center;">
+        已出貨
+        </a>
+    <% when @order.delivery_status = 3%>
+      <a class="ui green tag label" style="width:140px;text-align:center;">
+        已確認取貨
+        </a>
+    <% when @order.delivery_status = 4%>
+      <a class="ui red tag label" style="width:140px;text-align:center;">
+        逾期未取貨
+        </a>
+    <% when @order.delivery_status = 5%>
+      <a class="ui teal tag label" style="width:140px;text-align:center;">
+        訂單完成
+        </a>
+    <% end %>
+    <br></br>
+    <div></div>
+  <%= form_for(@order) do |f| %>
+   <% if @order.order_products.present? %>
+      <% if @order.order_products.size != 0 %>
+        <div class="infinite-table">
+          <table id="order_table" class="ui celled table" style="table-layout:fixed">
+            
+            <thead>
+              <tr>
+                <th>商品名稱</th>
+                <th>單價</th>
+                <th>數量</th>
+                <th>總價</th>
+              </tr>
+            </thead>
+            <tbody>
+            <%price = 0%>
+            <% @order.order_products.each do |p| %>
+<tr>
+  <td><%= p.product_name %><br>規格：<%= p.option_name %></td>
+  <td>$<%= p.single_price%></td>
+  <td><div  id="selectsum">
+      <%= p.sum %>
+      </div></td>
+  <td>$<%= p.sum_price %></td>
+  <%price += p.sum_price%>
+  
+</tr>
+
+<% end %>
+<tr>
+<td align="center" colspan="4" ><label>商品小計：</label><b id='product_price'><%= price%></b></td>
+</tr>
+<tr>
+<td colspan="2">
+
+          <label>付款方式：</label>
+        
+     <%=@order.payment %>
+        </td>
+<td colspan="2"> 
+          <label>運送方式：</label>
+          <%=@order.delivery%>
+        </select>
+     
+        </td>
+        </tr>
+        <tr>
+        <td colspan="4" >
+    <input type="hidden" id="total_price_hide" name="order[total_price]" value="<%= @order_price%>" />
+  <label>總金額：</label><b id='total_price' ><%= @order.total_price%></b>
+        </td>
+        </tr>
+        </table>
+        <div class="ui horizontal divider">Receiver Info</div>
+<table class="ui celled table" style="table-layout:fixed">
+      <tr>
+        <td colspan="1" >
+  <label>姓名：</label><%= @order.receiver_name %>
+        </td>
+        <td colspan="1" >
+  <label>電話：</label><%= @order.receiver_phone %>
+        </td>
+        <td colspan="2" >
+  <label>收貨地址：</label><%= @order.receiver_address %>
+        </td>
+        </tr>
+        <tr>
+        <td colspan="4" >
+  <label>備註：</label><%= @order.note %>
+        </td>
+        </tr>
+            </tbody>
+          </table>
+    <div class="ui horizontal divider">Pay Info</div>
+    <table class="ui celled table" style="table-layout:fixed">
+    <tr>
+    <td colspan="4">
+    請將款項匯至：00000000000 戶名：種馬
+    </td>
+    </tr>
+    <tr>
+    <td colspan="2" >
+  <label>帳戶末五碼：</label>
+  <% if @order.lastfivepay.present? %>
+  <%= @order.lastfivepay %>
+  <% else %>
+  尚未匯款
+  <%end%>
+    </td>
+    <td colspan="2" >
+  <label>匯款金額：</label>
+    <% if @order.paidprice.present? %>
+    <%= @order.paidprice %>
+    <% else %>
+    尚未匯款
+    <%end%>
+    </td>
+    </table>
+        </div>
+
+        <div class="divider"></div>
+          
+
+      <% else %>
+        <h3>購物車沒有商品。</h3>
+      <% end %>
+    
+  </div>
+
+
+<% else %>
+<h3 class="ui center aligned icon header">購物車是空的，快去選購吧！</h3>
+<% end %>
+<%end%>
+</div>
+<script type="text/javascript">
+function ValidateNumber(e, pnumber)
+{
+    if (!/^\d+$/.test(pnumber))
+    {
+        $(e).val(/^\d+/.exec($(e).val()));
+    }
+    if(pnumber.length>5)
+    {
+      alert("輸入大於5碼");
+    }
+
+    return false;
+}
+
+
+
+</script>

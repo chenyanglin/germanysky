@@ -1,0 +1,30 @@
+    <% if @orders.present? %>
+      <% if @orders.size != 0 %>
+        
+          <table  style="border:1px" cellpadding="0" border='1'>
+            <thead>
+              <tr>
+                <th>訂單編號</th>
+                <th style="width:60px;">總價</th>
+                <th style="width:150px;">付款狀態</th>
+                <th style="width:150px;">出貨狀態</th>
+                <th style="width:150px;">付款方式</th>
+                <th style="width:150px;">運送方式</th>
+                <th style="width:150px;">會員名稱</th>
+                <th style="width:150px;">收件人名稱</th>
+                <th>建立日期</th>
+              </tr>
+            </thead>
+            <tbody>
+              <%= render :partial => 'pureorder', :object => @orders %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <h3>未建立！</h3>
+      <% end %>
+    <% end %>
+    
+          </tbody>
+        </table>
+ 

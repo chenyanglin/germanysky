@@ -1,0 +1,81 @@
+// Place all the styles related to the maps controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+#map_image {
+    width:auto;
+    height:10vh;
+    max-width:100%;
+    // max-height:55vh;
+  }
+
+//---select
+#mode_pic {
+  background-color: #fff;
+  width: 30vh;
+  height: 30vh;
+}
+
+//---form
+#target {
+    display: inline-block;
+  }
+
+//---index
+#search_part {
+	padding-top:10px;
+	padding-bottom:10px;
+	background-color: azure;
+}
+
+#map_table {
+
+}
+
+#infor_part {
+	background-color: #fff;
+}
+
+#control_box {
+	padding-top:10px;
+}
+
+#control_label {
+	padding-top:10px;
+}
+
+#map_title_label, #map_address_label {
+	background-color: #ffe;
+}
+
+//---assigned
+#databox{
+    background-color: #F7F7F7;
+    height:80vh;
+  }
+
+#map {
+    width: auto;
+    height:80vh;
+    // max-height:100%;
+}
+#task_beacons{
+    overflow-y:auto;
+    max-height: 80vh;
+  }
+
+  #pointbutton{
+    a:hover {color:#0000FF;}
+  }
+
+.imagebox{
+    // border-style:solid;
+    // border-color:black;
+    // border-width:5px;
+    // background-color: #F7F7F7;
+  }
+
+  //---google map
+  #infowindow {
+    font-size: 15px;
+  }

@@ -1,0 +1,256 @@
+<div class="ui grid content-section" style="margin-top:0px;padding-top:0px;">
+  <div class="three wide column" style="margin-right:-15px;padding-top:0px;">
+      <div id="control_panel" class="ui sticky control-menu">
+        <div class="ui fluid vertical large menu">
+          <div class="header item">
+            <h3 class="site-font ui teal header">
+              商品展示
+            </h3>
+          </div>
+<!--            <div class="item">
+              <button id="test" class="site-font fluid ui teal right labeled icon button" value="testtt">
+                <i class="add icon"></i>
+                <div id="test2">test</div>
+              </button>
+            </div> -->
+          <div class="header item">
+            搜尋
+          </div>
+          <div class="ui item">
+            <div class="ui transparent icon input">
+              <input id="filter" type="text" placeholder="Search...">
+                <div id="empty_msg" class="ui popup transition hidden">
+                  <span style="color:#db2828;">請輸入條件</span>
+                </div>
+              <i id="search_go" class="search link icon"></i>
+            </div>
+          </div>
+           <div class="header item">
+              <h4 class="site-font ui blue horizontal fitted divider header">
+                <a style="color:red;" href="/products">全部商品</a>
+              </h4>
+            </div>
+          <div class="header item">
+            <h4 class="site-font ui blue horizontal fitted divider header">
+              品牌
+            </h4>
+          </div>
+          <% @brands.each do |b|%>
+           <div class="item">
+            <h4 class="ui header">
+              <a style="color:black;" href="/products?brand=<%=b.id%>"><%= b.name%></a>
+            </h4>
+          </div>
+          <%end%>
+          <div class="header item">
+            <h4 class="site-font ui blue horizontal fitted divider header">
+              分類
+            </h4>
+          </div>
+          <% @type_ones.each do |t|%>
+           <div class="item">
+            <h4 class="ui header">
+              <a  style="color:black;" href="/products?type=<%=t.id%>"><%= t.name%></a>
+            </h4>
+          </div>
+          <%end%>
+          </div>
+      </div>
+  </div>
+  <div id="content_part" class="thirteen wide column" style="margin-top:5px;">
+    <div class="ui inverted dimmer main">
+      <div class="ui text loader">讀取中</div>
+    </div>
+
+
+<% if @brand.present? %>
+<div class="ui top attached black info message">
+  <div class="image">
+    <img class="ui centered image" src="<%= asset_path @brand.brandimage.phourl %>">
+  </div>
+  <div class="content">
+    <label><%=@brand.name%></label>
+    <div class="description">
+      <%=@brand.detaildescription%>
+    </div>
+  </div>
+</div>
+    <div class="ui compact segment">
+      <div class="ui horizontal mini green statistic" style="margin:0;">
+        <div class="value">
+          <%= number_with_delimiter(@products_size, :delimiter => ',') %>
+        </div>
+        <div class="site-font label">
+          <%=@brand.name%>商品總數
+        </div>
+      </div>
+    </div>
+            <h1 class="site-font ui blue horizontal fitted divider header">
+              品牌商品
+            </h1>
+<br></br>
+<%elsif @type.present?%>
+     <div class="ui compact segment">
+      <div class="ui horizontal mini green statistic" style="margin:0;">
+        <div class="value">
+          <%= number_with_delimiter(@products_size, :delimiter => ',') %>
+        </div>
+        <div class="site-font label">
+          <%=@type.name %>類商品總數
+        </div>
+      </div>
+    </div>
+    <%else%>
+    <div class="ui compact segment">
+      <div class="ui horizontal mini green statistic" style="margin:0;">
+        <div class="value">
+          <%= number_with_delimiter(@products_size, :delimiter => ',') %>
+        </div>
+        <div class="site-font label">
+          商品總數
+        </div>
+      </div>
+    </div>
+<% end %>
+  <div class="ui five cards">
+  <% if @products.present? %>
+  <% if @products.size != 0 %>
+  <% @products.each do |product| %>
+  
+  <div class="ui link card" data-id="<%= product.id %>">
+  
+  <div class="bluebg content" href="/products/<%= product.id %>">
+    <a style="display:block" href="/products/<%= product.id %>">
+ 
+  <h3 class="site-font ui header" href="/products/<%= product.id %>">
+            
+              <%= product.name %>
+          </h3>
+          </a>
+           </div>
+          <a style="display:block" href="/products/<%= product.id %>">
+           <div class="ui horizontal divider">GERMANYSKY</div>
+           </a>
+           <a style="display:block" href="/products/<%= product.id %>">
+      <div class="item" href="/products/<%= product.id %>">
+
+      <img class="ui centered small image" href="/products/<%= product.id %>" src="<%= asset_path product.productimages.first.phourl %>" style='height: 100px; width: 100px; object-fit: contain'>
+    </div>
+
+  <div class="center extra content">
+  <%= product.type_one.name %>
+  <span class="right floated">
+        NT $<%= product.price %>
+      </span>
+    
+  </div>
+  </a>
+</div>
+
+  <% end %>
+  <% else %>
+  <div>沒有商品</div>
+  <% end %>
+  <% end %>
+  
+</div>
+<!-- 分隔 -->
+    
+    
+          </tbody>
+        </table>
+  </div>
+
+</div>
+
+<div class="ui small modal edit-product" style="padding-top:0px;">
+  <i class="close icon"></i>
+  <div id="edit_product_from" style="padding:10px;">
+  </div>
+</div>
+
+
+<script type="text/javascript">
+$(function(){
+  $('.ui.sticky.control-menu')
+  .sticky({
+    offset            : 81,
+    observeChanges    : true,
+    context: '#content_part'
+  });
+
+// search functions
+  var search_msg = $('#filter')
+    .popup({
+      inline   : true,
+      hoverable: false,
+      position : 'top center',
+      delay: {
+        show: 100,
+        hide: 800
+      },
+      on: 'manual'
+    })
+  ;
+
+  $("#search_go").click(function(){
+    start_search();
+  });
+
+  $(document).on('keypress', function(e) {
+    if(e.which == 13) {
+      start_search();
+    }
+  });
+
+  $( "#filter" ).focus(function() {
+    search_msg.popup('hide');
+  });
+
+  function start_search(){
+    var search_string = $("#filter").val();
+    if(search_string == ""){
+      search_msg.popup('toggle');
+    }else{
+      var target_url = "";
+      if(window.location.href == "http://"+location.host+"/products"){
+        target_url = window.location.href+"?filter="+search_string;
+      }else if(window.location.href.indexOf('filter') > -1){
+        target_url = "http://"+location.host+"/products?filter="+search_string;
+      }else{
+        target_url = window.location.href+"&filter="+search_string;
+      }
+      window.location.replace(target_url);
+    }
+  }
+// search functions
+
+  $('#products_table').tablesort();
+
+ 
+$("#test").click(function(){
+    var area_id = $('#area_select').val();
+    var request = "/products/test";
+    var aj = $.ajax({
+        url: request,
+        type: 'get',
+        data: $(this).serialize(),
+        dataType: 'text'
+    }).done(function (data) {
+      alert( data );
+         document.getElementById('test').innerHTML='abc';
+    }).fail(function (data) {
+      alert("ss");
+         document.getElementById('test2').innerHTML='efg';
+    });
+
+  });
+$("#product_card").click(function(){
+    var row_id = $(this).data("id");
+    alert(row_id);
+    window.location.replace("http://"+location.host+"/products/"+row_id);
+
+  });
+
+});
+</script>

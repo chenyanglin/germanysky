@@ -1,0 +1,10 @@
+$("<%=j render(:partial => 'account', :object => @install_accounts) %>")
+.appendTo($(".infinite-table table"));
+
+// Update pagination link
+<% if @install_accounts.last_page? %>
+  $('.pagination').html("讀取完畢!");
+<% else %>
+  $('.pagination')
+    .html("<%=j link_to_next_page(@install_accounts, 'Next Page', :remote => true,  :params => {:filter => @search_param}) %>");
+<% end %>
