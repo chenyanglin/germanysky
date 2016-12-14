@@ -1,4 +1,4 @@
-class ConsoleController < ApplicationController
+class ConsolesController < ApplicationController
   before_filter :current_user, :only => [:index]
 	def index
 		# @console_user ||= ManagerAccount.find(1)
@@ -28,10 +28,10 @@ class ConsoleController < ApplicationController
         cookies[:user_email] = params[:email]
       end
 
-     redirect_to console_index_path
+     redirect_to consoles_path
       # end
     else
-      redirect_to login_console_index_path
+      redirect_to login_consoles_path
     end
 		
 	end
@@ -41,7 +41,7 @@ class ConsoleController < ApplicationController
         session[:user_id] = nil
         end
     # cookies.delete(:auth_token)
-    redirect_to console_index_path
+    redirect_to consoles_path
   end
   def aboutus
   end
@@ -54,9 +54,9 @@ class ConsoleController < ApplicationController
     @account.email = "chenyang1205@gmail.com"
 
     if @account.save
-      redirect_to login_console_index_path
+      redirect_to login_consoles_path
     else
-      redirect_to login_console_index_path
+      redirect_to login_consoles_path
     end
   end
 end
