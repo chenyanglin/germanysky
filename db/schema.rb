@@ -34,7 +34,7 @@ ActiveRecord::Schema.define(version: 20161204174852) do
     t.string   "phone2",          limit: 255
     t.string   "address",         limit: 255
     t.integer  "role",            limit: 4,   default: 2, null: false
-    t.string   "account_level_id" limit: 255  default: 1, null: false
+    t.string   "account_level_id",limit: 255,   default: "1", null: false
     t.integer  "score",           limit: 4,   default: 0
     t.integer  "point",           limit: 4,   default: 0
     t.string   "deleted",         limit: 255
@@ -122,7 +122,7 @@ ActiveRecord::Schema.define(version: 20161204174852) do
   end
 
   create_table "orders", force: :cascade do |t|
-    t.string   "ordernumber"       limit: 255,             null: false
+    t.string   "ordernumber",       limit: 255,             null: false
     t.string   "account_id",       limit: 255,             null: false
     t.string   "account_name",     limit: 255
     t.integer  "total_price",      limit: 4,               null: false
