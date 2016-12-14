@@ -5,7 +5,6 @@ class ConsolesController < ApplicationController
     @product = Product.includes(:productimages).where(on_store: true)
     @product = @product.order("created_at desc")
     @newsboards = Newsboard.limit(5).order('id desc')
-    @newsboard = Newsboard.find(1)
 	end
 
 	def login
