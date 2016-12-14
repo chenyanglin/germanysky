@@ -28,8 +28,8 @@
 
 
 $(document).ready(function() {
-	$('#beacon_function').dropdown();
-	$('#user_profile').popup({
+
+	$('#user_e').popup({
 		inline   : true,
 		position : 'bottom right',
 		on: 'click'
