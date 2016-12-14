@@ -17,8 +17,8 @@ development:
 production:
   <<: *default
   adapter: postgresql
-   encoding: utf8
-   pool: 5
+  encoding: utf8
+  pool: 5
   # chenyang local
   # database: germanysky_production
   # host: localhost
