@@ -14,7 +14,7 @@ class CreateProduct < ActiveRecord::Migration
       t.string :tier_one_id
       t.string :tier_two_id
       t.string :tier_three_id
-      t.string :producttype #現貨 1 預購空運2 預購海運3
+      t.string :producttype_id #現貨 1 預購空運2 預購海運3
       t.string :brand_id
       t.timestamps null: false
 

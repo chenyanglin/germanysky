@@ -13,7 +13,7 @@ Rails.application.routes.draw do
   # devise_for :accounts, :controllers => { :omniauth_callbacks => "accounts" }
   root :to => "console#index"
 
-  resources :console do
+  resources :consoles do
      collection do
       get :login
       post :signin

@@ -1,7 +1,7 @@
 <% if @current_user != nil && @current_user.role == 1 %>
 <div id="top_nav" class="ui top fixed large labeled icon menu grid" style="padding: 0 10px 0 10px;">
  <div class="grid menu row">
-    <%= link_to console_index_path, class: "item" do %>
+    <%= link_to consoles_path, class: "item" do %>
       <i class="home icon"></i>首頁
     <% end %>
     <%= link_to newsboards_path, class: "item" do %>
@@ -82,7 +82,7 @@
         </div>
       </div>
 
-      <%= link_to logout_console_index_path, class: "item", style: "color:#f2711c;" do %>
+      <%= link_to logout_consoles_path, class: "item", style: "color:#f2711c;" do %>
         <i class="sign out icon"></i>登出
       <% end %>
     </div>
@@ -90,10 +90,10 @@
 <% else %>
 <div id="top_nav" class="ui top fixed large labeled icon menu grid" style="padding: 0 10px 0 10px;">
  <div class="grid menu row">
-    <%= link_to console_index_path, class: "item" do %>
+    <%= link_to consoles_path, class: "item" do %>
       <i class="home icon"></i>首頁
     <% end %>
-    <%= link_to aboutus_console_index_path, class: "item" do %>
+    <%= link_to aboutus_consoles_path, class: "item" do %>
       <i class="in cart icon"></i>關於我們
     <% end %>
 
@@ -144,11 +144,11 @@
         <% end %>
       
               <% if @current_user != nil %>
-      <%= link_to logout_console_index_path, style: "color:red;",class: "item" do %>
+      <%= link_to logout_consoles_path, style: "color:red;",class: "item" do %>
         <i class="sign out icon"></i>登出
       <% end %>
         <% else %>
-      <a href="/console/login" class="item" style="color:#f2711c;">
+      <a href="/consoles/login" class="item" style="color:#f2711c;">
         <i class="sign in icon"></i>
         登入
       </a>
@@ -176,7 +176,7 @@ $(function(){
 
   $("#login").click(function(){
     $("#login").addClass("loading");
-    $.get( "/console/login", function(html) {
+    $.get( "/consoles/login", function(html) {
       $("#loginpage").empty();
       $("#loginpage").append(html);
       $("#login").removeClass("loading");

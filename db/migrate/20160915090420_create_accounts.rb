@@ -21,3 +21,4 @@ class CreateAccounts < ActiveRecord::Migration
     end
   end
 end
+# Account.create!( :account_name => "germanysky", :password_digest => "germanytest" ,:name => "種馬",:sex=>"男",:email => "germanyskt@gmail.com",:role =>1 , :account_level_id => "1",:score => 0,:point =>100000)
