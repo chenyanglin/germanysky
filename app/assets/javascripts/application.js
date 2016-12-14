@@ -29,11 +29,6 @@
 
 $(document).ready(function() {
 	$('#beacon_function').dropdown();
-	$('#user_profile').popup({
-		inline   : true,
-		position : 'bottom right',
-		on: 'click'
-  });
   $('#type_and_brand').popup({
     inline   : true,
     position : 'bottom right',
