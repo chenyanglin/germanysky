@@ -11,7 +11,7 @@ Rails.application.routes.draw do
   # get '/console/auth/:provider/callback', to: 'sessions#create_with_fb'
   # get '/console/auth/failure', :to => 'accounts#failure'
   # devise_for :accounts, :controllers => { :omniauth_callbacks => "accounts" }
-  root :to => "console#index"
+  root :to => "consoles#index"
 
   resources :consoles do
      collection do
