@@ -14,8 +14,10 @@ development:
 
 production:
   <<: *default
+  adapter: postgresql
+   encoding: unicode
   # chenyang local
-  database: germanysky_production
-  host: localhost
-  username: root
-  password: "iii"
+  # database: germanysky_production
+  # host: localhost
+  # username: root
+  # password: "iii"
