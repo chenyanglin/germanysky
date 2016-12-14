@@ -116,16 +116,30 @@
   <% if @products.present? %>
   <% if @products.size != 0 %>
   <% @products.each do |product| %>
-  
+    <% surplus = 0%>
+    
+    <% if product.product_options.size > 1 %>
+    <% price = [] %>
+    <% product.product_options.each do |o| %>
+    <% surplus += o.surplus %>
+    <% price << o.price %>
+      <%end%>
+    <% else %>
+    <% price = product.product_options.first.price %>
+    <% surplus  = product.product_options.first.surplus %>
+    <% end %>
+
   <div class="ui link card" data-id="<%= product.id %>">
-  
-  <div class="bluebg content" href="/products/<%= product.id %>">
+  <% if surplus != 0 %>
+  <div class="bluebg content">
+  <% else %>
+  <div class="graybg content">
+  <% end %>
     <a style="display:block" href="/products/<%= product.id %>">
  
   <h3 class="site-font ui header" href="/products/<%= product.id %>">
-            
-              <%= product.name %>
-          </h3>
+            <%= product.name %>
+  </h3>
           </a>
            </div>
           <a style="display:block" href="/products/<%= product.id %>">
@@ -140,7 +154,13 @@
   <div class="center extra content">
   <%= product.type_one.name %>
   <span class="right floated">
-        NT $<%= product.price %>
+  庫存：<%= surplus %></br>
+  <% if product.product_options.size>1 %>
+        NT ＄ <%= price.min %>~<%=price.max %>
+  <%else%>
+        NT ＄ <%= price %>
+  <%end%>
+  </br>
       </span>
     
   </div>
