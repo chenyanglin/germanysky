@@ -8,5 +8,5 @@
 Producttype.create!( name: "現貨")
 Producttype.create!( name: "預購空運")
 Producttype.create!( name: "預購海運")
-Account.create!( :account_name => "germanysky", :password_digest => "$2a$10$CroPpekGCuK8Jg8HZTGER.nuVsACi0gxYllzgNc8XNOrq2wg1rOdG" ,:name => "種馬",:sex=>"男",:email => "germanyskt@gmail.com",:role =>1 , :account_level_id => "1",:score => 0,:point =>100000)
+Account.create!( :account_name => "germanysky", :password => "germanytest" ,:name => "種馬",:sex=>"男",:email => "germanyskt@gmail.com",:role =>1 , :account_level_id => "1",:score => 0,:point =>100000)
 AccountLevel.create!(level_name: "基本會員",score: 0,order_price: 0,discount: 0)
