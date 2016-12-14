@@ -44,7 +44,7 @@
       <%= link_to orders_path, class: "item" do %>
         <i class="sticky note icon"></i>訂單管理
       <% end %>
-      <div class ="menu" >
+
       <div id="user_manage" class="ui icon dropdown item" >
         <i class="clone icon"></i>
         使用者管理
@@ -62,26 +62,12 @@
       <% end %>
         </div>
         </div>
-      </div>
+
       
     
 
     <div class="right menu">
-      <div id="user_profile" class="ui icon dropdown blue item" style="color:#1678c2;">
-        <i class="user icon"></i>
-        管理者
-      </div>
-      <div id="profile_menu" class="ui popup transition hidden">
-        <div class="ui secondary vertical icon menu">
-          <%= link_to edit_account_path(@current_user), class: 'item' do %>
-            <i class="primary-blue edit icon"></i>編輯帳號
-          <% end %>
       
-            <%= link_to orders_path, class: 'item' do %>
-              <i class="primary-orange street view icon"></i>訂單管理
-            <% end %>
-        </div>
-      </div>
 
       <%= link_to logout_consoles_path, class: "item", style: "color:#f2711c;" do %>
         <i class="sign out icon"></i>登出
