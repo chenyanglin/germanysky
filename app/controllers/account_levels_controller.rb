@@ -9,7 +9,7 @@ before_action :set_accountlevel, only: [:edit, :update, :destroy]
         @accountlevels = @accountlevels.order(updated_at: :desc) if params[:recent]
         @accountlevels_size = @accountlevels.size
         @accountlevels = @accountlevels.page(params[:page]).per(15)
-
+        @accountlevel_infos = false
 
   end
 
