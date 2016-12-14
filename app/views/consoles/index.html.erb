@@ -35,31 +35,31 @@ a:hover{text-decoration:underline;}
 	<%end%>
 </div>
 </div>
+<% if @product.present? %>
 <div class="ui four stackable link cards" >
-		<div id="first_card" class="card">
+	<div id="first_card" class="card">
 			<div class="content" >
 				<div class="header">
-	      	<h2 class="site-font ui blue header"><i class="shopping basket icon"></i><%= @product.first.name %></h2>
-	      </div>
-	      <div class="divider"></div>
+	   				<h2 class="site-font ui blue header"><i class="shopping basket icon"></i><%= @product.first.name %></h2>
+	      		</div>
+	      	<div class="divider"></div>
 			</div>
 		
 	    <div class="content">
-	      
 	      <div class="center aligned description">
 		      <div class="ui statistic">
 					  <div class="item">
-      <img class="ui centered small image" src="<%= asset_path @product.first.productimages.first.phourl %>" style='height: 120px; width: 100px; object-fit: contain' >
-    		</div>
-		</div>
+      				<img class="ui centered small image" src="<%= asset_path @product.first.productimages.first.phourl %>" style='height: 120px; width: 100px; object-fit: contain' >
+    					</div>
+				</div>
 
 	      </div>
 	    </div>
 	    <a id="first_btn"  href="/products/<%= @product.first.id %>" class="large ui bottom attached blue button">
-	      <i class="chevron circle right icon"></i>
-	      查看商品
+	      <i class="chevron circle right icon"></i>查看商品
 	    </a>
-	  </div>
+	 </div>
+
 	  <div id="second_card" class="card">
 		  <div class="content">
 		  	<div class="header">
@@ -83,7 +83,8 @@ a:hover{text-decoration:underline;}
 	      查看商品
 	    </a>
 	  </div>
-	  	  <div id="third_card" class="card">
+
+	 <div id="third_card" class="card">
 	  	<div class="content">
 	  		<div class="header">
 	  			<h2 class="site-font ui green header">
@@ -110,6 +111,7 @@ a:hover{text-decoration:underline;}
 	      查看商品
 	    </a>
 	  </div>
+	  
 	  <div id="fourth_card" class="card">
 	  	<div class="content">
 	  		<div class="header">
@@ -138,16 +140,7 @@ a:hover{text-decoration:underline;}
 	    </a>
 	  </div>
 </div>
-  <!-- <div class="ui one column centered grid">
-	  <div class="ten wide column">
-			<h3 class="site-font ui top attached teal header">
-			  最新動態
-			</h3>
-			<div class="ui bottom attached segment">
-			  <p>Dogs are one type of animal</p>
-			</div>
-		</div>
-	</div> -->
+<%end%>
 </div>
 <script type="text/javascript">
 $(function(){
