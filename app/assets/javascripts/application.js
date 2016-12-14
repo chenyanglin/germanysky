@@ -29,7 +29,7 @@
 
 $(document).ready(function() {
 
-	$('#user_e').popup({
+	$('#user_profile').popup({
 		inline   : true,
 		position : 'bottom right',
 		on: 'click'
