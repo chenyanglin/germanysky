@@ -1,7 +1,9 @@
 default: &default
-  adapter: mysql2
+  # adapter: mysql2
+  # encoding: utf8
+  # pool: 5
+  adapter: postgresql
   encoding: utf8
-
   pool: 5
 
 development:
@@ -15,7 +17,8 @@ development:
 production:
   <<: *default
   adapter: postgresql
-   encoding: unicode
+   encoding: utf8
+   pool: 5
   # chenyang local
   # database: germanysky_production
   # host: localhost
