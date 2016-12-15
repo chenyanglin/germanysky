@@ -180,7 +180,7 @@ def destroy
     @order_price = 0
     @payments = []
     @deliveries =[]
-    if @shoppingcarts.size > 0
+    begin
     @shoppingcarts.each do |s|
       @order_price += s.product.product_options.find_by_option1(s.option_id).price*s.sum
       s.product.payments.each do |p| 
@@ -196,6 +196,7 @@ def destroy
         end
       end
     end
+    rescue
     end
     # render :layout => "empty"
     
