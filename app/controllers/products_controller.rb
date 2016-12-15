@@ -180,7 +180,7 @@ def destroy
     @order_price = 0
     @payments = []
     @deliveries =[]
-    if @shoppingcarts.present?
+    if @shoppingcarts.size > 0
     @shoppingcarts.each do |s|
       @order_price += s.product.product_options.find_by_option1(s.option_id).price*s.sum
       s.product.payments.each do |p| 
