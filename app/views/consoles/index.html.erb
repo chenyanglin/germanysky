@@ -9,32 +9,33 @@ a:hover{text-decoration:underline;}
 	    Germanysky 徳心應手
 	  </div>
 	</h1>
-	<div class="ui two stackable cards" >
+<div class="ui two stackable cards" >
+
 <div class="ui grey card">
   <div class="content">
 	  <div class="ui big image">
-
       <img src="<%= asset_path 'mymytw.png' %>">
-
       </div>
   </div>
-
 </div>
 
 <div class="ui grey card">
   <div class="content" >
-  <h2>最新消息</h2>
-  <% if @newsboards.present? %>
-  <% @newsboards.each do |n| %>
-  <div id="<%= n.id %>">
-   <i class="browser icon"></i><a href="/newsboards/<%=n.id%>"><%= n.title %></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font size="0.5"  ><span class="float:right"><%= n.created_at.strftime("%Y-%m-%d") %></span></font>
-    </div></br>
-    <div class="divider"></div>
-    <%end%>
-  </div>
+  	<h2>最新消息</h2>
+  	<% if @newsboards.present? %>
+  		<% @newsboards.each do |n| %>
+  			<div id="<%= n.id %>">
+   			<i class="browser icon"></i><a href="/newsboards/<%=n.id%>"><%= n.title %></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font size="0.5"  ><span class="float:right"><%= n.created_at.strftime("%Y-%m-%d") %></span></font>
+    		</div>
+    		</br>
+    		<div class="divider"></div>
+    	<%end%>
 	<%end%>
+	</div>
 </div>
+
 </div>
+
 <% if @product.present? %>
 <div class="ui two stackable link cards" >
 <% if @product.first.present? %>
