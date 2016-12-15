@@ -6,7 +6,7 @@
     </div>
   </h1>
   <div class="ui horizontal divider">Shopping Cart</div>
-   <% if @shoppingcarts.present? %>
+   <% begin %>
       <% if @shoppingcarts.size != 0 %>
         <div class="infinite-table">
           <table id="products_table" class="ui celled table" style="table-layout:fixed">
@@ -61,13 +61,13 @@
 
           
       <% else %>
-        <h3>未建立分類！</h3>
+        <h3 class="ui center aligned icon header">購物車是空的，快去選購吧！</h3>
       <% end %>
     
   </div>
 
 
-<% else %>
+<% rescue %>
 <h3 class="ui center aligned icon header">購物車是空的，快去選購吧！</h3>
 <% end %>
 
