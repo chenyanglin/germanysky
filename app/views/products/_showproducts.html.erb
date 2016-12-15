@@ -3,7 +3,7 @@
   <td><%= product.name %></td>
   <td><%= Producttype.find(product.producttype).name %></td>
   <td><div class="item">
-  <i class="chevron big shop icon"></i>
+<img class="ui centered small image" src="<%= asset_path '100px.png' %>">
       <!-- <img class="ui centered small image" src="<%= asset_path product.productimages.first.phourl %>"> -->
     </div></td>
   <td><%= product.briefdescription%></td>

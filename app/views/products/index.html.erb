@@ -147,8 +147,9 @@
            </a>
            <a style="display:block" href="/products/<%= product.id %>">
       <div class="item" href="/products/<%= product.id %>">
-<i class="chevron big shop icon"  style='height: 100px; width: 100px; object-fit: contain'></i>
-      <!-- <img class="ui centered small image" href="/products/<%= product.id %>" src="<%= asset_path product.productimages.first.phourl %>" style='height: 100px; width: 100px; object-fit: contain'> -->
+
+    <img class="ui centered small image" href="/products/<%= product.id %>" src="<%= asset_path '100px.png' %>" style='height: 100px; width: 100px; object-fit: contain'>
+  <!--   <img class="ui centered small image" href="/products/<%= product.id %>" src="<%= asset_path product.productimages.first.phourl %>" style='height: 100px; width: 100px; object-fit: contain'> -->
     </div>
 
   <div class="center extra content">
