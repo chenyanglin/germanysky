@@ -4,7 +4,9 @@
   <td class="collapsing product_info not-icon" data-value="<%= product.id %>"><%= product.producttype.name %></td>
   <td class="collapsing product_info not-icon" data-value="<%= product.id %>"><%= product.type_one.name %></td>
   <td><div class="item">
-      <img class="ui centered small image" src="<%= asset_path product.productimages.first.phourl %>">
+  <img class="ui centered small image" src="<%= asset_path '100px.png' %>">
+
+      <!-- <img class="ui centered small image" src="<%= asset_path product.productimages.first.phourl %>"> -->
     </div></td>
   <td class="collapsing product_info not-icon" data-value="<%= product.id %>"><%= product.briefdescription%></td>
    <td class="collapsing product_info not-icon" data-value="<%= product.id %>">
