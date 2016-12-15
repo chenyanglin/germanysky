@@ -37,6 +37,7 @@ a:hover{text-decoration:underline;}
 </div>
 <% if @product.present? %>
 <div class="ui four stackable link cards" >
+<% if @product.first.present? %>
 	<div id="first_card" class="card">
 			<div class="content" >
 				<div class="header">
@@ -59,7 +60,8 @@ a:hover{text-decoration:underline;}
 	      <i class="chevron circle right icon"></i>查看商品
 	    </a>
 	 </div>
-
+<%end%>
+<% if @product.second.present? %>
 	  <div id="second_card" class="card">
 		  <div class="content">
 		  	<div class="header">
@@ -83,7 +85,8 @@ a:hover{text-decoration:underline;}
 	      查看商品
 	    </a>
 	  </div>
-
+<%end%>
+<% if @product.third.present? %>
 	 <div id="third_card" class="card">
 	  	<div class="content">
 	  		<div class="header">
@@ -111,7 +114,8 @@ a:hover{text-decoration:underline;}
 	      查看商品
 	    </a>
 	  </div>
-	  
+	  <%end%>
+	  <% if @product.fourth.present? %>
 	  <div id="fourth_card" class="card">
 	  	<div class="content">
 	  		<div class="header">
@@ -139,6 +143,7 @@ a:hover{text-decoration:underline;}
 	      查看商品
 	    </a>
 	  </div>
+	  <%end%>
 </div>
 <%end%>
 </div>

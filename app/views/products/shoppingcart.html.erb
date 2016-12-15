@@ -13,6 +13,7 @@
             <thead>
               <tr>
                 <th>商品名稱</th>
+                <th>圖片</th>
                 <th>單價</th>
                 <th>數量</th>
                 <th>總價</th>
@@ -25,6 +26,7 @@
             <% price = shoppingcart.product.product_options.find_by_option1(shoppingcart.option_id).price%>
 <tr>
   <td><%= shoppingcart.product.name %><br>規格：<%= shoppingcart.option_id %></td>
+  <td><img class="ui centered mini image" src="<%= asset_path shoppingcart.product.productimages.first.phourl %>" style='height: 80px; width: 80px; object-fit: contain'></td>
   <td>$<%= price %></td>
   <td><div  id="selectsum">
        <span class="input-group-btn"><button id ="minus" type="button" class="btn btn-default btn-minus" data-id="<%= shoppingcart.id %>" data-price = "<%= price %>">－</button>  <input id = "sum<%= shoppingcart.id %>" type="text" name="lname" size="2" value ="<%= shoppingcart.sum %> ">  <span class="input-group-btn"><button id = "plus" type="button" class="btn btn-default btn-plus" data-id="<%= shoppingcart.id %>" data-price = "<%= price %>">＋</button>
@@ -38,10 +40,10 @@
 
 <% end %>
 <tr>
-<td align="center" colspan="5" ><label>商品小計：</label><b id='product_price'><%= @order_price%></b></td>
+<td align="center" colspan="6" ><label>商品小計：</label><b id='product_price'><%= @order_price%></b></td>
 </tr>
         <tr>
-        <td colspan="5" >
+        <td colspan="6" >
     
         <a id="to_order"  href="/orders/new" class="small ui bottom attached blue button">
         <i class="chevron circle right icon"></i>

@@ -44,7 +44,7 @@
       <%= link_to orders_path, class: "item" do %>
         <i class="sticky note icon"></i>訂單管理
       <% end %>
-      
+
       <div id="user_manage" class="ui icon dropdown item" >
         <i class="clone icon"></i>
         使用者管理
@@ -105,7 +105,8 @@
       <i class="calculator icon"></i>商品列表
     <% end %>
     <% if @current_user.present? %>
-    <a class="inline item" href="/products/shoppingcart" data-html="您的購物車商品列表<br><%=@barcarts.first.product.name%>">
+    <a class="inline item" href="/products/shoppingcart" data-html="您的購物車商品列表<br><%@barcarts.each do |b| %>
+    <%=b.product.name%>&nbsp;x&nbsp;<%=b.sum %><br><%end%>">
         <i class="shipping icon"></i>購物車
       </a>  
    <%end%>

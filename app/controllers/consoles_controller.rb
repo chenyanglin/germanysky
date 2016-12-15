@@ -2,7 +2,7 @@ class ConsolesController < ApplicationController
   before_filter :current_user, :only => [:index]
 	def index
 		# @console_user ||= ManagerAccount.find(1)
-    @product = Product.includes(:productimages).where(on_store: true)
+    @product = Product.includes(:productimages).where(on_store: true).limit(4)
     @product = @product.order("created_at desc")
     @newsboards = Newsboard.limit(5).order('id desc')
 	end
