@@ -105,8 +105,10 @@
       <i class="calculator icon"></i>商品列表
     <% end %>
     <% if @current_user.present? %>
-    <a class="inline item" href="/products/shoppingcart" data-html="您的購物車商品列表<br><%@barcarts.each do |b| %>
-    <%=b.product.name%>&nbsp;x&nbsp;<%=b.sum %><br><%end%>">
+    <a class="inline item" href="/products/shoppingcart" data-html="<%if @barcarts.size>0 %>
+    您的購物車商品列表<br>
+    <%@barcarts.each do |b| %>
+    <%=b.product.name%>&nbsp;x&nbsp;<%=b.sum %><br><%end%><%else%>購物車是空的<%end%>">
         <i class="shipping icon"></i>購物車
       </a>  
    <%end%>

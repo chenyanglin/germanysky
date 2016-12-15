@@ -48,19 +48,20 @@ $(function(){
 
   $("#register").click(function(){
     $("#register").addClass("loading");
-    $.get( "/accounts/new", function(html) {
-      $("#loginpage").empty();
-      $("#loginpage").append(html);
-      $("#register").removeClass("loading");
+    window.location="/accounts/register";
+    // $.get( "/accounts/register", function(html) {
+    //   $("#loginpage").empty();
+    //   $("#loginpage").append(html);
+    //   $("#register").removeClass("loading");
 
-      $('.ui.modal.edit-product').modal({
-        observeChanges: true
-      }).modal('refresh').modal('show');
+    //   $('.ui.modal.edit-product').modal({
+    //     observeChanges: true
+    //   }).modal('refresh').modal('show');
 
-    }).fail(function() {
-      $("#register").removeClass("loading");
-      alert( "error" );
-    });
+    // }).fail(function() {
+    //   $("#register").removeClass("loading");
+    //   alert( "error" );
+    // });
 
   });
 

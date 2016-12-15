@@ -19,7 +19,7 @@ def new
   end
   def register
     @account = Account.new
-    render :layout => "empty"
+
   end
 
   def create
