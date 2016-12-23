@@ -167,14 +167,24 @@
   </div>
   <div class="eight wide column">
     <div class="item">
+    <% begin %>
       <img class="ui centered middle image" id = "productimage" src="<%= asset_path @product.productimages.first.phourl %>">
+      <% rescue %>
+      <img class="ui centered middle image" id = "productimage" src="<%= asset_path '100px.png' %>">
+      <%end%>
     </div>
     <br></br>
      <% i = 1 %>
      <div class="ui grid">
      <% @product.productimages.each do |photo| %>
      
-      <div class="four wide column"><div class="ui card"  style='height: 90px; width: 90px; object-fit: contain' ><img class="ui tiny image" id="<%= asset_path photo.phourl %>"  style="display:block; margin:auto;" src="<%= asset_path photo.phourl %>" onclick="changephoto(this.id)"></img></div>
+      <div class="four wide column"><div class="ui card"  style='height: 90px; width: 90px; object-fit: contain' >
+      <%begin %>
+      <img class="ui tiny image" id="<%= asset_path photo.phourl %>"  style="display:block; margin:auto;" src="<%= asset_path photo.phourl %>" onclick="changephoto(this.id)"></img>
+      <% rescue %>
+      <img class="ui tiny image" id="<%= asset_path '100px.png' %>"  style="display:block; margin:auto;" src="<%= asset_path '100px.png' %>" onclick="changephoto(this.id)">
+      <%end%>
+      </div>
        <% i +=1 %></div>
      <% end %>
      </div>
