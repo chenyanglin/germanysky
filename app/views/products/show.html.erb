@@ -101,7 +101,7 @@
     </div>
   
   <div class="ui segment">
-    <div style="display:none" id="optionprice" value="<%=@product.price%>">售價d：NT$<%= @product.price %></div>
+    <div style="display:none" id="optionprice" value="<%=@product.price%>">售價：NT$<%= @product.price %></div>
   </div>
   <div class="ui segment">
     <div style="display:none" id="optionsurplus" value="<%=@product.surplus %>">庫存：<%= @product.surplus %></div>
@@ -109,7 +109,7 @@
   <div class="ui segment">
     <div style="display:none" id="selectsum">
       選擇數量：
-       <span class="input-group-btn"><button id ="minus" type="button" class="btn btn-default btn-add">－</button>  <input id = "sum" type="text" name="lname" size="2" value ="1">  <span class="input-group-btn"><button id = "plus" type="button" class="btn btn-default btn-add">＋</button>
+       <span class="input-group-btn"><button id ="minus" type="button" class="btn btn-default btn-add">－</button>  <d id = "sum" size="2" value ="1">1</d>  <span class="input-group-btn"><button id = "plus" type="button" class="btn btn-default btn-add">＋</button>
       </div>
   </div>
 </div>
@@ -126,7 +126,7 @@
   <div class="ui segment">
         <div id="selectsum">
       選擇數量：
-       <span class="input-group-btn"><button id ="minus" type="button" class="btn btn-default btn-add">－</button>  <input id = "sum" type="text" name="lname" size="2" value ="1">  <span class="input-group-btn"><button id = "plus" type="button" class="btn btn-default btn-add">＋</button>
+       <span class="input-group-btn"><button id ="minus" type="button" class="btn btn-default btn-add">－</button>  <d id = "sum" size="2" value ="1" >1</d> <span class="input-group-btn"><button id = "plus" type="button" class="btn btn-default btn-add">＋</button>
       </div>
   </div>
 </div>
@@ -204,7 +204,7 @@ function optionclick(price,surplus,id) {
   document.getElementById('selectsum').style.display = '';
   document.getElementById('optionprice').style.display = '';
   document.getElementById("optionsurplus").style.display = '';
-  document.getElementById("sum").value = 1;
+  document.getElementById("sum").innerHTML = 1;
   document.getElementById('optionprice').innerHTML = '售價：NT$'+price;
   document.getElementById("optionprice").value = price;
   document.getElementById('optionsurplus').innerHTML = '庫存：'+surplus;
@@ -269,23 +269,39 @@ $(function(){
 
   $('#products_table').tablesort();
 
+function ValidateSurplus(e, point)
+{
+    var surplus = document.getElementById("optionsurplus").value;
+    if (!/^\d+$/.test(point))
+    {
+        $(e).val(/^\d+/.exec($(e).val('1')));
+        return false;
+    }
+    if(Number(point)>surplus)
+    {
+       $(e).val('1');
+       {alert("不得大於庫存量");}
+    }
+    return false;
+}
+
 $("#plus").click(function(){
-var sum = Number(document.getElementById("sum").value);
+var sum = Number(document.getElementById("sum").innerHTML);
 
 var surplus = document.getElementById("optionsurplus").value;
 
 if (sum+1 > surplus)
   {alert("不得大於庫存量");}
 else
-{document.getElementById("sum").value = sum +1;}
+{document.getElementById("sum").innerHTML = sum +1;}
   });
 
 $("#minus").click(function(){
-  var sum = Number(document.getElementById("sum").value);
+  var sum = Number(document.getElementById("sum").innerHTML);
   if (sum == 1)
     {alert("無法低於1");}
   else
-{document.getElementById("sum").value = sum - 1;}
+{document.getElementById("sum").innerHTML = sum - 1;}
   });
 
 
@@ -302,7 +318,7 @@ $("#add_cart").click(function(){
       alert("請先選擇規格");
     else
     {
-    var sum = document.getElementById("sum").value;
+    var sum = Number(document.getElementById("sum").innerHTML);
     var surplus = document.getElementById("optionsurplus").value;
     if (sum > surplus)
     {alert("不得大於庫存量");}
@@ -336,7 +352,7 @@ $("#buy_btn").click(function(){
       alert("請先選擇規格");
     else
     {
-    var sum = document.getElementById("sum").value;
+    var sum = Number(document.getElementById("sum").innerHTML);
     var surplus = document.getElementById("optionsurplus").value;
     if (sum > surplus)
     {alert("不得大於庫存量");}
