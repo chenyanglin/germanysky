@@ -23,7 +23,7 @@ before_action :set_order, only: [:edit, :update, :destroy,
 
 def new
     @order = Order.new
-    @shoppingcarts = Shoppingcart.where('account_id = ?',@current_user.id)
+    @shoppingcarts = Shoppingcart.where('account_id = ?',@current_user.id.to_s)
     @order_price = 0
     @payments = []
     @deliveries =[]
@@ -72,7 +72,7 @@ def new
     if @order.save
       ordernumber = Time.now.strftime("%Y%m%d")+@order.id.rjust(4, '0')
       @order.update(ordernumber: ordernumber)
-      @shoppingcarts = Shoppingcart.where('account_id = ?',@current_user.id)
+      @shoppingcarts = Shoppingcart.where('account_id = ?',@current_user.id.to_s)
       @shoppingcarts.each do |s|
       @order_product = OrderProduct.new
       @order_product.order_id = @order.id
