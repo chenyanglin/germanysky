@@ -46,7 +46,6 @@ def new
   end
 
   def create
-    binding.pry
     @order = Order.new(order_params)
     @order.pay_status = 1 #未付款
     @order.delivery_status = 1

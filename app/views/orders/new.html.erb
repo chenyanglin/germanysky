@@ -73,7 +73,7 @@
         <tr>
         <td colspan="6" >
       <input type="hidden" id="user_point" value="<%= @current_user.point%>" />
-      <label>使用紅利點數：</label><input type="text" name="order[usepoint]" id="usepoint" onkeyup="return ValidatePoint($(this),value)" value="0"/><b>您目前有<%= @current_user.point%>點(不可大於現有點數，不可大於訂單總價)</b>
+      <label>使用紅利點數：</label><input type="text" name="order[usepoint]" id="usepoint" onkeyup="return ValidatePoint($(this),value)" value="0"/><b>您目前有<%= @current_user.point%>點(不可大於現有點數)</b>
         </td>
         </tr>
         <td colspan="6" >
@@ -102,7 +102,7 @@
         <tr>
         <td colspan="6" >
   <label>備註：</label><textarea name="order[note]" id="content" rows="3" cols="120">
-任何備註。</textarea>
+</textarea>
         </td>
         </tr>
         <tr>
@@ -184,8 +184,8 @@ function ValidatePoint(e, point)
        var payment_price = Number(document.getElementById('payment_price').value)
        var product_price=Number(document.getElementById("product_price").innerHTML)
        var delivery_price = Number(document.getElementById('delivery_price').value)
-       var total = payment_price+product_price+delivery_price-point;
-       document.getElementById('total_price').innerHTML = "付款手續費 ＄"+payment_price+"+運費 ＄"+delivery_price+"+商品總計 ＄"+product_price+" - 使用紅利"+point+"點 =＄"+total;
+       var total = payment_price+product_price+delivery_price;
+       document.getElementById('total_price').innerHTML = "付款手續費 ＄"+payment_price+"+運費 ＄"+delivery_price+"+商品總計 ＄"+product_price+" - 使用紅利 0 點 =＄"+total;
        return false;
     }else
     {
