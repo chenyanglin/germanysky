@@ -178,7 +178,7 @@ def destroy
 
   def shoppingcart
 
-    @shoppingcarts = Shoppingcart.where('account_id = ?',@current_user.id)
+    @shoppingcarts = Shoppingcart.where('account_id = ?',@current_user.id.to_s)
     @order_price = 0
     @payments = []
     @deliveries =[]
