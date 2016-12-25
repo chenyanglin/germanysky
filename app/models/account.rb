@@ -3,6 +3,7 @@ class Account < ActiveRecord::Base
 	has_many :orders
 	has_many :messages
 	has_many :replies
+	has_many :product_messages, :dependent => :destroy
 	belongs_to :account_level
 	# validates :email, presence: true, format: /@/ , uniqueness: true
 	# validates :email_backup, presence: true, format: /@/ , uniqueness: true

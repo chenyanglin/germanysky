@@ -88,7 +88,11 @@
   <div class="ui segment">
     <p>分類：<%= @product.type_one.name %></p>
   </div>
-  
+  <% if @product.brand.present?%>
+    <div class="ui segment">
+    <p>品牌：<%= @product.brand.name %></p>
+  </div>
+  <%end%>
     <% if @product.product_options.size > 1 %>
     <div class="ui segment">
     <input type="hidden" id="option_id" value="">
@@ -162,7 +166,35 @@
     <%= @product.content.html_safe %>
   </div>
   <div class="ui bottom attached tab segment" data-tab="second">
-  Second
+  <!--留言-->
+  <% if @messages.size > 0 %>
+  <div class="comment">
+    <% @messages.each do |r| %>
+    <div class="ui graybg segment">
+      <a class="author"><%if r.account.role == 1 %>管理員<%= r.account_name %><%else%><%= r.account_name %><%end%></a>
+      
+        <div class="date"><%= r.created_at.strftime("%Y-%m-%d") %></div>
+      
+      <div class="text">
+        <%= r.content %>
+      </div>
+    </div>
+    <% end %>
+  </div>
+  <% end %>
+  <br></br>
+  <div class="divider"></div>
+<div class="form-check">
+  <%= form_for @message ,:html =>{:class => "ui reply form"}, :url => new_product_message_path, method: :post do |f| %>
+    <div class="field">
+      <textarea id="content" name = "content"></textarea>
+    </div>
+    <div id="reply-btn" class="ui primary labeled icon button reply-btn">
+      <i class="icon edit"></i> 留言
+    </div>
+<% end %>
+</div>
+  <!--留言-->
   </div>
   </div>
   <div class="eight wide column">
@@ -379,5 +411,27 @@ $("#buy_btn").click(function(){
       }
     }
   });
+$('.form-check form').on('click','.reply-btn',function(){
+    var product_id = document.getElementById("product_id").value;
+    var replycontent = document.getElementById("content").value;
+    alert(replycontent);
+    var request = "/product_messages";
 
+      var aj = $.ajax({
+          url: request,
+          type: 'post',
+          data:{
+             product_id: product_id,
+             replycontent: replycontent
+           },
+          dataType: 'json'
+        }).success(function(upload_result) {
+          if(upload_result == "success" ){
+            window.location.reload();
+          }
+        }).fail(function(data) {
+       window.location.reload();
+        });
+    return false; // prevents normal behaviour
+  });
 </script>

@@ -7,7 +7,8 @@ class Product < ActiveRecord::Base
     has_many :productimages
     has_many :product_typeships, :dependent => :destroy
     has_many :product_options, :dependent => :destroy
-    has_one :brand
+    has_many :product_messages, :dependent => :destroy
+    belongs_to :brand,  foreign_key: "brand_id"
     belongs_to :type_one,  foreign_key: "type_one_id"
     belongs_to :producttype, foreign_key: "producttype_id"
 

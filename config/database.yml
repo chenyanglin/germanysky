@@ -19,7 +19,7 @@ production:
   adapter: postgresql
   encoding: utf8
   pool: 5
-  ##chenyang local
+  # #chenyang local
   # database: germanysky_production
   # host: localhost
   # username: root

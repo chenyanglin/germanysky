@@ -36,7 +36,27 @@
               <i id="search_go" class="search link icon"></i>
             </div>
           </div>
-         
+          
+          <div class="header item">
+            <h4 class="site-font ui blue horizontal fitted divider header">
+              篩選條件
+            </h4>
+          </div>
+  <!--  #pay_status 
+  #1:未付款
+  #2:已付款未確認
+  #3:已確認付款
+  #4:逾期未付款
+  #5:貨到付款
+  #6:完成
+  #delivery_status
+  #1:未出貨
+  #2:已出貨
+  #3:已確認取貨
+  #4:逾期未取貨
+  #5:完成
+   -->
+
         </div>
       </div>
   </div>
@@ -60,9 +80,9 @@
           <table id="orders_table" class="site-font ui sortable selectable teal table">
             <thead>
               <tr>
-              <th class="collapsing">
+              <th >
                 <div class="ui master checkbox">
-                  <input type="checkbox" name="all">
+                  <input type="checkbox">
                   <label>全選</label>
                 </div>
               </th>
@@ -302,7 +322,11 @@ $(function(){
       }
     })
   ;
-
+  $('body').on('click','.order-setting',function(){
+    $rowCheckbox = $(this).siblings('.order-setting').find('.child.checkbox');
+    $rowCheckbox.checkbox('toggle');
+    $(this).closest('tr').toggleClass("active");
+  });
   $('#orders_table').tablesort();
 
  $("#checkorder").click(function(){

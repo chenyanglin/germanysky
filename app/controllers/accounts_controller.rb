@@ -24,6 +24,7 @@ def new
 
   def create
     @account = Account.new(account_params)
+    @account.account_level_id = "1"
     @account.role = "2"
     if @account.save
       render :text => "success"

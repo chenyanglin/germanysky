@@ -145,6 +145,8 @@ def show
   @brands = Brand.all
   @type_ones = TypeOne.all
   @product = Product.find(params[:id])#.includes(:product_options)
+  @messages = @product.product_messages
+  @message = ProductMessage.new
   if @product.on_store == false
     redirect_to "/"
   end
@@ -237,7 +239,7 @@ cart= Shoppingcart.find(params[:cart_id])
   end
 
     def product_params
-    params.require(:product).permit(:name, :briefdescription,:price,:surplus,:type_one_id)
+    params.require(:product).permit(:name, :briefdescription,:price,:surplus,:type_one_id,:brand_id)
   end
   def photo_params
       params.require(:product).permit(:upload)

@@ -15,13 +15,13 @@
 
 <% @orders.each do |order| %>
 <tr>
-  <td class="center aligned collapsing notifi-setting">
+  <td class="center aligned collapsing order-setting">
     <div class="ui child checkbox">
       <input type="checkbox" name="<%= order.id %>" value="<%= order.id %>">
       <label></label>
     </div>
   </td>
-  <td><%= order.ordernumber %></td>
+  <td class="center aligned collapsing order-setting"><%= order.ordernumber %></td>
   <td><%= order.total_price%></td>
   <!-- 付款tag -->
   <td>

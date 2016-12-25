@@ -98,6 +98,10 @@ Rails.application.routes.draw do
       post :reply
     end
   end
+  resources :product_messages do
+    collection do
+    end
+  end
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

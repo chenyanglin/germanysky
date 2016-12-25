@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161204174852) do
+ActiveRecord::Schema.define(version: 20161224185227) do
 
   create_table "account_levels", force: :cascade do |t|
     t.string   "level_name",  limit: 255
@@ -23,25 +23,25 @@ ActiveRecord::Schema.define(version: 20161204174852) do
   end
 
   create_table "accounts", force: :cascade do |t|
-    t.string   "account_name",    limit: 255
-    t.string   "password_digest", limit: 255
-    t.string   "name",            limit: 255
-    t.string   "sex",             limit: 255
-    t.string   "birthday",        limit: 255
-    t.string   "email",           limit: 255
-    t.string   "email_backup",    limit: 255
-    t.string   "phone1",          limit: 255
-    t.string   "phone2",          limit: 255
-    t.string   "address",         limit: 255
-    t.integer  "role",            limit: 4,   default: 2, null: false
-    t.string   "account_level_id",limit: 255,   default: "1", null: false
-    t.integer  "score",           limit: 4,   default: 0
-    t.integer  "point",           limit: 4,   default: 0
-    t.string   "deleted",         limit: 255
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
-    t.string   "provider",        limit: 255
-    t.string   "uid",             limit: 255
+    t.string   "account_name",     limit: 255
+    t.string   "password_digest",  limit: 255
+    t.string   "name",             limit: 255
+    t.string   "sex",              limit: 255
+    t.string   "birthday",         limit: 255
+    t.string   "email",            limit: 255
+    t.string   "email_backup",     limit: 255
+    t.string   "phone1",           limit: 255
+    t.string   "phone2",           limit: 255
+    t.string   "address",          limit: 255
+    t.integer  "role",             limit: 4,   default: 2, null: false
+    t.string   "account_level_id", limit: 255
+    t.integer  "score",            limit: 4,   default: 0
+    t.integer  "point",            limit: 4,   default: 0
+    t.string   "deleted",          limit: 255
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
+    t.string   "provider",         limit: 255
+    t.string   "uid",              limit: 255
   end
 
   create_table "brandimages", force: :cascade do |t|
@@ -122,7 +122,7 @@ ActiveRecord::Schema.define(version: 20161204174852) do
   end
 
   create_table "orders", force: :cascade do |t|
-    t.string   "ordernumber",       limit: 255,             null: false
+    t.integer  "ordernumber",      limit: 4
     t.string   "account_id",       limit: 255,             null: false
     t.string   "account_name",     limit: 255
     t.integer  "total_price",      limit: 4,               null: false
@@ -149,6 +149,8 @@ ActiveRecord::Schema.define(version: 20161204174852) do
     t.datetime "updated_at",                               null: false
   end
 
+  add_index "orders", ["ordernumber"], name: "ordernumber_UNIQUE", unique: true, using: :btree
+
   create_table "payments", force: :cascade do |t|
     t.string   "name",        limit: 255
     t.string   "description", limit: 255
@@ -174,6 +176,17 @@ ActiveRecord::Schema.define(version: 20161204174852) do
   end
 
   add_index "product_deliveryships", ["product_id", "delivery_id"], name: "index_product_deliveryships_on_product_id_and_delivery_id", unique: true, using: :btree
+
+  create_table "product_messages", force: :cascade do |t|
+    t.string   "account_id",   limit: 255
+    t.string   "account_name", limit: 255
+    t.string   "product_id",   limit: 255
+    t.string   "content",      limit: 255
+    t.string   "reply",        limit: 255
+    t.integer  "status",       limit: 4,   default: 0
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
+  end
 
   create_table "product_options", force: :cascade do |t|
     t.string   "product_id", limit: 255
@@ -230,8 +243,8 @@ ActiveRecord::Schema.define(version: 20161204174852) do
     t.string   "type_two_id",       limit: 255
     t.string   "type_three_id",     limit: 255
     t.string   "producttype_id",    limit: 255
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
     t.text     "content",           limit: 65535
     t.string   "brand_id",          limit: 255
     t.integer  "point",             limit: 4,     default: 0
