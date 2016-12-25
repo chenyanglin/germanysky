@@ -6,7 +6,7 @@
     </div>
   </h1>
   <div class="ui horizontal divider">Shopping Cart</div>
-
+   <% begin %>
       <% if @shoppingcarts.size != 0 %>
         <div class="infinite-table">
           <table id="products_table" class="ui celled table" style="table-layout:fixed">
@@ -26,7 +26,13 @@
             <% price = shoppingcart.product.product_options.find_by_option1(shoppingcart.option_id).price%>
 <tr>
   <td><%= shoppingcart.product.name %><br>規格：<%= shoppingcart.option_id %></td>
-  <td><img class="ui centered mini image" src="<%= asset_path shoppingcart.product.productimages.first.phourl %>" style='height: 80px; width: 80px; object-fit: contain'></td>
+  <td>
+  <% begin %>
+  <img class="ui centered mini image" src="<%= asset_path shoppingcart.product.productimages.first.phourl %>" style='height: 80px; width: 80px; object-fit: contain'>
+  <%rescue%>
+  <img class="ui centered mini image" src="<%= asset_path '100px.png' %>" style='height: 80px; width: 80px; object-fit: contain'>
+  <%end%>
+  </td>
   <td>$<%= price %></td>
   <td><div  id="selectsum">
        <span class="input-group-btn"><button id ="minus" type="button" class="btn btn-default btn-minus" data-id="<%= shoppingcart.id %>" data-price = "<%= price %>">－</button>  <input id = "sum<%= shoppingcart.id %>" type="text" name="lname" size="2" value ="<%= shoppingcart.sum %> ">  <span class="input-group-btn"><button id = "plus" type="button" class="btn btn-default btn-plus" data-id="<%= shoppingcart.id %>" data-price = "<%= price %>">＋</button>
@@ -61,13 +67,15 @@
 
           
       <% else %>
-        <h3 class="ui center aligned icon header">購物車是空的，快去選購吧！</h3>
+        <h3 class="ui center aligned icon header">購物車是空的，快去選購吧！！</h3>
       <% end %>
     
   </div>
 
 
-
+<% rescue %>
+<h3 class="ui center aligned icon header">購物車是空的，快去選購吧！</h3>
+<% end %>
 
 </div>
 <script type="text/javascript">
