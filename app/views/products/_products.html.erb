@@ -1,7 +1,7 @@
 <% @products.each do |product| %>
 <tr>
-  <td class="collapsing product_info not-icon" data-value="<%= product.id %>"><%= product.name %></td>
-  <td class="collapsing product_info not-icon" data-value="<%= product.id %>"><%= product.producttype.name %></td>
+  <td class="product_info not-icon"  style= "word-break:break-all;" data-value="<%= product.id %>"><%= product.name %></td>
+  <td class="product_info not-icon" style= "word-break:break-all; " data-value="<%= product.id %>"><%= product.producttype.name %></td>
   <td class="collapsing product_info not-icon" data-value="<%= product.id %>"><%= product.type_one.name %></td>
   <td><div class="item">
   
@@ -11,8 +11,8 @@
      <img class="ui centered tiny image" src="<%= asset_path '100px.png' %>">
      <%end%>
     </div></td>
-  <td class="collapsing product_info not-icon" data-value="<%= product.id %>"><%= product.briefdescription%></td>
-   <td class="collapsing product_info not-icon" data-value="<%= product.id %>">
+  <td class="product_info not-icon" style= "word-break:break-all;" data-value="<%= product.id %>"><%= product.briefdescription%></td>
+   <td class="product_info not-icon" style= "word-break:break-all;" data-value="<%= product.id %>">
  <% if product.product_options.size > 1 %>
  <% product.product_options.each do |o| %>
  <%= o.option1 %></br>

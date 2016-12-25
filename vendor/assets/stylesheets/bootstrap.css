@@ -3539,6 +3539,7 @@ tbody.collapse.in {
   display: table-row-group;
 }
 .collapsing {
+  word-break: break-all;
   position: relative;
   height: 0;
   overflow: hidden;

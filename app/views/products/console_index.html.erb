@@ -87,7 +87,7 @@
           <table id="products_table" class="site-font ui sortable selectable teal table">
             <thead>
               <tr>
-                <th>名稱</th>
+                <th class="AutoNewline" style="width:100px;" >名稱</th>
                 <th>庫存分類</th>
                 <th>商品分類</th>
                 <th>圖片</th>
@@ -314,4 +314,11 @@ window.location="http://"+location.host+"/products/"+product_id;
 
 
 });
+
 </script>
+<style type="text/css">
+.AutoNewline
+{
+word-break: break-all;/*必須*/
+}
+</style>
