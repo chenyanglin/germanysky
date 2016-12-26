@@ -59,7 +59,7 @@ def new
     @order.delivery_price = delivery[1]
     @order.account_id = @current_user.id
     @order.account_name = @current_user.name
-    
+    @order.ordernumber = Time.now.strftime("%Y%m%d")
     @order.use_point = params[:order][:usepoint]
     lastpoint = @current_user.point - params[:order][:usepoint].to_i
     @current_user.update(point: lastpoint)
@@ -69,7 +69,6 @@ def new
       @order.cash_on_delivery = false
     end
     if @order.save
-      binding.pry
       ordernumber = Time.now.strftime("%Y%m%d")+@order.id.to_s.rjust(4, '0')
       @order.update(ordernumber: ordernumber)
       @shoppingcarts = Shoppingcart.where('account_id = ?',@current_user.id.to_s)
