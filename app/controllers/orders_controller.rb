@@ -69,6 +69,7 @@ def new
       @order.cash_on_delivery = false
     end
     if @order.save
+      binding.pry
       ordernumber = Time.now.strftime("%Y%m%d")+@order.id.to_s.rjust(4, '0')
       @order.update(ordernumber: ordernumber)
       @shoppingcarts = Shoppingcart.where('account_id = ?',@current_user.id.to_s)
