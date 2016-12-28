@@ -128,10 +128,14 @@
     <p>庫存：<%= @product.product_options.first.surplus %></p>
   </div>
   <div class="ui segment">
+  <% if @product.product_options.first.surplus == 0%>
+  <p>選擇數量：無庫存，請進行缺貨登記</p>
+  <%else%>
         <div id="selectsum">
       選擇數量：
        <span class="input-group-btn"><button id ="minus" type="button" class="btn btn-default btn-add">－</button>  <d id = "sum" size="2" value ="1" >1</d> <span class="input-group-btn"><button id = "plus" type="button" class="btn btn-default btn-add">＋</button>
       </div>
+      <%end%>
   </div>
 </div>
 

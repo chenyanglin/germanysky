@@ -132,15 +132,23 @@
   <div class="ui link card" data-id="<%= product.id %>">
   <% if surplus != 0 %>
   <div class="bluebg content">
-  <% else %>
-  <div class="graybg content">
-  <% end %>
-    <a style="display:block" href="/products/<%= product.id %>">
+      <a style="display:block" href="/products/<%= product.id %>">
  
   <h3 class="site-font ui header" href="/products/<%= product.id %>">
             <%= product.name %>
   </h3>
+  </a>
+  <% else %>
+  <div class="graybg content">
+      <a style="display:block" href="/products/<%= product.id %>">
+ 
+  <h3 class="site-font ui header" href="/products/<%= product.id %>">
+            <%= product.name %>
+  </h3>無庫存
           </a>
+  <% end %>
+
+          
            </div>
           <a style="display:block" href="/products/<%= product.id %>">
            <div class="ui horizontal divider">GERMANYSKY</div>
