@@ -1,0 +1,67 @@
+<%= form_for(@newsletter) do |f| %>
+<div class="ui stackable one column centered grid">
+  <div class="fourteen wide column">
+    <div class="ui large form" style="text-align:left;">
+      
+      <div class="required field">
+        <label>主旨 Subject：</label>
+        <%= f.text_field :subject, placeholder: "請輸入主旨" %>
+      </div>
+      <div class="required field">
+        <label>內容 Content</label>
+        <%= f.text_area :content, placeholder: "請輸入內容"  %>
+      </div>
+    </div>
+    <br>
+    <div>
+
+
+    <div class="ui divider"></div>
+    <button id="newsletter_form_submit" class="ui teal basic button">
+      <i class="write icon"></i>發送
+    </button>
+
+  </div>
+</div>
+
+
+
+<% end %>
+<script type="text/javascript">
+$(function(){
+  $('select.dropdown')
+    .dropdown()
+  ;
+  $('form').submit(function() {
+    var valuesToSubmit = $(this).serialize();
+    $("#newsletter_form_submit").addClass("loading");
+    console.log($(this).attr('action'));
+    $.ajax({
+        url: $(this).attr('action'), //sumbits it to the given url of the form
+        type: 'POST',
+        processData: false,
+        contentType: false,
+        data: new FormData(this)
+    }).success(function(upload_result){
+        console.log(upload_result);
+        if(upload_result == "success" ){
+          window.location.replace("http://"+location.host+"/newsletters");
+        }
+    }).fail(function(e) {
+        console.log(e);
+    }).done(function(){
+      $("#newsletter_form_submit").removeClass("loading");
+    });
+    return false; // prevents normal behaviour
+  });
+});
+
+function ValidateNumber(e, pnumber)
+{
+    if (!/^\d+$/.test(pnumber))
+    {
+        $(e).val(/^\d+/.exec($(e).val()));
+    }
+    return false;
+}
+</script>

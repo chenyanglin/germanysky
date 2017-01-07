@@ -12,7 +12,7 @@ before_action :set_message, only: [:edit, :update, :destroy,:show]
       else
         @messages = @current_user.messages
         @messages = @messages.like(params[:filter]) if params[:filter]
-        @messages = @messages.order(updated_at: :desc) if params[:recent]
+        @messages = @messages.order(updated_at: :desc)
         @messages_size = @messages.size
         @messages = @messages.page(params[:page]).per(15)
       end
@@ -29,6 +29,8 @@ def new
     @message.account_id = @current_user.id
     @message.account_name = @current_user.name
     if @message.save
+      content = "使用者 "+@current_user.name.to_s+" 在留言板留下了新留言。<br>主旨："+@message.title.to_s+"<br>內容："+@message.content+"<br>請登入後台回覆留言。"
+      NewsMailer.system_email("新留言通知",content).deliver_now!
     	render :text => "success"
 	else
 		render :text => "error"
@@ -68,6 +70,8 @@ def new
       @message.update(status: 0)
     end
     if @reply.save
+      content_to_user = "您的留言「"+@message.content.to_s+"」有了新回覆。"
+      NewsMailer.normal_email("留言回覆通知",content_to_user,@message.account_id).deliver_now!
       render :text => "success"
     else
       render :text => "error"

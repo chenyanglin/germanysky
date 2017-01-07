@@ -184,7 +184,7 @@ def destroy
     @deliveries =[]
     begin
     @shoppingcarts.each do |s|
-      @order_price += s.product.product_options.find_by_option1(s.option_id).price*s.sum
+      @order_price += s.product.product_options.find(s.option_id).price*s.sum
       s.product.payments.each do |p| 
          if @payments.include?(p)
          else

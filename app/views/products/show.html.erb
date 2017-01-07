@@ -98,7 +98,7 @@
     <input type="hidden" id="option_id" value="">
     選擇規格：
     <% @product.product_options.each do |o| %>
-    <a  class="ui blue basic button to_position" tabindex="0" style="margin-left:10px;" onClick="optionclick('<%=o.price%>','<%=o.surplus%>','<%=o.option1%>')">
+    <a  class="ui blue basic button to_position" tabindex="0" style="margin-left:10px;" onClick="optionclick('<%=o.price%>','<%=o.surplus%>','<%=o.id%>')">
           <div class="visible content"><%= o.option1 %></div>
         </a>
     <% end %>
@@ -118,7 +118,7 @@
   </div>
 </div>
     <% else %>
-    <input type="hidden" id="option_id" value="<%= @product.product_options.first.option1 %>">
+    <input type="hidden" id="option_id" value="<%= @product.product_options.first.id %>">
     <input type="hidden" id="optionsurplus" value="<%= @product.product_options.first.surplus %>">
 
   <div class="ui segment">

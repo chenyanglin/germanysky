@@ -8,13 +8,13 @@ before_action :set_order, only: [:edit, :update, :destroy,
     if @current_user.role ==1
     @orders = Order.all
     @orders = @orders.like(params[:filter]) if params[:filter]
-        @orders = @orders.order(updated_at: :desc) if params[:recent]
+        @orders = @orders.order(updated_at: :desc)
         @orders_size = @orders.size
         @orders = @orders.page(params[:page]).per(15)
     else
       @orders = @current_user.orders
         @orders = @orders.like(params[:filter]) if params[:filter]
-        @orders = @orders.order(updated_at: :desc) if params[:recent]
+        @orders = @orders.order(updated_at: :desc)
         @orders_size = @orders.size
         @orders = @orders.page(params[:page]).per(15)
     end
@@ -28,7 +28,7 @@ def new
     @payments = []
     @deliveries =[]
     @shoppingcarts.each do |s|
-      @order_price += s.product.product_options.find_by_option1(s.option_id).price*s.sum
+      @order_price += s.product.product_options.find(s.option_id).price*s.sum
       s.product.payments.each do |p| 
          if @payments.include?(p)
          else
@@ -77,13 +77,22 @@ def new
       @order_product.order_id = @order.id
       @order_product.product_id = s.product.id
       @order_product.product_name = s.product.name
-      @order_product.option_name = s.product.product_options.find_by_option1(s.option_id).option1
-      @order_product.single_price = s.product.product_options.find_by_option1(s.option_id).price
-      @order_product.sum_price = s.product.product_options.find_by_option1(s.option_id).price*s.sum
+      @order_product.option_name = s.product.product_options.find(s.option_id).option1
+      @order_product.single_price = s.product.product_options.find(s.option_id).price
+      @order_product.sum_price = s.product.product_options.find(s.option_id).price*s.sum
       @order_product.sum = s.sum
       @order_product.save
+      @product=ProductOption.find(s.option_id)
+      @product.update(surplus: @product.surplus-s.sum)
+      if @product.surplus <= 0
+        content = "商品「 "+@product.product.name+"」之規格「"+@product.option1+"」已無庫存，請評估是否補貨上架。"
+        NewsMailer.system_email("商品缺貨通知",content).deliver_now!
+      end
       s.destroy
-    end
+      end
+      NewsMailer.normal_email("訂單成立通知","感謝您訂購GermanySky商品，您已於"+@order.created_at.to_s+"訂購完成。訂單編號為"+@order.ordernumber.to_s+"，總金額為"+@order.total_price.to_s+"。您可以登入網站查看訂單詳細資訊與進行訂單程序。",@current_user.id).deliver_now!
+      content = "使用者 "+@current_user.name.to_s+" 剛建立一筆訂單，詳細資訊請登入後台查詢。"
+      NewsMailer.system_email("訂單成立通知",content).deliver_now!
       render :text => "success"
     else
       render :text => "error"
@@ -113,6 +122,10 @@ def new
   end
   def usercheckpay_update
     if @order.update(pay_status: 2, lastfivepay: params[:lastfivepay],paidprice: params[:paidprice])
+      content_to_user = "感謝您已將訂單編號"+@order.ordernumber.to_s+"之訂單狀態轉變為已付款，我們會儘速確認並處理商品事宜。您可以登入網站查看訂單詳細資訊，謝謝。"
+      NewsMailer.normal_email("訂單狀態通知（未付款->已付款未確認）",content_to_user,@current_user.id).deliver_now!
+      content = "使用者 "+@current_user.name.to_s+"已將訂單編號"+@order.ordernumber.to_s+"之訂單狀態改變為已付款，請逕行確認"
+      NewsMailer.system_email("訂單狀態通知（未付款->已付款未確認）",content).deliver_now!
       redirect_to orders_path
     else
       render :text => "error"
@@ -120,6 +133,10 @@ def new
   end
     def confirmpay
     if @order.update(pay_status: 3)
+      content_to_user = "訂單編號"+@order.ordernumber.to_s+"之訂單狀態已轉變為確認匯款，我們已經確認您的匯款並會儘速處理商品事宜。您可以登入網站查看訂單詳細資訊，謝謝。"
+      NewsMailer.normal_email("訂單狀態通知（已付款未確認->已確認付款）",content_to_user,@order.account_id).deliver_now!
+      content = "您已將使用者 "+@current_user.name.to_s+"之訂單編號"+@order.ordernumber.to_s+"之訂單狀態改變為已確認付款。"
+      NewsMailer.system_email("訂單狀態通知（已付款未確認->已確認付款）",content).deliver_now!
       redirect_to orders_path
     else
       render :text => "error"
@@ -127,6 +144,12 @@ def new
   end
   def confirmdelivery
     if @order.update(delivery_status: 2)
+
+      content_to_user = "訂單編號"+@order.ordernumber.to_s+"之訂單狀態已轉變為已出貨，請您取貨後再上系統確認，您可以登入網站查看訂單詳細資訊，謝謝。"
+      NewsMailer.normal_email("訂單狀態通知（未出貨->已出貨）",content_to_user,@order.account_id).deliver_now!
+      content = "您已將使用者 "+@current_user.name.to_s+"之訂單編號"+@order.ordernumber.to_s+"之訂單狀態改變為已出貨。"
+      NewsMailer.system_email("訂單狀態通知（未出貨->已出貨）",content).deliver_now!
+      
       redirect_to orders_path
     else
       render :text => "error"
@@ -135,13 +158,21 @@ def new
   
   def takeproduct
     if @order.update(delivery_status: 3)
+      content_to_user = "感謝您已將訂單編號"+@order.ordernumber.to_s+"之訂單狀態轉變為已取貨，希望您滿意我們的商品，有任何疑問都可以在留言板聯繫我們。您可以登入網站查看訂單詳細資訊，謝謝。"
+      NewsMailer.normal_email("訂單狀態通知（已出貨->已取貨）",content_to_user,@current_user.id).deliver_now!
+      content = "使用者 "+@current_user.name.to_s+"已將訂單編號"+@order.ordernumber.to_s+"之訂單狀態改變為已取貨，請逕行確認"
+      NewsMailer.system_email("訂單狀態通知（已出貨->已取貨）",content).deliver_now!
       redirect_to orders_path
     else
       render :text => "error"
     end
   end
   def orderdone
-    if @order.update(delivery_status: 4,pay_status: 6)
+    if @order.update(delivery_status: 5,pay_status: 6)
+      content_to_user = "訂單編號"+@order.ordernumber.to_s+"之訂單已完成所有付款與寄送事宜，希望您滿意我們的商品，有任何疑問都可以在留言板聯繫我們。此筆訂單將封存於系統中，謝謝。"
+      NewsMailer.normal_email("訂單狀態通知（訂單完成）",content_to_user,@order.account_id).deliver_now!
+      content = "您已將使用者 "+@current_user.name.to_s+"之訂單編號"+@order.ordernumber.to_s+"之訂單狀態改變為完成訂單，訂單資料將封存於系統中，謝謝。"
+      NewsMailer.system_email("訂單狀態通知（訂單完成）",content).deliver_now!
       redirect_to orders_path
     else
       render :text => "error"

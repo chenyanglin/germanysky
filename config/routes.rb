@@ -16,15 +16,18 @@ Rails.application.routes.draw do
   resources :consoles do
      collection do
       get :login
+      post :fblogin
       post :signin
       get :logout
       get :aboutus
       get :test
+      get :subscription
     end
   end
-    resources :accounts do
+  resources :accounts do
      collection do
       get :register
+      get :fbregister
       get :login
       get :console_edit
       post :signin
@@ -32,12 +35,20 @@ Rails.application.routes.draw do
       get :test
     end
   end
-     resources :account_levels do
-     collection do
+  resources :account_levels do
+    collection do
     end
   end
-    resources :newsboards do
-     collection do
+  resources :specialoffers do
+    collection do
+    end
+  end
+  resources :newsboards do
+    collection do
+    end
+  end
+  resources :newsletters do
+    collection do
     end
   end
     resources :orders do

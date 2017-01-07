@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161224185227) do
+ActiveRecord::Schema.define(version: 20170104141813) do
 
   create_table "account_levels", force: :cascade do |t|
     t.string   "level_name",  limit: 255
@@ -101,6 +101,24 @@ ActiveRecord::Schema.define(version: 20161224185227) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "newsletter_emails", force: :cascade do |t|
+    t.string   "email",        limit: 255, unique: true
+    t.string   "account_id",   limit: 255
+    t.string   "account_name", limit: 255
+    t.string   "name",         limit: 255
+    t.integer  "status",       limit: 4, default: 1
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  create_table "newsletters", force: :cascade do |t|
+    t.string   "subject",    limit: 255
+    t.string   "content",    limit: 255
+    t.string   "status",     limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "order_messages", force: :cascade do |t|
     t.string   "order_id",   limit: 255
     t.string   "account_id", limit: 255
@@ -122,7 +140,7 @@ ActiveRecord::Schema.define(version: 20161224185227) do
   end
 
   create_table "orders", force: :cascade do |t|
-    t.integer  "ordernumber",      limit: 4
+    t.string   "ordernumber",      limit: 255
     t.string   "account_id",       limit: 255,             null: false
     t.string   "account_name",     limit: 255
     t.integer  "total_price",      limit: 4,               null: false
@@ -292,6 +310,18 @@ ActiveRecord::Schema.define(version: 20161224185227) do
   end
 
   add_index "shoppingcarts", ["account_id", "product_id", "option_id"], name: "index_account_product", unique: true, using: :btree
+
+  create_table "specialoffers", force: :cascade do |t|
+    t.string   "name",         limit: 255
+    t.string   "type",         limit: 255
+    t.integer  "productcount", limit: 4
+    t.integer  "saleprice",    limit: 4
+    t.integer  "discount",     limit: 4
+    t.string   "phourl",       limit: 255
+    t.string   "status",       limit: 255
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
 
   create_table "type_ones", force: :cascade do |t|
     t.string   "name",        limit: 255

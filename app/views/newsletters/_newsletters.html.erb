@@ -1,0 +1,16 @@
+<% @newsletters.each do |newsletter| %>
+<tr>
+<td class="collapsing newsboard_info not-icon" data-value="<%= newsletter.id %>">
+<%= newsletter.subject %>
+  </td>
+  <td><%= newsletter.content %></td>
+  <td><%= newsletter.created_at.strftime("%Y-%m-%d") %></td>
+ <% if @current_user.present? && @current_user.role == 1 %>
+  <td class="collapsing">
+    <%= link_to newsletter, class: 'ui orange basic button newsletter_del', method: :delete, data:{name: newsletter.subject} do %>
+      刪除
+    <% end %>
+  </td>
+  <% end %>
+</tr>
+<% end %>

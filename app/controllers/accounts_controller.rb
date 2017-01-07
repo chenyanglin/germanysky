@@ -21,13 +21,42 @@ def new
     @account = Account.new
 
   end
+  def fbregister
+    @FBaccount = Account.new
+  end
 
   def create
     @account = Account.new(account_params)
     @account.account_level_id = "1"
     @account.role = "2"
+    if params[:account][:uid]!= nil
+      @account.uid = params[:account][:uid]
+      session[:profile_photo] = params[:account][:profile_photo]
+    end
     if @account.save
-      render :text => "success"
+      if @account.email != nil
+        NewsMailer.normal_email("歡迎您註冊成為GermanySky會員","歡迎您註冊成為GermanySky會員",@account.id).deliver_now!
+        content = "使用者 "+@account.account_name+" 剛註冊成為會員，詳細會員資訊請登入後台查詢。"
+        NewsMailer.system_email("新會員通知",content).deliver_now!
+        begin
+          @emaillist = NewsletterEmail.find_by_email(@account.email)
+          if @emaillist.present?
+            @emaillist.update(email: @account.email,account_id: @account.id,name: @account.name,account_name:@account.account_name)
+
+          else
+          @newsletteremail = NewsletterEmail.new
+          @newsletteremail.email = @account.email
+          @newsletteremail.account_id = @account.id
+          @newsletteremail.name = @account.name
+          @newsletteremail.account_name = @account.account_name
+          @newsletteremail.save
+          end
+        rescue
+        end
+      end
+    
+    session[:user_id] = @account.id
+     render :text => "success"
     else
       render :text => "error"
     end
@@ -44,11 +73,17 @@ def new
     render :layout => "empty"
   end
   def update
-    if @account.update(account_params)
-      render :text => "success"
+    @account = Account.find(params[:id])
+    @news = NewsletterEmail.find_by_email(@account.email)
+    @news.update(email: params[:account][:email])
+    @account.update(account_params)
+    # @account.update(name: params[:account][:name],email: params[:account][:email],password: @account.password,phone1: params[:account][:phone1],address: params[:account][:address])
+    if params[:subscription] == "on"
+     @news.update(status: 1) 
     else
-      render :text => "error"
-    end
+     @news.update(status: 0) 
+    end   
+      render :text => "success"
   end
 
 def destroy
@@ -92,7 +127,7 @@ def create_with_fb
   end
 end
     def account_params
-    params.require(:account).permit(:account_name,:name,:password,:password_confirmation)
+    params.require(:account).permit(:account_name,:name,:email,:password,:password_confirmation,:phone1,:address)
   end
 
     def set_account

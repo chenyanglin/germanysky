@@ -1,0 +1,135 @@
+<div class="form-check">
+<%= form_for(@account) do |f| %>
+<div class="ui stackable one column centered grid">
+  <div class="fourteen wide column">
+    <div class="ui large form" style="text-align:left;">
+      
+      <div class="required field">
+        <label>帳號 Account：</label>
+        <%= f.text_field :account_name, placeholder: "請輸入帳號" , :data => {validate:"accountname"}%>
+      </div>
+      <div class="required field">
+        <label>密碼 Password：</label>
+        <%= f.password_field :password, placeholder: "請輸入密碼", :data => {validate:"password"} %>
+      </div>
+      <div class="required field">
+      <%= f.password_field :password_confirmation, placeholder: "請再次輸入密碼" , :data => {validate:"password_confirmation"}%>
+      </div>
+      <div class="required field">
+        <label>姓名 Name：</label>
+        <%= f.text_field :name, placeholder: "請輸入姓名" , :data => {validate:"name"}%>
+      </div>
+      <div class="required field">
+        <label>信箱 Email：</label>
+        <%= f.text_field :email, placeholder: "請輸入Email" , :data => {validate:"email"}%>
+      </div>
+
+     
+      <div class="ui divider"></div>
+      <button id="account_form_submit" class="site-font ui fluid teal basic button">
+        <i class="write icon"></i>送出
+      </button>
+      </div>
+    </div>
+  </div>
+
+
+<% end %>
+</div>
+
+<script type="text/javascript">
+$(function(){
+  $('select.dropdown')
+    .dropdown()
+  ;
+
+
+  $('.form-check form')
+    .form({
+      fields: {
+        email : {
+          identifier: 'email',
+          rules: [{
+            type   : 'empty',
+            prompt : '不可為空值'
+          },
+          {
+            type   : 'contains[@]',
+            prompt : '格式錯誤'
+          }]
+        },
+        name : {
+          identifier: 'name',
+          rules: [{
+            type   : 'empty',
+            prompt : '不可為空值'
+          }]
+        },
+        account_name : {
+          identifier: 'accountname',
+          rules: [{
+            type   : 'empty',
+            prompt : '不可為空值'
+          }]
+        },
+        password : {
+          identifier: 'password',
+          rules: [{
+            type   : 'empty',
+            prompt : '不可為空值'
+          },
+          {
+            type   : 'minLength[4]',
+            prompt : '至少包含 4 個字元.'
+          }]
+        },
+        password_confirmation : {
+          identifier: 'password_confirmation',
+          rules: [{
+            type   : 'empty',
+            prompt : '不可為空值'
+          },
+          {
+            type   : 'match[password]',
+            prompt : '需要與密碼相同'
+          }]
+        }
+      },
+      inline : true,
+      on     : 'submit'
+    });
+
+  $('.form-check form').submit(function() {
+    var valuesToSubmit = $(this).serialize();
+    var form_check = $('.form-check form').form("is valid");
+
+    if(form_check){
+      // data check
+      var account_formData = new FormData(this);
+   
+      $("#account_form_submit").addClass("loading");
+
+      $.ajax({
+          url: $(this).attr('action'), //sumbits it to the given url of the form
+          type: 'POST',
+          processData: false,
+          contentType: false,
+          data: account_formData
+      }).success(function(upload_result){
+          console.log(upload_result);
+          if(upload_result == "success" ){
+            window.location.replace("//"+location.host+"/accounts?recent=true");
+          }
+      }).fail(function(e) {
+          console.log(e);
+          $("#account_form_submit").removeClass("loading");
+      });
+    }
+    return false; // prevents normal behaviour
+  });
+
+
+
+
+});
+</script>

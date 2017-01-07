@@ -10908,7 +10908,7 @@ return jQuery;
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
-	var ReactDOM = __webpack_require__(33);
+	var ReactDOM = __webpack_require__(35);
 
 	window.React = React;
 	window.ReactDOM = ReactDOM;
@@ -10944,13 +10944,14 @@ return jQuery;
 
 	var ReactChildren = __webpack_require__(5);
 	var ReactComponent = __webpack_require__(17);
-	var ReactClass = __webpack_require__(20);
-	var ReactDOMFactories = __webpack_require__(25);
+	var ReactPureComponent = __webpack_require__(20);
+	var ReactClass = __webpack_require__(21);
+	var ReactDOMFactories = __webpack_require__(26);
 	var ReactElement = __webpack_require__(9);
-	var ReactPropTypes = __webpack_require__(30);
-	var ReactVersion = __webpack_require__(31);
+	var ReactPropTypes = __webpack_require__(32);
+	var ReactVersion = __webpack_require__(33);
 
-	var onlyChild = __webpack_require__(32);
+	var onlyChild = __webpack_require__(34);
 	var warning = __webpack_require__(11);
 
 	var createElement = ReactElement.createElement;
@@ -10958,7 +10959,7 @@ return jQuery;
 	var cloneElement = ReactElement.cloneElement;
 
 	if (process.env.NODE_ENV !== 'production') {
-	  var ReactElementValidator = __webpack_require__(27);
+	  var ReactElementValidator = __webpack_require__(28);
 	  createElement = ReactElementValidator.createElement;
 	  createFactory = ReactElementValidator.createFactory;
 	  cloneElement = ReactElementValidator.cloneElement;
@@ -10988,6 +10989,7 @@ return jQuery;
 	  },
 
 	  Component: ReactComponent,
+	  PureComponent: ReactPureComponent,
 
 	  createElement: createElement,
 	  cloneElement: cloneElement,
@@ -11021,7 +11023,6 @@ return jQuery;
 /***/ function(module, exports) {
 
 	// shim for using process in browser
-
 	var process = module.exports = {};
 
 	// cached from whatever global is present so that test runners that stub it
@@ -11033,21 +11034,63 @@ return jQuery;
 	var cachedClearTimeout;
 
 	(function () {
-	  try {
-	    cachedSetTimeout = setTimeout;
-	  } catch (e) {
-	    cachedSetTimeout = function () {
-	      throw new Error('setTimeout is not defined');
+	    try {
+	        cachedSetTimeout = setTimeout;
+	    } catch (e) {
+	        cachedSetTimeout = function () {
+	            throw new Error('setTimeout is not defined');
+	        }
 	    }
-	  }
-	  try {
-	    cachedClearTimeout = clearTimeout;
-	  } catch (e) {
-	    cachedClearTimeout = function () {
-	      throw new Error('clearTimeout is not defined');
+	    try {
+	        cachedClearTimeout = clearTimeout;
+	    } catch (e) {
+	        cachedClearTimeout = function () {
+	            throw new Error('clearTimeout is not defined');
+	        }
 	    }
-	  }
 	} ())
+	function runTimeout(fun) {
+	    if (cachedSetTimeout === setTimeout) {
+	        //normal enviroments in sane situations
+	        return setTimeout(fun, 0);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedSetTimeout(fun, 0);
+	    } catch(e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+	            return cachedSetTimeout.call(null, fun, 0);
+	        } catch(e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+	            return cachedSetTimeout.call(this, fun, 0);
+	        }
+	    }
+
+
+	}
+	function runClearTimeout(marker) {
+	    if (cachedClearTimeout === clearTimeout) {
+	        //normal enviroments in sane situations
+	        return clearTimeout(marker);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedClearTimeout(marker);
+	    } catch (e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+	            return cachedClearTimeout.call(null, marker);
+	        } catch (e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+	            return cachedClearTimeout.call(this, marker);
+	        }
+	    }
+
+
+
+	}
 	var queue = [];
 	var draining = false;
 	var currentQueue;
@@ -11072,7 +11115,7 @@ return jQuery;
 	    if (draining) {
 	        return;
 	    }
-	    var timeout = cachedSetTimeout.call(null, cleanUpNextTick);
+	    var timeout = runTimeout(cleanUpNextTick);
 	    draining = true;
 
 	    var len = queue.length;
@@ -11089,7 +11132,7 @@ return jQuery;
 	    }
 	    currentQueue = null;
 	    draining = false;
-	    cachedClearTimeout.call(null, timeout);
+	    runClearTimeout(timeout);
 	}
 
 	process.nextTick = function (fun) {
@@ -11101,7 +11144,7 @@ return jQuery;
 	    }
 	    queue.push(new Item(fun, args));
 	    if (queue.length === 1 && !draining) {
-	        cachedSetTimeout.call(null, drainQueue, 0);
+	        runTimeout(drainQueue);
 	    }
 	};
 
@@ -11755,6 +11798,7 @@ return jQuery;
 	    // This can be replaced with a WeakMap once they are implemented in
 	    // commonly used development environments.
 	    element._store = {};
+	    var shadowChildren = Array.isArray(props.children) ? props.children.slice(0) : props.children;
 
 	    // To make comparing ReactElements easier for testing purposes, we make
 	    // the validation flag non-enumerable (where possible, which should
@@ -11774,6 +11818,12 @@ return jQuery;
 	        writable: false,
 	        value: self
 	      });
+	      Object.defineProperty(element, '_shadowChildren', {
+	        configurable: false,
+	        enumerable: false,
+	        writable: false,
+	        value: shadowChildren
+	      });
 	      // Two elements created in two different places should be considered
 	      // equal for testing purposes and therefore we hide it from enumeration.
 	      Object.defineProperty(element, '_source', {
@@ -11785,6 +11835,7 @@ return jQuery;
 	    } else {
 	      element._store.validated = false;
 	      element._self = self;
+	      element._shadowChildren = shadowChildren;
 	      element._source = source;
 	    }
 	    if (Object.freeze) {
@@ -12285,7 +12336,14 @@ return jQuery;
 	        }
 	      } else {
 	        if (process.env.NODE_ENV !== 'production') {
-	          process.env.NODE_ENV !== 'production' ? warning(didWarnAboutMaps, 'Using Maps as children is not yet fully supported. It is an ' + 'experimental feature that might be removed. Convert it to a ' + 'sequence / iterable of keyed ReactElements instead.') : void 0;
+	          var mapsAsChildrenAddendum = '';
+	          if (ReactCurrentOwner.current) {
+	            var mapsAsChildrenOwnerName = ReactCurrentOwner.current.getName();
+	            if (mapsAsChildrenOwnerName) {
+	              mapsAsChildrenAddendum = ' Check the render method of `' + mapsAsChildrenOwnerName + '`.';
+	            }
+	          }
+	          process.env.NODE_ENV !== 'production' ? warning(didWarnAboutMaps, 'Using Maps as children is not yet fully supported. It is an ' + 'experimental feature that might be removed. Convert it to a ' + 'sequence / iterable of keyed ReactElements instead.%s', mapsAsChildrenAddendum) : void 0;
 	          didWarnAboutMaps = true;
 	        }
 	        // Iterator will provide entry [k,v] tuples rather than values.
@@ -12712,6 +12770,53 @@ return jQuery;
 /* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
+	/**
+	 * Copyright 2013-present, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule ReactPureComponent
+	 */
+
+	'use strict';
+
+	var _assign = __webpack_require__(4);
+
+	var ReactComponent = __webpack_require__(17);
+	var ReactNoopUpdateQueue = __webpack_require__(18);
+
+	var emptyObject = __webpack_require__(19);
+
+	/**
+	 * Base class helpers for the updating state of a component.
+	 */
+	function ReactPureComponent(props, context, updater) {
+	  // Duplicated from ReactComponent.
+	  this.props = props;
+	  this.context = context;
+	  this.refs = emptyObject;
+	  // We initialize the default updater but the real one gets injected by the
+	  // renderer.
+	  this.updater = updater || ReactNoopUpdateQueue;
+	}
+
+	function ComponentDummy() {}
+	ComponentDummy.prototype = ReactComponent.prototype;
+	ReactPureComponent.prototype = new ComponentDummy();
+	ReactPureComponent.prototype.constructor = ReactPureComponent;
+	// Avoid an extra prototype jump for these methods.
+	_assign(ReactPureComponent.prototype, ReactComponent.prototype);
+	ReactPureComponent.prototype.isPureReactComponent = true;
+
+	module.exports = ReactPureComponent;
+
+/***/ },
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
 	/* WEBPACK VAR INJECTION */(function(process) {/**
 	 * Copyright 2013-present, Facebook, Inc.
 	 * All rights reserved.
@@ -12730,14 +12835,14 @@ return jQuery;
 
 	var ReactComponent = __webpack_require__(17);
 	var ReactElement = __webpack_require__(9);
-	var ReactPropTypeLocations = __webpack_require__(21);
-	var ReactPropTypeLocationNames = __webpack_require__(23);
+	var ReactPropTypeLocations = __webpack_require__(22);
+	var ReactPropTypeLocationNames = __webpack_require__(24);
 	var ReactNoopUpdateQueue = __webpack_require__(18);
 
 	var emptyObject = __webpack_require__(19);
 	var invariant = __webpack_require__(8);
-	var keyMirror = __webpack_require__(22);
-	var keyOf = __webpack_require__(24);
+	var keyMirror = __webpack_require__(23);
+	var keyOf = __webpack_require__(25);
 	var warning = __webpack_require__(11);
 
 	var MIXINS_KEY = keyOf({ mixins: null });
@@ -13099,6 +13204,13 @@ return jQuery;
 	 */
 	function mixSpecIntoComponent(Constructor, spec) {
 	  if (!spec) {
+	    if (process.env.NODE_ENV !== 'production') {
+	      var typeofSpec = typeof spec;
+	      var isMixinValid = typeofSpec === 'object' && spec !== null;
+
+	      process.env.NODE_ENV !== 'production' ? warning(isMixinValid, '%s: You\'re attempting to include a mixin that is either null ' + 'or not an object. Check the mixins included by the component, ' + 'as well as any mixins they include themselves. ' + 'Expected object but got %s.', Constructor.displayName || 'ReactClass', spec === null ? null : typeofSpec) : void 0;
+	    }
+
 	    return;
 	  }
 
@@ -13440,7 +13552,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -13456,7 +13568,7 @@ return jQuery;
 
 	'use strict';
 
-	var keyMirror = __webpack_require__(22);
+	var keyMirror = __webpack_require__(23);
 
 	var ReactPropTypeLocations = keyMirror({
 	  prop: null,
@@ -13467,7 +13579,7 @@ return jQuery;
 	module.exports = ReactPropTypeLocations;
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -13520,7 +13632,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 23 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -13550,7 +13662,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 24 */
+/* 25 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -13589,7 +13701,7 @@ return jQuery;
 	module.exports = keyOf;
 
 /***/ },
-/* 25 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -13607,7 +13719,7 @@ return jQuery;
 
 	var ReactElement = __webpack_require__(9);
 
-	var mapObject = __webpack_require__(26);
+	var mapObject = __webpack_require__(27);
 
 	/**
 	 * Create a factory that creates HTML tag elements.
@@ -13617,7 +13729,7 @@ return jQuery;
 	 */
 	function createDOMFactory(tag) {
 	  if (process.env.NODE_ENV !== 'production') {
-	    var ReactElementValidator = __webpack_require__(27);
+	    var ReactElementValidator = __webpack_require__(28);
 	    return ReactElementValidator.createFactory(tag);
 	  }
 	  return ReactElement.createFactory(tag);
@@ -13771,7 +13883,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 26 */
+/* 27 */
 /***/ function(module, exports) {
 
 	/**
@@ -13826,7 +13938,7 @@ return jQuery;
 	module.exports = mapObject;
 
 /***/ },
-/* 27 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -13850,11 +13962,11 @@ return jQuery;
 	'use strict';
 
 	var ReactCurrentOwner = __webpack_require__(10);
-	var ReactComponentTreeDevtool = __webpack_require__(28);
+	var ReactComponentTreeDevtool = __webpack_require__(29);
 	var ReactElement = __webpack_require__(9);
-	var ReactPropTypeLocations = __webpack_require__(21);
+	var ReactPropTypeLocations = __webpack_require__(22);
 
-	var checkReactTypeSpec = __webpack_require__(29);
+	var checkReactTypeSpec = __webpack_require__(30);
 
 	var canDefineProperty = __webpack_require__(13);
 	var getIteratorFn = __webpack_require__(15);
@@ -14058,7 +14170,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 28 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -14282,7 +14394,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 29 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -14300,10 +14412,22 @@ return jQuery;
 
 	var _prodInvariant = __webpack_require__(7);
 
-	var ReactPropTypeLocationNames = __webpack_require__(23);
+	var ReactPropTypeLocationNames = __webpack_require__(24);
+	var ReactPropTypesSecret = __webpack_require__(31);
 
 	var invariant = __webpack_require__(8);
 	var warning = __webpack_require__(11);
+
+	var ReactComponentTreeDevtool;
+
+	if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
+	  // Temporary hack.
+	  // Inline requires don't work well with Jest:
+	  // https://github.com/facebook/react/issues/7240
+	  // Remove the inline requires when we don't need them anymore:
+	  // https://github.com/facebook/react/pull/7178
+	  ReactComponentTreeDevtool = __webpack_require__(29);
+	}
 
 	var loggedTypeFailures = {};
 
@@ -14330,7 +14454,7 @@ return jQuery;
 	        // This is intentionally an invariant that gets caught. It's the same
 	        // behavior as without this statement except with a better message.
 	        !(typeof typeSpecs[typeSpecName] === 'function') ? process.env.NODE_ENV !== 'production' ? invariant(false, '%s: %s type `%s` is invalid; it must be a function, usually from React.PropTypes.', componentName || 'React class', ReactPropTypeLocationNames[location], typeSpecName) : _prodInvariant('84', componentName || 'React class', ReactPropTypeLocationNames[location], typeSpecName) : void 0;
-	        error = typeSpecs[typeSpecName](values, typeSpecName, componentName, location);
+	        error = typeSpecs[typeSpecName](values, typeSpecName, componentName, location, null, ReactPropTypesSecret);
 	      } catch (ex) {
 	        error = ex;
 	      }
@@ -14343,7 +14467,9 @@ return jQuery;
 	        var componentStackInfo = '';
 
 	        if (process.env.NODE_ENV !== 'production') {
-	          var ReactComponentTreeDevtool = __webpack_require__(28);
+	          if (!ReactComponentTreeDevtool) {
+	            ReactComponentTreeDevtool = __webpack_require__(29);
+	          }
 	          if (debugID !== null) {
 	            componentStackInfo = ReactComponentTreeDevtool.getStackAddendumByID(debugID);
 	          } else if (element !== null) {
@@ -14361,10 +14487,31 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 30 */
-/***/ function(module, exports, __webpack_require__) {
+/* 31 */
+/***/ function(module, exports) {
 
 	/**
+	 * Copyright 2013-present, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule ReactPropTypesSecret
+	 */
+
+	'use strict';
+
+	var ReactPropTypesSecret = 'SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED';
+
+	module.exports = ReactPropTypesSecret;
+
+/***/ },
+/* 32 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {/**
 	 * Copyright 2013-present, Facebook, Inc.
 	 * All rights reserved.
 	 *
@@ -14378,10 +14525,12 @@ return jQuery;
 	'use strict';
 
 	var ReactElement = __webpack_require__(9);
-	var ReactPropTypeLocationNames = __webpack_require__(23);
+	var ReactPropTypeLocationNames = __webpack_require__(24);
+	var ReactPropTypesSecret = __webpack_require__(31);
 
 	var emptyFunction = __webpack_require__(12);
 	var getIteratorFn = __webpack_require__(15);
+	var warning = __webpack_require__(11);
 
 	/**
 	 * Collection of methods that allow declaration and validation of props that are
@@ -14471,9 +14620,21 @@ return jQuery;
 	/*eslint-enable no-self-compare*/
 
 	function createChainableTypeChecker(validate) {
-	  function checkType(isRequired, props, propName, componentName, location, propFullName) {
+	  if (process.env.NODE_ENV !== 'production') {
+	    var manualPropTypeCallCache = {};
+	  }
+	  function checkType(isRequired, props, propName, componentName, location, propFullName, secret) {
 	    componentName = componentName || ANONYMOUS;
 	    propFullName = propFullName || propName;
+	    if (process.env.NODE_ENV !== 'production') {
+	      if (secret !== ReactPropTypesSecret && typeof console !== 'undefined') {
+	        var cacheKey = componentName + ':' + propName;
+	        if (!manualPropTypeCallCache[cacheKey]) {
+	          process.env.NODE_ENV !== 'production' ? warning(false, 'You are manually calling a React.PropTypes validation ' + 'function for the `%s` prop on `%s`. This is deprecated ' + 'and will not work in the next major version. You may be ' + 'seeing this warning due to a third-party PropTypes library. ' + 'See https://fb.me/react-warning-dont-call-proptypes for details.', propFullName, componentName) : void 0;
+	          manualPropTypeCallCache[cacheKey] = true;
+	        }
+	      }
+	    }
 	    if (props[propName] == null) {
 	      var locationName = ReactPropTypeLocationNames[location];
 	      if (isRequired) {
@@ -14492,7 +14653,7 @@ return jQuery;
 	}
 
 	function createPrimitiveTypeChecker(expectedType) {
-	  function validate(props, propName, componentName, location, propFullName) {
+	  function validate(props, propName, componentName, location, propFullName, secret) {
 	    var propValue = props[propName];
 	    var propType = getPropType(propValue);
 	    if (propType !== expectedType) {
@@ -14525,7 +14686,7 @@ return jQuery;
 	      return new Error('Invalid ' + locationName + ' `' + propFullName + '` of type ' + ('`' + propType + '` supplied to `' + componentName + '`, expected an array.'));
 	    }
 	    for (var i = 0; i < propValue.length; i++) {
-	      var error = typeChecker(propValue, i, componentName, location, propFullName + '[' + i + ']');
+	      var error = typeChecker(propValue, i, componentName, location, propFullName + '[' + i + ']', ReactPropTypesSecret);
 	      if (error instanceof Error) {
 	        return error;
 	      }
@@ -14537,9 +14698,11 @@ return jQuery;
 
 	function createElementTypeChecker() {
 	  function validate(props, propName, componentName, location, propFullName) {
-	    if (!ReactElement.isValidElement(props[propName])) {
+	    var propValue = props[propName];
+	    if (!ReactElement.isValidElement(propValue)) {
 	      var locationName = ReactPropTypeLocationNames[location];
-	      return new Error('Invalid ' + locationName + ' `' + propFullName + '` supplied to ' + ('`' + componentName + '`, expected a single ReactElement.'));
+	      var propType = getPropType(propValue);
+	      return new Error('Invalid ' + locationName + ' `' + propFullName + '` of type ' + ('`' + propType + '` supplied to `' + componentName + '`, expected a single ReactElement.'));
 	    }
 	    return null;
 	  }
@@ -14561,9 +14724,8 @@ return jQuery;
 
 	function createEnumTypeChecker(expectedValues) {
 	  if (!Array.isArray(expectedValues)) {
-	    return createChainableTypeChecker(function () {
-	      return new Error('Invalid argument supplied to oneOf, expected an instance of array.');
-	    });
+	    process.env.NODE_ENV !== 'production' ? warning(false, 'Invalid argument supplied to oneOf, expected an instance of array.') : void 0;
+	    return emptyFunction.thatReturnsNull;
 	  }
 
 	  function validate(props, propName, componentName, location, propFullName) {
@@ -14594,7 +14756,7 @@ return jQuery;
 	    }
 	    for (var key in propValue) {
 	      if (propValue.hasOwnProperty(key)) {
-	        var error = typeChecker(propValue, key, componentName, location, propFullName + '.' + key);
+	        var error = typeChecker(propValue, key, componentName, location, propFullName + '.' + key, ReactPropTypesSecret);
 	        if (error instanceof Error) {
 	          return error;
 	        }
@@ -14607,15 +14769,14 @@ return jQuery;
 
 	function createUnionTypeChecker(arrayOfTypeCheckers) {
 	  if (!Array.isArray(arrayOfTypeCheckers)) {
-	    return createChainableTypeChecker(function () {
-	      return new Error('Invalid argument supplied to oneOfType, expected an instance of array.');
-	    });
+	    process.env.NODE_ENV !== 'production' ? warning(false, 'Invalid argument supplied to oneOfType, expected an instance of array.') : void 0;
+	    return emptyFunction.thatReturnsNull;
 	  }
 
 	  function validate(props, propName, componentName, location, propFullName) {
 	    for (var i = 0; i < arrayOfTypeCheckers.length; i++) {
 	      var checker = arrayOfTypeCheckers[i];
-	      if (checker(props, propName, componentName, location, propFullName) == null) {
+	      if (checker(props, propName, componentName, location, propFullName, ReactPropTypesSecret) == null) {
 	        return null;
 	      }
 	    }
@@ -14650,7 +14811,7 @@ return jQuery;
 	      if (!checker) {
 	        continue;
 	      }
-	      var error = checker(propValue, key, componentName, location, propFullName + '.' + key);
+	      var error = checker(propValue, key, componentName, location, propFullName + '.' + key, ReactPropTypesSecret);
 	      if (error) {
 	        return error;
 	      }
@@ -14767,9 +14928,10 @@ return jQuery;
 	}
 
 	module.exports = ReactPropTypes;
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 31 */
+/* 33 */
 /***/ function(module, exports) {
 
 	/**
@@ -14785,10 +14947,10 @@ return jQuery;
 
 	'use strict';
 
-	module.exports = '15.2.1';
+	module.exports = '15.3.0';
 
 /***/ },
-/* 32 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -14832,16 +14994,16 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 33 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	module.exports = __webpack_require__(34);
+	module.exports = __webpack_require__(36);
 
 
 /***/ },
-/* 34 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -14859,21 +15021,21 @@ return jQuery;
 
 	'use strict';
 
-	var ReactDOMComponentTree = __webpack_require__(35);
-	var ReactDefaultInjection = __webpack_require__(38);
-	var ReactMount = __webpack_require__(164);
-	var ReactReconciler = __webpack_require__(58);
-	var ReactUpdates = __webpack_require__(55);
-	var ReactVersion = __webpack_require__(31);
+	var ReactDOMComponentTree = __webpack_require__(37);
+	var ReactDefaultInjection = __webpack_require__(40);
+	var ReactMount = __webpack_require__(167);
+	var ReactReconciler = __webpack_require__(60);
+	var ReactUpdates = __webpack_require__(57);
+	var ReactVersion = __webpack_require__(33);
 
-	var findDOMNode = __webpack_require__(169);
-	var getHostComponentFromComposite = __webpack_require__(170);
-	var renderSubtreeIntoContainer = __webpack_require__(171);
+	var findDOMNode = __webpack_require__(172);
+	var getHostComponentFromComposite = __webpack_require__(173);
+	var renderSubtreeIntoContainer = __webpack_require__(174);
 	var warning = __webpack_require__(11);
 
 	ReactDefaultInjection.inject();
 
-	var React = {
+	var ReactDOM = {
 	  findDOMNode: findDOMNode,
 	  render: ReactMount.render,
 	  unmountComponentAtNode: ReactMount.unmountComponentAtNode,
@@ -14909,7 +15071,7 @@ return jQuery;
 	}
 
 	if (process.env.NODE_ENV !== 'production') {
-	  var ExecutionEnvironment = __webpack_require__(48);
+	  var ExecutionEnvironment = __webpack_require__(50);
 	  if (ExecutionEnvironment.canUseDOM && window.top === window.self) {
 
 	    // First check if devtools is not installed
@@ -14944,11 +15106,11 @@ return jQuery;
 	  }
 	}
 
-	module.exports = React;
+	module.exports = ReactDOM;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 35 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -14966,8 +15128,8 @@ return jQuery;
 
 	var _prodInvariant = __webpack_require__(7);
 
-	var DOMProperty = __webpack_require__(36);
-	var ReactDOMComponentFlags = __webpack_require__(37);
+	var DOMProperty = __webpack_require__(38);
+	var ReactDOMComponentFlags = __webpack_require__(39);
 
 	var invariant = __webpack_require__(8);
 
@@ -15142,7 +15304,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 36 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -15354,7 +15516,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 37 */
+/* 39 */
 /***/ function(module, exports) {
 
 	/**
@@ -15377,7 +15539,7 @@ return jQuery;
 	module.exports = ReactDOMComponentFlags;
 
 /***/ },
-/* 38 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -15393,24 +15555,24 @@ return jQuery;
 
 	'use strict';
 
-	var BeforeInputEventPlugin = __webpack_require__(39);
-	var ChangeEventPlugin = __webpack_require__(54);
-	var DefaultEventPluginOrder = __webpack_require__(71);
-	var EnterLeaveEventPlugin = __webpack_require__(72);
-	var HTMLDOMPropertyConfig = __webpack_require__(77);
-	var ReactComponentBrowserEnvironment = __webpack_require__(78);
-	var ReactDOMComponent = __webpack_require__(92);
-	var ReactDOMComponentTree = __webpack_require__(35);
-	var ReactDOMEmptyComponent = __webpack_require__(135);
-	var ReactDOMTreeTraversal = __webpack_require__(136);
-	var ReactDOMTextComponent = __webpack_require__(137);
-	var ReactDefaultBatchingStrategy = __webpack_require__(138);
-	var ReactEventListener = __webpack_require__(139);
-	var ReactInjection = __webpack_require__(142);
-	var ReactReconcileTransaction = __webpack_require__(143);
-	var SVGDOMPropertyConfig = __webpack_require__(151);
-	var SelectEventPlugin = __webpack_require__(152);
-	var SimpleEventPlugin = __webpack_require__(153);
+	var BeforeInputEventPlugin = __webpack_require__(41);
+	var ChangeEventPlugin = __webpack_require__(56);
+	var DefaultEventPluginOrder = __webpack_require__(74);
+	var EnterLeaveEventPlugin = __webpack_require__(75);
+	var HTMLDOMPropertyConfig = __webpack_require__(80);
+	var ReactComponentBrowserEnvironment = __webpack_require__(81);
+	var ReactDOMComponent = __webpack_require__(95);
+	var ReactDOMComponentTree = __webpack_require__(37);
+	var ReactDOMEmptyComponent = __webpack_require__(138);
+	var ReactDOMTreeTraversal = __webpack_require__(139);
+	var ReactDOMTextComponent = __webpack_require__(140);
+	var ReactDefaultBatchingStrategy = __webpack_require__(141);
+	var ReactEventListener = __webpack_require__(142);
+	var ReactInjection = __webpack_require__(145);
+	var ReactReconcileTransaction = __webpack_require__(146);
+	var SVGDOMPropertyConfig = __webpack_require__(154);
+	var SelectEventPlugin = __webpack_require__(155);
+	var SimpleEventPlugin = __webpack_require__(156);
 
 	var alreadyInjected = false;
 
@@ -15466,7 +15628,7 @@ return jQuery;
 	};
 
 /***/ },
-/* 39 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -15482,14 +15644,14 @@ return jQuery;
 
 	'use strict';
 
-	var EventConstants = __webpack_require__(40);
-	var EventPropagators = __webpack_require__(41);
-	var ExecutionEnvironment = __webpack_require__(48);
-	var FallbackCompositionState = __webpack_require__(49);
-	var SyntheticCompositionEvent = __webpack_require__(51);
-	var SyntheticInputEvent = __webpack_require__(53);
+	var EventConstants = __webpack_require__(42);
+	var EventPropagators = __webpack_require__(43);
+	var ExecutionEnvironment = __webpack_require__(50);
+	var FallbackCompositionState = __webpack_require__(51);
+	var SyntheticCompositionEvent = __webpack_require__(53);
+	var SyntheticInputEvent = __webpack_require__(55);
 
-	var keyOf = __webpack_require__(24);
+	var keyOf = __webpack_require__(25);
 
 	var END_KEYCODES = [9, 13, 27, 32]; // Tab, Return, Esc, Space
 	var START_KEYCODE = 229;
@@ -15859,7 +16021,7 @@ return jQuery;
 	module.exports = BeforeInputEventPlugin;
 
 /***/ },
-/* 40 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -15875,7 +16037,7 @@ return jQuery;
 
 	'use strict';
 
-	var keyMirror = __webpack_require__(22);
+	var keyMirror = __webpack_require__(23);
 
 	var PropagationPhases = keyMirror({ bubbled: null, captured: null });
 
@@ -15961,7 +16123,7 @@ return jQuery;
 	module.exports = EventConstants;
 
 /***/ },
-/* 41 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -15977,12 +16139,12 @@ return jQuery;
 
 	'use strict';
 
-	var EventConstants = __webpack_require__(40);
-	var EventPluginHub = __webpack_require__(42);
-	var EventPluginUtils = __webpack_require__(44);
+	var EventConstants = __webpack_require__(42);
+	var EventPluginHub = __webpack_require__(44);
+	var EventPluginUtils = __webpack_require__(46);
 
-	var accumulateInto = __webpack_require__(46);
-	var forEachAccumulated = __webpack_require__(47);
+	var accumulateInto = __webpack_require__(48);
+	var forEachAccumulated = __webpack_require__(49);
 	var warning = __webpack_require__(11);
 
 	var PropagationPhases = EventConstants.PropagationPhases;
@@ -16104,7 +16266,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 42 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -16122,12 +16284,12 @@ return jQuery;
 
 	var _prodInvariant = __webpack_require__(7);
 
-	var EventPluginRegistry = __webpack_require__(43);
-	var EventPluginUtils = __webpack_require__(44);
-	var ReactErrorUtils = __webpack_require__(45);
+	var EventPluginRegistry = __webpack_require__(45);
+	var EventPluginUtils = __webpack_require__(46);
+	var ReactErrorUtils = __webpack_require__(47);
 
-	var accumulateInto = __webpack_require__(46);
-	var forEachAccumulated = __webpack_require__(47);
+	var accumulateInto = __webpack_require__(48);
+	var forEachAccumulated = __webpack_require__(49);
 	var invariant = __webpack_require__(8);
 
 	/**
@@ -16162,6 +16324,10 @@ return jQuery;
 	};
 	var executeDispatchesAndReleaseTopLevel = function (e) {
 	  return executeDispatchesAndRelease(e, false);
+	};
+
+	var getDictionaryKey = function (inst) {
+	  return '.' + inst._rootNodeID;
 	};
 
 	/**
@@ -16207,7 +16373,7 @@ return jQuery;
 	  },
 
 	  /**
-	   * Stores `listener` at `listenerBank[registrationName][id]`. Is idempotent.
+	   * Stores `listener` at `listenerBank[registrationName][key]`. Is idempotent.
 	   *
 	   * @param {object} inst The instance, which is the source of events.
 	   * @param {string} registrationName Name of listener (e.g. `onClick`).
@@ -16216,8 +16382,9 @@ return jQuery;
 	  putListener: function (inst, registrationName, listener) {
 	    !(typeof listener === 'function') ? process.env.NODE_ENV !== 'production' ? invariant(false, 'Expected %s listener to be a function, instead got type %s', registrationName, typeof listener) : _prodInvariant('94', registrationName, typeof listener) : void 0;
 
+	    var key = getDictionaryKey(inst);
 	    var bankForRegistrationName = listenerBank[registrationName] || (listenerBank[registrationName] = {});
-	    bankForRegistrationName[inst._rootNodeID] = listener;
+	    bankForRegistrationName[key] = listener;
 
 	    var PluginModule = EventPluginRegistry.registrationNameModules[registrationName];
 	    if (PluginModule && PluginModule.didPutListener) {
@@ -16232,7 +16399,8 @@ return jQuery;
 	   */
 	  getListener: function (inst, registrationName) {
 	    var bankForRegistrationName = listenerBank[registrationName];
-	    return bankForRegistrationName && bankForRegistrationName[inst._rootNodeID];
+	    var key = getDictionaryKey(inst);
+	    return bankForRegistrationName && bankForRegistrationName[key];
 	  },
 
 	  /**
@@ -16250,7 +16418,8 @@ return jQuery;
 	    var bankForRegistrationName = listenerBank[registrationName];
 	    // TODO: This should never be null -- when is it?
 	    if (bankForRegistrationName) {
-	      delete bankForRegistrationName[inst._rootNodeID];
+	      var key = getDictionaryKey(inst);
+	      delete bankForRegistrationName[key];
 	    }
 	  },
 
@@ -16260,12 +16429,13 @@ return jQuery;
 	   * @param {object} inst The instance, which is the source of events.
 	   */
 	  deleteAllListeners: function (inst) {
+	    var key = getDictionaryKey(inst);
 	    for (var registrationName in listenerBank) {
 	      if (!listenerBank.hasOwnProperty(registrationName)) {
 	        continue;
 	      }
 
-	      if (!listenerBank[registrationName][inst._rootNodeID]) {
+	      if (!listenerBank[registrationName][key]) {
 	        continue;
 	      }
 
@@ -16274,7 +16444,7 @@ return jQuery;
 	        PluginModule.willDeleteListener(inst, registrationName);
 	      }
 
-	      delete listenerBank[registrationName][inst._rootNodeID];
+	      delete listenerBank[registrationName][key];
 	    }
 	  },
 
@@ -16351,7 +16521,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 43 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -16604,7 +16774,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 44 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -16622,8 +16792,8 @@ return jQuery;
 
 	var _prodInvariant = __webpack_require__(7);
 
-	var EventConstants = __webpack_require__(40);
-	var ReactErrorUtils = __webpack_require__(45);
+	var EventConstants = __webpack_require__(42);
+	var ReactErrorUtils = __webpack_require__(47);
 
 	var invariant = __webpack_require__(8);
 	var warning = __webpack_require__(11);
@@ -16839,7 +17009,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 45 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -16921,7 +17091,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 46 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -16985,7 +17155,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 47 */
+/* 49 */
 /***/ function(module, exports) {
 
 	/**
@@ -17021,7 +17191,7 @@ return jQuery;
 	module.exports = forEachAccumulated;
 
 /***/ },
-/* 48 */
+/* 50 */
 /***/ function(module, exports) {
 
 	/**
@@ -17061,7 +17231,7 @@ return jQuery;
 	module.exports = ExecutionEnvironment;
 
 /***/ },
-/* 49 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -17081,7 +17251,7 @@ return jQuery;
 
 	var PooledClass = __webpack_require__(6);
 
-	var getTextContentAccessor = __webpack_require__(50);
+	var getTextContentAccessor = __webpack_require__(52);
 
 	/**
 	 * This helper class stores information about text content of a target node,
@@ -17161,7 +17331,7 @@ return jQuery;
 	module.exports = FallbackCompositionState;
 
 /***/ },
-/* 50 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -17177,7 +17347,7 @@ return jQuery;
 
 	'use strict';
 
-	var ExecutionEnvironment = __webpack_require__(48);
+	var ExecutionEnvironment = __webpack_require__(50);
 
 	var contentKey = null;
 
@@ -17199,7 +17369,7 @@ return jQuery;
 	module.exports = getTextContentAccessor;
 
 /***/ },
-/* 51 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -17215,7 +17385,7 @@ return jQuery;
 
 	'use strict';
 
-	var SyntheticEvent = __webpack_require__(52);
+	var SyntheticEvent = __webpack_require__(54);
 
 	/**
 	 * @interface Event
@@ -17240,7 +17410,7 @@ return jQuery;
 	module.exports = SyntheticCompositionEvent;
 
 /***/ },
-/* 52 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -17506,7 +17676,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 53 */
+/* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -17522,7 +17692,7 @@ return jQuery;
 
 	'use strict';
 
-	var SyntheticEvent = __webpack_require__(52);
+	var SyntheticEvent = __webpack_require__(54);
 
 	/**
 	 * @interface Event
@@ -17548,7 +17718,7 @@ return jQuery;
 	module.exports = SyntheticInputEvent;
 
 /***/ },
-/* 54 */
+/* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -17564,18 +17734,18 @@ return jQuery;
 
 	'use strict';
 
-	var EventConstants = __webpack_require__(40);
-	var EventPluginHub = __webpack_require__(42);
-	var EventPropagators = __webpack_require__(41);
-	var ExecutionEnvironment = __webpack_require__(48);
-	var ReactDOMComponentTree = __webpack_require__(35);
-	var ReactUpdates = __webpack_require__(55);
-	var SyntheticEvent = __webpack_require__(52);
+	var EventConstants = __webpack_require__(42);
+	var EventPluginHub = __webpack_require__(44);
+	var EventPropagators = __webpack_require__(43);
+	var ExecutionEnvironment = __webpack_require__(50);
+	var ReactDOMComponentTree = __webpack_require__(37);
+	var ReactUpdates = __webpack_require__(57);
+	var SyntheticEvent = __webpack_require__(54);
 
-	var getEventTarget = __webpack_require__(68);
-	var isEventSupported = __webpack_require__(69);
-	var isTextInputElement = __webpack_require__(70);
-	var keyOf = __webpack_require__(24);
+	var getEventTarget = __webpack_require__(71);
+	var isEventSupported = __webpack_require__(72);
+	var isTextInputElement = __webpack_require__(73);
+	var keyOf = __webpack_require__(25);
 
 	var topLevelTypes = EventConstants.topLevelTypes;
 
@@ -17878,7 +18048,7 @@ return jQuery;
 	module.exports = ChangeEventPlugin;
 
 /***/ },
-/* 55 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -17897,11 +18067,11 @@ return jQuery;
 	var _prodInvariant = __webpack_require__(7),
 	    _assign = __webpack_require__(4);
 
-	var CallbackQueue = __webpack_require__(56);
+	var CallbackQueue = __webpack_require__(58);
 	var PooledClass = __webpack_require__(6);
-	var ReactFeatureFlags = __webpack_require__(57);
-	var ReactReconciler = __webpack_require__(58);
-	var Transaction = __webpack_require__(67);
+	var ReactFeatureFlags = __webpack_require__(59);
+	var ReactReconciler = __webpack_require__(60);
+	var Transaction = __webpack_require__(70);
 
 	var invariant = __webpack_require__(8);
 
@@ -18135,7 +18305,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 56 */
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -18247,7 +18417,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 57 */
+/* 59 */
 /***/ function(module, exports) {
 
 	/**
@@ -18274,7 +18444,7 @@ return jQuery;
 	module.exports = ReactFeatureFlags;
 
 /***/ },
-/* 58 */
+/* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -18290,12 +18460,10 @@ return jQuery;
 
 	'use strict';
 
-	var _prodInvariant = __webpack_require__(7);
+	var ReactRef = __webpack_require__(61);
+	var ReactInstrumentation = __webpack_require__(63);
 
-	var ReactRef = __webpack_require__(59);
-	var ReactInstrumentation = __webpack_require__(61);
-
-	var invariant = __webpack_require__(8);
+	var warning = __webpack_require__(11);
 
 	/**
 	 * Helper to call ReactRef.attachRefs with this composite component, split out
@@ -18432,7 +18600,7 @@ return jQuery;
 	    if (internalInstance._updateBatchNumber !== updateBatchNumber) {
 	      // The component's enqueued batch number should always be the current
 	      // batch or the following one.
-	      !(internalInstance._updateBatchNumber == null || internalInstance._updateBatchNumber === updateBatchNumber + 1) ? process.env.NODE_ENV !== 'production' ? invariant(false, 'performUpdateIfNecessary: Unexpected batch number (current %s, pending %s)', updateBatchNumber, internalInstance._updateBatchNumber) : _prodInvariant('121', updateBatchNumber, internalInstance._updateBatchNumber) : void 0;
+	      process.env.NODE_ENV !== 'production' ? warning(internalInstance._updateBatchNumber == null || internalInstance._updateBatchNumber === updateBatchNumber + 1, 'performUpdateIfNecessary: Unexpected batch number (current %s, ' + 'pending %s)', updateBatchNumber, internalInstance._updateBatchNumber) : void 0;
 	      return;
 	    }
 	    if (process.env.NODE_ENV !== 'production') {
@@ -18456,7 +18624,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 59 */
+/* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -18472,7 +18640,7 @@ return jQuery;
 
 	'use strict';
 
-	var ReactOwner = __webpack_require__(60);
+	var ReactOwner = __webpack_require__(62);
 
 	var ReactRef = {};
 
@@ -18522,7 +18690,9 @@ return jQuery;
 
 	  return(
 	    // This has a few false positives w/r/t empty components.
-	    prevEmpty || nextEmpty || nextElement._owner !== prevElement._owner || nextElement.ref !== prevElement.ref
+	    prevEmpty || nextEmpty || nextElement.ref !== prevElement.ref ||
+	    // If owner changes but we have an unchanged function ref, don't update refs
+	    typeof nextElement.ref === 'string' && nextElement._owner !== prevElement._owner
 	  );
 	};
 
@@ -18539,7 +18709,7 @@ return jQuery;
 	module.exports = ReactRef;
 
 /***/ },
-/* 60 */
+/* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -18639,7 +18809,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 61 */
+/* 63 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -18658,7 +18828,7 @@ return jQuery;
 	var debugTool = null;
 
 	if (process.env.NODE_ENV !== 'production') {
-	  var ReactDebugTool = __webpack_require__(62);
+	  var ReactDebugTool = __webpack_require__(64);
 	  debugTool = ReactDebugTool;
 	}
 
@@ -18666,7 +18836,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 62 */
+/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -18682,12 +18852,13 @@ return jQuery;
 
 	'use strict';
 
-	var ReactInvalidSetStateWarningDevTool = __webpack_require__(63);
-	var ReactHostOperationHistoryDevtool = __webpack_require__(64);
-	var ReactComponentTreeDevtool = __webpack_require__(28);
-	var ExecutionEnvironment = __webpack_require__(48);
+	var ReactInvalidSetStateWarningDevTool = __webpack_require__(65);
+	var ReactHostOperationHistoryDevtool = __webpack_require__(66);
+	var ReactComponentTreeDevtool = __webpack_require__(29);
+	var ReactChildrenMutationWarningDevtool = __webpack_require__(67);
+	var ExecutionEnvironment = __webpack_require__(50);
 
-	var performanceNow = __webpack_require__(65);
+	var performanceNow = __webpack_require__(68);
 	var warning = __webpack_require__(11);
 
 	var eventHandlers = [];
@@ -18716,6 +18887,8 @@ return jQuery;
 	var currentTimerStartTime = null;
 	var currentTimerNestedFlushDuration = null;
 	var currentTimerType = null;
+
+	var lifeCycleTimerHasWarned = false;
 
 	function clearHistory() {
 	  ReactComponentTreeDevtool.purgeUnmountedComponents();
@@ -18774,7 +18947,10 @@ return jQuery;
 	  if (currentFlushNesting === 0) {
 	    return;
 	  }
-	  process.env.NODE_ENV !== 'production' ? warning(!currentTimerType, 'There is an internal error in the React performance measurement code. ' + 'Did not expect %s timer to start while %s timer is still in ' + 'progress for %s instance.', timerType, currentTimerType || 'no', debugID === currentTimerDebugID ? 'the same' : 'another') : void 0;
+	  if (currentTimerType && !lifeCycleTimerHasWarned) {
+	    process.env.NODE_ENV !== 'production' ? warning(false, 'There is an internal error in the React performance measurement code. ' + 'Did not expect %s timer to start while %s timer is still in ' + 'progress for %s instance.', timerType, currentTimerType || 'no', debugID === currentTimerDebugID ? 'the same' : 'another') : void 0;
+	    lifeCycleTimerHasWarned = true;
+	  }
 	  currentTimerStartTime = performanceNow();
 	  currentTimerNestedFlushDuration = 0;
 	  currentTimerDebugID = debugID;
@@ -18785,7 +18961,10 @@ return jQuery;
 	  if (currentFlushNesting === 0) {
 	    return;
 	  }
-	  process.env.NODE_ENV !== 'production' ? warning(currentTimerType === timerType, 'There is an internal error in the React performance measurement code. ' + 'We did not expect %s timer to stop while %s timer is still in ' + 'progress for %s instance. Please report this as a bug in React.', timerType, currentTimerType || 'no', debugID === currentTimerDebugID ? 'the same' : 'another') : void 0;
+	  if (currentTimerType !== timerType && !lifeCycleTimerHasWarned) {
+	    process.env.NODE_ENV !== 'production' ? warning(false, 'There is an internal error in the React performance measurement code. ' + 'We did not expect %s timer to stop while %s timer is still in ' + 'progress for %s instance. Please report this as a bug in React.', timerType, currentTimerType || 'no', debugID === currentTimerDebugID ? 'the same' : 'another') : void 0;
+	    lifeCycleTimerHasWarned = true;
+	  }
 	  if (isProfiling) {
 	    currentFlushMeasurements.push({
 	      timerType: timerType,
@@ -18911,6 +19090,14 @@ return jQuery;
 	    checkDebugID(debugID);
 	    emitEvent('onHostOperation', debugID, type, payload);
 	  },
+	  onComponentHasMounted: function (debugID) {
+	    checkDebugID(debugID);
+	    emitEvent('onComponentHasMounted', debugID);
+	  },
+	  onComponentHasUpdated: function (debugID) {
+	    checkDebugID(debugID);
+	    emitEvent('onComponentHasUpdated', debugID);
+	  },
 	  onSetState: function () {
 	    emitEvent('onSetState');
 	  },
@@ -18966,6 +19153,7 @@ return jQuery;
 
 	ReactDebugTool.addDevtool(ReactInvalidSetStateWarningDevTool);
 	ReactDebugTool.addDevtool(ReactComponentTreeDevtool);
+	ReactDebugTool.addDevtool(ReactChildrenMutationWarningDevtool);
 	var url = ExecutionEnvironment.canUseDOM && window.location.href || '';
 	if (/[?&]react_perf\b/.test(url)) {
 	  ReactDebugTool.beginProfiling();
@@ -18975,7 +19163,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 63 */
+/* 65 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -19017,7 +19205,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 64 */
+/* 66 */
 /***/ function(module, exports) {
 
 	/**
@@ -19059,7 +19247,75 @@ return jQuery;
 	module.exports = ReactHostOperationHistoryDevtool;
 
 /***/ },
-/* 65 */
+/* 67 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {/**
+	 * Copyright 2013-present, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule ReactChildrenMutationWarningDevtool
+	 */
+
+	'use strict';
+
+	var ReactComponentTreeDevtool = __webpack_require__(29);
+
+	var warning = __webpack_require__(11);
+
+	var elements = {};
+
+	function handleElement(debugID, element) {
+	  if (element == null) {
+	    return;
+	  }
+	  if (element._shadowChildren === undefined) {
+	    return;
+	  }
+	  if (element._shadowChildren === element.props.children) {
+	    return;
+	  }
+	  var isMutated = false;
+	  if (Array.isArray(element._shadowChildren)) {
+	    if (element._shadowChildren.length === element.props.children.length) {
+	      for (var i = 0; i < element._shadowChildren.length; i++) {
+	        if (element._shadowChildren[i] !== element.props.children[i]) {
+	          isMutated = true;
+	        }
+	      }
+	    } else {
+	      isMutated = true;
+	    }
+	  }
+	  process.env.NODE_ENV !== 'production' ? warning(Array.isArray(element._shadowChildren) && !isMutated, 'Component\'s children should not be mutated.%s', ReactComponentTreeDevtool.getStackAddendumByID(debugID)) : void 0;
+	}
+
+	var ReactDOMUnknownPropertyDevtool = {
+	  onBeforeMountComponent: function (debugID, element) {
+	    elements[debugID] = element;
+	  },
+	  onBeforeUpdateComponent: function (debugID, element) {
+	    elements[debugID] = element;
+	  },
+	  onComponentHasMounted: function (debugID) {
+	    handleElement(debugID, elements[debugID]);
+	    delete elements[debugID];
+	  },
+	  onComponentHasUpdated: function (debugID) {
+	    handleElement(debugID, elements[debugID]);
+	    delete elements[debugID];
+	  }
+	};
+
+	module.exports = ReactDOMUnknownPropertyDevtool;
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ },
+/* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -19075,7 +19331,7 @@ return jQuery;
 	 * @typechecks
 	 */
 
-	var performance = __webpack_require__(66);
+	var performance = __webpack_require__(69);
 
 	var performanceNow;
 
@@ -19097,7 +19353,7 @@ return jQuery;
 	module.exports = performanceNow;
 
 /***/ },
-/* 66 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -19113,7 +19369,7 @@ return jQuery;
 
 	'use strict';
 
-	var ExecutionEnvironment = __webpack_require__(48);
+	var ExecutionEnvironment = __webpack_require__(50);
 
 	var performance;
 
@@ -19124,7 +19380,7 @@ return jQuery;
 	module.exports = performance || {};
 
 /***/ },
-/* 67 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -19363,7 +19619,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 68 */
+/* 71 */
 /***/ function(module, exports) {
 
 	/**
@@ -19403,7 +19659,7 @@ return jQuery;
 	module.exports = getEventTarget;
 
 /***/ },
-/* 69 */
+/* 72 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -19419,7 +19675,7 @@ return jQuery;
 
 	'use strict';
 
-	var ExecutionEnvironment = __webpack_require__(48);
+	var ExecutionEnvironment = __webpack_require__(50);
 
 	var useHasFeature;
 	if (ExecutionEnvironment.canUseDOM) {
@@ -19468,7 +19724,7 @@ return jQuery;
 	module.exports = isEventSupported;
 
 /***/ },
-/* 70 */
+/* 73 */
 /***/ function(module, exports) {
 
 	/**
@@ -19524,7 +19780,7 @@ return jQuery;
 	module.exports = isTextInputElement;
 
 /***/ },
-/* 71 */
+/* 74 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -19540,7 +19796,7 @@ return jQuery;
 
 	'use strict';
 
-	var keyOf = __webpack_require__(24);
+	var keyOf = __webpack_require__(25);
 
 	/**
 	 * Module that is injectable into `EventPluginHub`, that specifies a
@@ -19556,7 +19812,7 @@ return jQuery;
 	module.exports = DefaultEventPluginOrder;
 
 /***/ },
-/* 72 */
+/* 75 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -19572,12 +19828,12 @@ return jQuery;
 
 	'use strict';
 
-	var EventConstants = __webpack_require__(40);
-	var EventPropagators = __webpack_require__(41);
-	var ReactDOMComponentTree = __webpack_require__(35);
-	var SyntheticMouseEvent = __webpack_require__(73);
+	var EventConstants = __webpack_require__(42);
+	var EventPropagators = __webpack_require__(43);
+	var ReactDOMComponentTree = __webpack_require__(37);
+	var SyntheticMouseEvent = __webpack_require__(76);
 
-	var keyOf = __webpack_require__(24);
+	var keyOf = __webpack_require__(25);
 
 	var topLevelTypes = EventConstants.topLevelTypes;
 
@@ -19666,7 +19922,7 @@ return jQuery;
 	module.exports = EnterLeaveEventPlugin;
 
 /***/ },
-/* 73 */
+/* 76 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -19682,10 +19938,10 @@ return jQuery;
 
 	'use strict';
 
-	var SyntheticUIEvent = __webpack_require__(74);
-	var ViewportMetrics = __webpack_require__(75);
+	var SyntheticUIEvent = __webpack_require__(77);
+	var ViewportMetrics = __webpack_require__(78);
 
-	var getEventModifierState = __webpack_require__(76);
+	var getEventModifierState = __webpack_require__(79);
 
 	/**
 	 * @interface MouseEvent
@@ -19743,7 +19999,7 @@ return jQuery;
 	module.exports = SyntheticMouseEvent;
 
 /***/ },
-/* 74 */
+/* 77 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -19759,9 +20015,9 @@ return jQuery;
 
 	'use strict';
 
-	var SyntheticEvent = __webpack_require__(52);
+	var SyntheticEvent = __webpack_require__(54);
 
-	var getEventTarget = __webpack_require__(68);
+	var getEventTarget = __webpack_require__(71);
 
 	/**
 	 * @interface UIEvent
@@ -19807,7 +20063,7 @@ return jQuery;
 	module.exports = SyntheticUIEvent;
 
 /***/ },
-/* 75 */
+/* 78 */
 /***/ function(module, exports) {
 
 	/**
@@ -19839,7 +20095,7 @@ return jQuery;
 	module.exports = ViewportMetrics;
 
 /***/ },
-/* 76 */
+/* 79 */
 /***/ function(module, exports) {
 
 	/**
@@ -19887,7 +20143,7 @@ return jQuery;
 	module.exports = getEventModifierState;
 
 /***/ },
-/* 77 */
+/* 80 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -19903,7 +20159,7 @@ return jQuery;
 
 	'use strict';
 
-	var DOMProperty = __webpack_require__(36);
+	var DOMProperty = __webpack_require__(38);
 
 	var MUST_USE_PROPERTY = DOMProperty.injection.MUST_USE_PROPERTY;
 	var HAS_BOOLEAN_VALUE = DOMProperty.injection.HAS_BOOLEAN_VALUE;
@@ -20009,6 +20265,7 @@ return jQuery;
 	    profile: 0,
 	    radioGroup: 0,
 	    readOnly: HAS_BOOLEAN_VALUE,
+	    referrerPolicy: 0,
 	    rel: 0,
 	    required: HAS_BOOLEAN_VALUE,
 	    reversed: HAS_BOOLEAN_VALUE,
@@ -20100,7 +20357,7 @@ return jQuery;
 	module.exports = HTMLDOMPropertyConfig;
 
 /***/ },
-/* 78 */
+/* 81 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -20116,8 +20373,8 @@ return jQuery;
 
 	'use strict';
 
-	var DOMChildrenOperations = __webpack_require__(79);
-	var ReactDOMIDOperations = __webpack_require__(91);
+	var DOMChildrenOperations = __webpack_require__(82);
+	var ReactDOMIDOperations = __webpack_require__(94);
 
 	/**
 	 * Abstracts away all functionality of the reconciler that requires knowledge of
@@ -20144,7 +20401,7 @@ return jQuery;
 	module.exports = ReactComponentBrowserEnvironment;
 
 /***/ },
-/* 79 */
+/* 82 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -20160,15 +20417,15 @@ return jQuery;
 
 	'use strict';
 
-	var DOMLazyTree = __webpack_require__(80);
-	var Danger = __webpack_require__(86);
-	var ReactMultiChildUpdateTypes = __webpack_require__(90);
-	var ReactDOMComponentTree = __webpack_require__(35);
-	var ReactInstrumentation = __webpack_require__(61);
+	var DOMLazyTree = __webpack_require__(83);
+	var Danger = __webpack_require__(89);
+	var ReactMultiChildUpdateTypes = __webpack_require__(93);
+	var ReactDOMComponentTree = __webpack_require__(37);
+	var ReactInstrumentation = __webpack_require__(63);
 
-	var createMicrosoftUnsafeLocalFunction = __webpack_require__(83);
-	var setInnerHTML = __webpack_require__(82);
-	var setTextContent = __webpack_require__(84);
+	var createMicrosoftUnsafeLocalFunction = __webpack_require__(86);
+	var setInnerHTML = __webpack_require__(85);
+	var setTextContent = __webpack_require__(87);
 
 	function getNodeAfter(parentNode, node) {
 	  // Special case for text components, which return [open, close] comments
@@ -20344,7 +20601,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 80 */
+/* 83 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -20360,11 +20617,11 @@ return jQuery;
 
 	'use strict';
 
-	var DOMNamespaces = __webpack_require__(81);
-	var setInnerHTML = __webpack_require__(82);
+	var DOMNamespaces = __webpack_require__(84);
+	var setInnerHTML = __webpack_require__(85);
 
-	var createMicrosoftUnsafeLocalFunction = __webpack_require__(83);
-	var setTextContent = __webpack_require__(84);
+	var createMicrosoftUnsafeLocalFunction = __webpack_require__(86);
+	var setTextContent = __webpack_require__(87);
 
 	var ELEMENT_NODE_TYPE = 1;
 	var DOCUMENT_FRAGMENT_NODE_TYPE = 11;
@@ -20467,7 +20724,7 @@ return jQuery;
 	module.exports = DOMLazyTree;
 
 /***/ },
-/* 81 */
+/* 84 */
 /***/ function(module, exports) {
 
 	/**
@@ -20492,7 +20749,7 @@ return jQuery;
 	module.exports = DOMNamespaces;
 
 /***/ },
-/* 82 */
+/* 85 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -20508,13 +20765,13 @@ return jQuery;
 
 	'use strict';
 
-	var ExecutionEnvironment = __webpack_require__(48);
-	var DOMNamespaces = __webpack_require__(81);
+	var ExecutionEnvironment = __webpack_require__(50);
+	var DOMNamespaces = __webpack_require__(84);
 
 	var WHITESPACE_TEST = /^[ \r\n\t\f]/;
 	var NONVISIBLE_TEST = /<(!--|link|noscript|meta|script|style)[ \r\n\t\f\/>]/;
 
-	var createMicrosoftUnsafeLocalFunction = __webpack_require__(83);
+	var createMicrosoftUnsafeLocalFunction = __webpack_require__(86);
 
 	// SVG temp container for IE lacking innerHTML
 	var reusableSVGContainer;
@@ -20595,7 +20852,7 @@ return jQuery;
 	module.exports = setInnerHTML;
 
 /***/ },
-/* 83 */
+/* 86 */
 /***/ function(module, exports) {
 
 	/**
@@ -20632,7 +20889,7 @@ return jQuery;
 	module.exports = createMicrosoftUnsafeLocalFunction;
 
 /***/ },
-/* 84 */
+/* 87 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -20648,9 +20905,9 @@ return jQuery;
 
 	'use strict';
 
-	var ExecutionEnvironment = __webpack_require__(48);
-	var escapeTextContentForBrowser = __webpack_require__(85);
-	var setInnerHTML = __webpack_require__(82);
+	var ExecutionEnvironment = __webpack_require__(50);
+	var escapeTextContentForBrowser = __webpack_require__(88);
+	var setInnerHTML = __webpack_require__(85);
 
 	/**
 	 * Set the textContent property of a node, ensuring that whitespace is preserved
@@ -20685,7 +20942,7 @@ return jQuery;
 	module.exports = setTextContent;
 
 /***/ },
-/* 85 */
+/* 88 */
 /***/ function(module, exports) {
 
 	/**
@@ -20812,7 +21069,7 @@ return jQuery;
 	module.exports = escapeTextContentForBrowser;
 
 /***/ },
-/* 86 */
+/* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -20830,10 +21087,10 @@ return jQuery;
 
 	var _prodInvariant = __webpack_require__(7);
 
-	var DOMLazyTree = __webpack_require__(80);
-	var ExecutionEnvironment = __webpack_require__(48);
+	var DOMLazyTree = __webpack_require__(83);
+	var ExecutionEnvironment = __webpack_require__(50);
 
-	var createNodesFromMarkup = __webpack_require__(87);
+	var createNodesFromMarkup = __webpack_require__(90);
 	var emptyFunction = __webpack_require__(12);
 	var invariant = __webpack_require__(8);
 
@@ -20866,7 +21123,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 87 */
+/* 90 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -20884,10 +21141,10 @@ return jQuery;
 
 	/*eslint-disable fb-www/unsafe-html*/
 
-	var ExecutionEnvironment = __webpack_require__(48);
+	var ExecutionEnvironment = __webpack_require__(50);
 
-	var createArrayFromMixed = __webpack_require__(88);
-	var getMarkupWrap = __webpack_require__(89);
+	var createArrayFromMixed = __webpack_require__(91);
+	var getMarkupWrap = __webpack_require__(92);
 	var invariant = __webpack_require__(8);
 
 	/**
@@ -20955,7 +21212,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 88 */
+/* 91 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -21087,7 +21344,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 89 */
+/* 92 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -21104,7 +21361,7 @@ return jQuery;
 
 	/*eslint-disable fb-www/unsafe-html */
 
-	var ExecutionEnvironment = __webpack_require__(48);
+	var ExecutionEnvironment = __webpack_require__(50);
 
 	var invariant = __webpack_require__(8);
 
@@ -21187,7 +21444,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 90 */
+/* 93 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -21203,7 +21460,7 @@ return jQuery;
 
 	'use strict';
 
-	var keyMirror = __webpack_require__(22);
+	var keyMirror = __webpack_require__(23);
 
 	/**
 	 * When a component's children are updated, a series of update configuration
@@ -21224,7 +21481,7 @@ return jQuery;
 	module.exports = ReactMultiChildUpdateTypes;
 
 /***/ },
-/* 91 */
+/* 94 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -21240,8 +21497,8 @@ return jQuery;
 
 	'use strict';
 
-	var DOMChildrenOperations = __webpack_require__(79);
-	var ReactDOMComponentTree = __webpack_require__(35);
+	var DOMChildrenOperations = __webpack_require__(82);
+	var ReactDOMComponentTree = __webpack_require__(37);
 
 	/**
 	 * Operations used to process updates to DOM nodes.
@@ -21263,7 +21520,7 @@ return jQuery;
 	module.exports = ReactDOMIDOperations;
 
 /***/ },
-/* 92 */
+/* 95 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -21284,35 +21541,35 @@ return jQuery;
 	var _prodInvariant = __webpack_require__(7),
 	    _assign = __webpack_require__(4);
 
-	var AutoFocusUtils = __webpack_require__(93);
-	var CSSPropertyOperations = __webpack_require__(95);
-	var DOMLazyTree = __webpack_require__(80);
-	var DOMNamespaces = __webpack_require__(81);
-	var DOMProperty = __webpack_require__(36);
-	var DOMPropertyOperations = __webpack_require__(103);
-	var EventConstants = __webpack_require__(40);
-	var EventPluginHub = __webpack_require__(42);
-	var EventPluginRegistry = __webpack_require__(43);
-	var ReactBrowserEventEmitter = __webpack_require__(109);
-	var ReactComponentBrowserEnvironment = __webpack_require__(78);
-	var ReactDOMButton = __webpack_require__(112);
-	var ReactDOMComponentFlags = __webpack_require__(37);
-	var ReactDOMComponentTree = __webpack_require__(35);
-	var ReactDOMInput = __webpack_require__(114);
-	var ReactDOMOption = __webpack_require__(116);
-	var ReactDOMSelect = __webpack_require__(117);
-	var ReactDOMTextarea = __webpack_require__(118);
-	var ReactInstrumentation = __webpack_require__(61);
-	var ReactMultiChild = __webpack_require__(119);
-	var ReactServerRenderingTransaction = __webpack_require__(130);
+	var AutoFocusUtils = __webpack_require__(96);
+	var CSSPropertyOperations = __webpack_require__(98);
+	var DOMLazyTree = __webpack_require__(83);
+	var DOMNamespaces = __webpack_require__(84);
+	var DOMProperty = __webpack_require__(38);
+	var DOMPropertyOperations = __webpack_require__(106);
+	var EventConstants = __webpack_require__(42);
+	var EventPluginHub = __webpack_require__(44);
+	var EventPluginRegistry = __webpack_require__(45);
+	var ReactBrowserEventEmitter = __webpack_require__(112);
+	var ReactComponentBrowserEnvironment = __webpack_require__(81);
+	var ReactDOMButton = __webpack_require__(115);
+	var ReactDOMComponentFlags = __webpack_require__(39);
+	var ReactDOMComponentTree = __webpack_require__(37);
+	var ReactDOMInput = __webpack_require__(117);
+	var ReactDOMOption = __webpack_require__(119);
+	var ReactDOMSelect = __webpack_require__(120);
+	var ReactDOMTextarea = __webpack_require__(121);
+	var ReactInstrumentation = __webpack_require__(63);
+	var ReactMultiChild = __webpack_require__(122);
+	var ReactServerRenderingTransaction = __webpack_require__(134);
 
 	var emptyFunction = __webpack_require__(12);
-	var escapeTextContentForBrowser = __webpack_require__(85);
+	var escapeTextContentForBrowser = __webpack_require__(88);
 	var invariant = __webpack_require__(8);
-	var isEventSupported = __webpack_require__(69);
-	var keyOf = __webpack_require__(24);
-	var shallowEqual = __webpack_require__(133);
-	var validateDOMNesting = __webpack_require__(134);
+	var isEventSupported = __webpack_require__(72);
+	var keyOf = __webpack_require__(25);
+	var shallowEqual = __webpack_require__(129);
+	var validateDOMNesting = __webpack_require__(137);
 	var warning = __webpack_require__(11);
 
 	var Flags = ReactDOMComponentFlags;
@@ -21679,6 +21936,8 @@ return jQuery;
 	   * @return {string} The computed markup.
 	   */
 	  mountComponent: function (transaction, hostParent, hostContainerInfo, context) {
+	    var _this = this;
+
 	    this._rootNodeID = globalIdCounter++;
 	    this._domID = hostContainerInfo._idCounter++;
 	    this._hostParent = hostParent;
@@ -21832,6 +22091,15 @@ return jQuery;
 	      case 'option':
 	        transaction.getReactMountReady().enqueue(optionPostMount, this);
 	        break;
+	    }
+
+	    if (process.env.NODE_ENV !== 'production') {
+	      if (this._debugID) {
+	        var callback = function () {
+	          return ReactInstrumentation.debugTool.onComponentHasMounted(_this._debugID);
+	        };
+	        transaction.getReactMountReady().enqueue(callback, this);
+	      }
 	    }
 
 	    return mountImage;
@@ -22002,6 +22270,8 @@ return jQuery;
 	   * @overridable
 	   */
 	  updateComponent: function (transaction, prevElement, nextElement, context) {
+	    var _this2 = this;
+
 	    var lastProps = prevElement.props;
 	    var nextProps = this._currentElement.props;
 
@@ -22038,6 +22308,15 @@ return jQuery;
 	      // <select> value update needs to occur after <option> children
 	      // reconciliation
 	      transaction.getReactMountReady().enqueue(postUpdateSelectWrapper, this);
+	    }
+
+	    if (process.env.NODE_ENV !== 'production') {
+	      if (this._debugID) {
+	        var callback = function () {
+	          return ReactInstrumentation.debugTool.onComponentHasUpdated(_this2._debugID);
+	        };
+	        transaction.getReactMountReady().enqueue(callback, this);
+	      }
 	    }
 	  },
 
@@ -22272,7 +22551,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 93 */
+/* 96 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -22288,9 +22567,9 @@ return jQuery;
 
 	'use strict';
 
-	var ReactDOMComponentTree = __webpack_require__(35);
+	var ReactDOMComponentTree = __webpack_require__(37);
 
-	var focusNode = __webpack_require__(94);
+	var focusNode = __webpack_require__(97);
 
 	var AutoFocusUtils = {
 	  focusDOMComponent: function () {
@@ -22301,7 +22580,7 @@ return jQuery;
 	module.exports = AutoFocusUtils;
 
 /***/ },
-/* 94 */
+/* 97 */
 /***/ function(module, exports) {
 
 	/**
@@ -22332,7 +22611,7 @@ return jQuery;
 	module.exports = focusNode;
 
 /***/ },
-/* 95 */
+/* 98 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -22348,14 +22627,14 @@ return jQuery;
 
 	'use strict';
 
-	var CSSProperty = __webpack_require__(96);
-	var ExecutionEnvironment = __webpack_require__(48);
-	var ReactInstrumentation = __webpack_require__(61);
+	var CSSProperty = __webpack_require__(99);
+	var ExecutionEnvironment = __webpack_require__(50);
+	var ReactInstrumentation = __webpack_require__(63);
 
-	var camelizeStyleName = __webpack_require__(97);
-	var dangerousStyleValue = __webpack_require__(99);
-	var hyphenateStyleName = __webpack_require__(100);
-	var memoizeStringOnly = __webpack_require__(102);
+	var camelizeStyleName = __webpack_require__(100);
+	var dangerousStyleValue = __webpack_require__(102);
+	var hyphenateStyleName = __webpack_require__(103);
+	var memoizeStringOnly = __webpack_require__(105);
 	var warning = __webpack_require__(11);
 
 	var processStyleName = memoizeStringOnly(function (styleName) {
@@ -22543,7 +22822,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 96 */
+/* 99 */
 /***/ function(module, exports) {
 
 	/**
@@ -22696,7 +22975,7 @@ return jQuery;
 	module.exports = CSSProperty;
 
 /***/ },
-/* 97 */
+/* 100 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -22712,7 +22991,7 @@ return jQuery;
 
 	'use strict';
 
-	var camelize = __webpack_require__(98);
+	var camelize = __webpack_require__(101);
 
 	var msPattern = /^-ms-/;
 
@@ -22740,7 +23019,7 @@ return jQuery;
 	module.exports = camelizeStyleName;
 
 /***/ },
-/* 98 */
+/* 101 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -22776,7 +23055,7 @@ return jQuery;
 	module.exports = camelize;
 
 /***/ },
-/* 99 */
+/* 102 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -22792,7 +23071,7 @@ return jQuery;
 
 	'use strict';
 
-	var CSSProperty = __webpack_require__(96);
+	var CSSProperty = __webpack_require__(99);
 	var warning = __webpack_require__(11);
 
 	var isUnitlessNumber = CSSProperty.isUnitlessNumber;
@@ -22861,7 +23140,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 100 */
+/* 103 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -22877,7 +23156,7 @@ return jQuery;
 
 	'use strict';
 
-	var hyphenate = __webpack_require__(101);
+	var hyphenate = __webpack_require__(104);
 
 	var msPattern = /^ms-/;
 
@@ -22904,7 +23183,7 @@ return jQuery;
 	module.exports = hyphenateStyleName;
 
 /***/ },
-/* 101 */
+/* 104 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -22941,7 +23220,7 @@ return jQuery;
 	module.exports = hyphenate;
 
 /***/ },
-/* 102 */
+/* 105 */
 /***/ function(module, exports) {
 
 	/**
@@ -22975,7 +23254,7 @@ return jQuery;
 	module.exports = memoizeStringOnly;
 
 /***/ },
-/* 103 */
+/* 106 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -22991,12 +23270,12 @@ return jQuery;
 
 	'use strict';
 
-	var DOMProperty = __webpack_require__(36);
-	var ReactDOMComponentTree = __webpack_require__(35);
-	var ReactDOMInstrumentation = __webpack_require__(104);
-	var ReactInstrumentation = __webpack_require__(61);
+	var DOMProperty = __webpack_require__(38);
+	var ReactDOMComponentTree = __webpack_require__(37);
+	var ReactDOMInstrumentation = __webpack_require__(107);
+	var ReactInstrumentation = __webpack_require__(63);
 
-	var quoteAttributeValueForBrowser = __webpack_require__(108);
+	var quoteAttributeValueForBrowser = __webpack_require__(111);
 	var warning = __webpack_require__(11);
 
 	var VALID_ATTRIBUTE_NAME_REGEX = new RegExp('^[' + DOMProperty.ATTRIBUTE_NAME_START_CHAR + '][' + DOMProperty.ATTRIBUTE_NAME_CHAR + ']*$');
@@ -23209,7 +23488,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 104 */
+/* 107 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -23228,7 +23507,7 @@ return jQuery;
 	var debugTool = null;
 
 	if (process.env.NODE_ENV !== 'production') {
-	  var ReactDOMDebugTool = __webpack_require__(105);
+	  var ReactDOMDebugTool = __webpack_require__(108);
 	  debugTool = ReactDOMDebugTool;
 	}
 
@@ -23236,7 +23515,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 105 */
+/* 108 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -23252,9 +23531,9 @@ return jQuery;
 
 	'use strict';
 
-	var ReactDOMNullInputValuePropDevtool = __webpack_require__(106);
-	var ReactDOMUnknownPropertyDevtool = __webpack_require__(107);
-	var ReactDebugTool = __webpack_require__(62);
+	var ReactDOMNullInputValuePropDevtool = __webpack_require__(109);
+	var ReactDOMUnknownPropertyDevtool = __webpack_require__(110);
+	var ReactDebugTool = __webpack_require__(64);
 
 	var warning = __webpack_require__(11);
 
@@ -23309,7 +23588,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 106 */
+/* 109 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -23325,7 +23604,7 @@ return jQuery;
 
 	'use strict';
 
-	var ReactComponentTreeDevtool = __webpack_require__(28);
+	var ReactComponentTreeDevtool = __webpack_require__(29);
 
 	var warning = __webpack_require__(11);
 
@@ -23358,7 +23637,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 107 */
+/* 110 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -23374,9 +23653,9 @@ return jQuery;
 
 	'use strict';
 
-	var DOMProperty = __webpack_require__(36);
-	var EventPluginRegistry = __webpack_require__(43);
-	var ReactComponentTreeDevtool = __webpack_require__(28);
+	var DOMProperty = __webpack_require__(38);
+	var EventPluginRegistry = __webpack_require__(45);
+	var ReactComponentTreeDevtool = __webpack_require__(29);
 
 	var warning = __webpack_require__(11);
 
@@ -23476,7 +23755,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 108 */
+/* 111 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -23492,7 +23771,7 @@ return jQuery;
 
 	'use strict';
 
-	var escapeTextContentForBrowser = __webpack_require__(85);
+	var escapeTextContentForBrowser = __webpack_require__(88);
 
 	/**
 	 * Escapes attribute value to prevent scripting attacks.
@@ -23507,7 +23786,7 @@ return jQuery;
 	module.exports = quoteAttributeValueForBrowser;
 
 /***/ },
-/* 109 */
+/* 112 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -23525,13 +23804,13 @@ return jQuery;
 
 	var _assign = __webpack_require__(4);
 
-	var EventConstants = __webpack_require__(40);
-	var EventPluginRegistry = __webpack_require__(43);
-	var ReactEventEmitterMixin = __webpack_require__(110);
-	var ViewportMetrics = __webpack_require__(75);
+	var EventConstants = __webpack_require__(42);
+	var EventPluginRegistry = __webpack_require__(45);
+	var ReactEventEmitterMixin = __webpack_require__(113);
+	var ViewportMetrics = __webpack_require__(78);
 
-	var getVendorPrefixedEventName = __webpack_require__(111);
-	var isEventSupported = __webpack_require__(69);
+	var getVendorPrefixedEventName = __webpack_require__(114);
+	var isEventSupported = __webpack_require__(72);
 
 	/**
 	 * Summary of `ReactBrowserEventEmitter` event handling:
@@ -23829,7 +24108,7 @@ return jQuery;
 	module.exports = ReactBrowserEventEmitter;
 
 /***/ },
-/* 110 */
+/* 113 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -23845,7 +24124,7 @@ return jQuery;
 
 	'use strict';
 
-	var EventPluginHub = __webpack_require__(42);
+	var EventPluginHub = __webpack_require__(44);
 
 	function runEventQueueInBatch(events) {
 	  EventPluginHub.enqueueEvents(events);
@@ -23867,7 +24146,7 @@ return jQuery;
 	module.exports = ReactEventEmitterMixin;
 
 /***/ },
-/* 111 */
+/* 114 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -23883,7 +24162,7 @@ return jQuery;
 
 	'use strict';
 
-	var ExecutionEnvironment = __webpack_require__(48);
+	var ExecutionEnvironment = __webpack_require__(50);
 
 	/**
 	 * Generate a mapping of standard vendor prefixes using the defined style property and event name.
@@ -23973,7 +24252,7 @@ return jQuery;
 	module.exports = getVendorPrefixedEventName;
 
 /***/ },
-/* 112 */
+/* 115 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -23989,7 +24268,7 @@ return jQuery;
 
 	'use strict';
 
-	var DisabledInputUtils = __webpack_require__(113);
+	var DisabledInputUtils = __webpack_require__(116);
 
 	/**
 	 * Implements a <button> host component that does not receive mouse events
@@ -24002,7 +24281,7 @@ return jQuery;
 	module.exports = ReactDOMButton;
 
 /***/ },
-/* 113 */
+/* 116 */
 /***/ function(module, exports) {
 
 	/**
@@ -24057,7 +24336,7 @@ return jQuery;
 	module.exports = DisabledInputUtils;
 
 /***/ },
-/* 114 */
+/* 117 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -24076,11 +24355,11 @@ return jQuery;
 	var _prodInvariant = __webpack_require__(7),
 	    _assign = __webpack_require__(4);
 
-	var DisabledInputUtils = __webpack_require__(113);
-	var DOMPropertyOperations = __webpack_require__(103);
-	var LinkedValueUtils = __webpack_require__(115);
-	var ReactDOMComponentTree = __webpack_require__(35);
-	var ReactUpdates = __webpack_require__(55);
+	var DisabledInputUtils = __webpack_require__(116);
+	var DOMPropertyOperations = __webpack_require__(106);
+	var LinkedValueUtils = __webpack_require__(118);
+	var ReactDOMComponentTree = __webpack_require__(37);
+	var ReactUpdates = __webpack_require__(57);
 
 	var invariant = __webpack_require__(8);
 	var warning = __webpack_require__(11);
@@ -24128,7 +24407,10 @@ return jQuery;
 	    var hostProps = _assign({
 	      // Make sure we set .type before any other properties (setting .value
 	      // before .type means .value is lost in IE11 and below)
-	      type: undefined
+	      type: undefined,
+	      // Make sure we set .step before .value (setting .value before .step
+	      // means .value is rounded on mount, based upon step precision)
+	      step: undefined
 	    }, DisabledInputUtils.getHostProps(inst, props), {
 	      defaultChecked: undefined,
 	      defaultValue: undefined,
@@ -24307,7 +24589,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 115 */
+/* 118 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -24325,8 +24607,9 @@ return jQuery;
 
 	var _prodInvariant = __webpack_require__(7);
 
-	var ReactPropTypes = __webpack_require__(30);
-	var ReactPropTypeLocations = __webpack_require__(21);
+	var ReactPropTypes = __webpack_require__(32);
+	var ReactPropTypeLocations = __webpack_require__(22);
+	var ReactPropTypesSecret = __webpack_require__(31);
 
 	var invariant = __webpack_require__(8);
 	var warning = __webpack_require__(11);
@@ -24389,7 +24672,7 @@ return jQuery;
 	  checkPropTypes: function (tagName, props, owner) {
 	    for (var propName in propTypes) {
 	      if (propTypes.hasOwnProperty(propName)) {
-	        var error = propTypes[propName](props, propName, tagName, ReactPropTypeLocations.prop);
+	        var error = propTypes[propName](props, propName, tagName, ReactPropTypeLocations.prop, null, ReactPropTypesSecret);
 	      }
 	      if (error instanceof Error && !(error.message in loggedTypeFailures)) {
 	        // Only monitor this failure once because there tends to be a lot of the
@@ -24448,7 +24731,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 116 */
+/* 119 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -24467,8 +24750,8 @@ return jQuery;
 	var _assign = __webpack_require__(4);
 
 	var ReactChildren = __webpack_require__(5);
-	var ReactDOMComponentTree = __webpack_require__(35);
-	var ReactDOMSelect = __webpack_require__(117);
+	var ReactDOMComponentTree = __webpack_require__(37);
+	var ReactDOMSelect = __webpack_require__(120);
 
 	var warning = __webpack_require__(11);
 	var didWarnInvalidOptionChildren = false;
@@ -24577,7 +24860,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 117 */
+/* 120 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -24595,10 +24878,10 @@ return jQuery;
 
 	var _assign = __webpack_require__(4);
 
-	var DisabledInputUtils = __webpack_require__(113);
-	var LinkedValueUtils = __webpack_require__(115);
-	var ReactDOMComponentTree = __webpack_require__(35);
-	var ReactUpdates = __webpack_require__(55);
+	var DisabledInputUtils = __webpack_require__(116);
+	var LinkedValueUtils = __webpack_require__(118);
+	var ReactDOMComponentTree = __webpack_require__(37);
+	var ReactUpdates = __webpack_require__(57);
 
 	var warning = __webpack_require__(11);
 
@@ -24783,7 +25066,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 118 */
+/* 121 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -24802,10 +25085,10 @@ return jQuery;
 	var _prodInvariant = __webpack_require__(7),
 	    _assign = __webpack_require__(4);
 
-	var DisabledInputUtils = __webpack_require__(113);
-	var LinkedValueUtils = __webpack_require__(115);
-	var ReactDOMComponentTree = __webpack_require__(35);
-	var ReactUpdates = __webpack_require__(55);
+	var DisabledInputUtils = __webpack_require__(116);
+	var LinkedValueUtils = __webpack_require__(118);
+	var ReactDOMComponentTree = __webpack_require__(37);
+	var ReactUpdates = __webpack_require__(57);
 
 	var invariant = __webpack_require__(8);
 	var warning = __webpack_require__(11);
@@ -24944,7 +25227,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 119 */
+/* 122 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -24962,17 +25245,17 @@ return jQuery;
 
 	var _prodInvariant = __webpack_require__(7);
 
-	var ReactComponentEnvironment = __webpack_require__(120);
-	var ReactInstanceMap = __webpack_require__(121);
-	var ReactInstrumentation = __webpack_require__(61);
-	var ReactMultiChildUpdateTypes = __webpack_require__(90);
+	var ReactComponentEnvironment = __webpack_require__(123);
+	var ReactInstanceMap = __webpack_require__(124);
+	var ReactInstrumentation = __webpack_require__(63);
+	var ReactMultiChildUpdateTypes = __webpack_require__(93);
 
 	var ReactCurrentOwner = __webpack_require__(10);
-	var ReactReconciler = __webpack_require__(58);
-	var ReactChildReconciler = __webpack_require__(122);
+	var ReactReconciler = __webpack_require__(60);
+	var ReactChildReconciler = __webpack_require__(125);
 
 	var emptyFunction = __webpack_require__(12);
-	var flattenChildren = __webpack_require__(129);
+	var flattenChildren = __webpack_require__(133);
 	var invariant = __webpack_require__(8);
 
 	/**
@@ -25149,7 +25432,7 @@ return jQuery;
 	      return ReactChildReconciler.instantiateChildren(nestedChildren, transaction, context);
 	    },
 
-	    _reconcilerUpdateChildren: function (prevChildren, nextNestedChildrenElements, removedNodes, transaction, context) {
+	    _reconcilerUpdateChildren: function (prevChildren, nextNestedChildrenElements, mountImages, removedNodes, transaction, context) {
 	      var nextChildren;
 	      if (process.env.NODE_ENV !== 'production') {
 	        if (this._currentElement) {
@@ -25159,12 +25442,12 @@ return jQuery;
 	          } finally {
 	            ReactCurrentOwner.current = null;
 	          }
-	          ReactChildReconciler.updateChildren(prevChildren, nextChildren, removedNodes, transaction, context);
+	          ReactChildReconciler.updateChildren(prevChildren, nextChildren, mountImages, removedNodes, transaction, this, this._hostContainerInfo, context);
 	          return nextChildren;
 	        }
 	      }
 	      nextChildren = flattenChildren(nextNestedChildrenElements);
-	      ReactChildReconciler.updateChildren(prevChildren, nextChildren, removedNodes, transaction, context);
+	      ReactChildReconciler.updateChildren(prevChildren, nextChildren, mountImages, removedNodes, transaction, this, this._hostContainerInfo, context);
 	      return nextChildren;
 	    },
 
@@ -25261,7 +25544,8 @@ return jQuery;
 	    _updateChildren: function (nextNestedChildrenElements, transaction, context) {
 	      var prevChildren = this._renderedChildren;
 	      var removedNodes = {};
-	      var nextChildren = this._reconcilerUpdateChildren(prevChildren, nextNestedChildrenElements, removedNodes, transaction, context);
+	      var mountImages = [];
+	      var nextChildren = this._reconcilerUpdateChildren(prevChildren, nextNestedChildrenElements, mountImages, removedNodes, transaction, context);
 	      if (!nextChildren && !prevChildren) {
 	        return;
 	      }
@@ -25269,8 +25553,10 @@ return jQuery;
 	      var name;
 	      // `nextIndex` will increment for each child in `nextChildren`, but
 	      // `lastIndex` will be the last index visited in `prevChildren`.
-	      var lastIndex = 0;
 	      var nextIndex = 0;
+	      var lastIndex = 0;
+	      // `nextMountIndex` will increment for each newly mounted child.
+	      var nextMountIndex = 0;
 	      var lastPlacedNode = null;
 	      for (name in nextChildren) {
 	        if (!nextChildren.hasOwnProperty(name)) {
@@ -25289,7 +25575,8 @@ return jQuery;
 	            // The `removedNodes` loop below will actually remove the child.
 	          }
 	          // The child must be instantiated before it's mounted.
-	          updates = enqueue(updates, this._mountChildAtIndex(nextChild, lastPlacedNode, nextIndex, transaction, context));
+	          updates = enqueue(updates, this._mountChildAtIndex(nextChild, mountImages[nextMountIndex], lastPlacedNode, nextIndex, transaction, context));
+	          nextMountIndex++;
 	        }
 	        nextIndex++;
 	        lastPlacedNode = ReactReconciler.getHostNode(nextChild);
@@ -25372,8 +25659,7 @@ return jQuery;
 	     * @param {ReactReconcileTransaction} transaction
 	     * @private
 	     */
-	    _mountChildAtIndex: function (child, afterNode, index, transaction, context) {
-	      var mountImage = ReactReconciler.mountComponent(child, transaction, this, this._hostContainerInfo, context);
+	    _mountChildAtIndex: function (child, mountImage, afterNode, index, transaction, context) {
 	      child._mountIndex = index;
 	      return this.createChild(child, afterNode, mountImage);
 	    },
@@ -25400,7 +25686,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 120 */
+/* 123 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -25459,7 +25745,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 121 */
+/* 124 */
 /***/ function(module, exports) {
 
 	/**
@@ -25512,7 +25798,7 @@ return jQuery;
 	module.exports = ReactInstanceMap;
 
 /***/ },
-/* 122 */
+/* 125 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -25528,19 +25814,32 @@ return jQuery;
 
 	'use strict';
 
-	var ReactReconciler = __webpack_require__(58);
+	var ReactReconciler = __webpack_require__(60);
 
-	var instantiateReactComponent = __webpack_require__(123);
+	var instantiateReactComponent = __webpack_require__(126);
 	var KeyEscapeUtils = __webpack_require__(16);
-	var shouldUpdateReactComponent = __webpack_require__(126);
+	var shouldUpdateReactComponent = __webpack_require__(130);
 	var traverseAllChildren = __webpack_require__(14);
 	var warning = __webpack_require__(11);
+
+	var ReactComponentTreeDevtool;
+
+	if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
+	  // Temporary hack.
+	  // Inline requires don't work well with Jest:
+	  // https://github.com/facebook/react/issues/7240
+	  // Remove the inline requires when we don't need them anymore:
+	  // https://github.com/facebook/react/pull/7178
+	  ReactComponentTreeDevtool = __webpack_require__(29);
+	}
 
 	function instantiateChild(childInstances, child, name, selfDebugID) {
 	  // We found a component instance.
 	  var keyUnique = childInstances[name] === undefined;
 	  if (process.env.NODE_ENV !== 'production') {
-	    var ReactComponentTreeDevtool = __webpack_require__(28);
+	    if (!ReactComponentTreeDevtool) {
+	      ReactComponentTreeDevtool = __webpack_require__(29);
+	    }
 	    process.env.NODE_ENV !== 'production' ? warning(keyUnique, 'flattenChildren(...): Encountered two children with the same key, ' + '`%s`. Child keys must be unique; when two children share a key, only ' + 'the first child will be used.%s', KeyEscapeUtils.unescape(name), ReactComponentTreeDevtool.getStackAddendumByID(selfDebugID)) : void 0;
 	  }
 	  if (child != null && keyUnique) {
@@ -25589,7 +25888,7 @@ return jQuery;
 	   * @return {?object} A new set of child instances.
 	   * @internal
 	   */
-	  updateChildren: function (prevChildren, nextChildren, removedNodes, transaction, context) {
+	  updateChildren: function (prevChildren, nextChildren, mountImages, removedNodes, transaction, hostParent, hostContainerInfo, context) {
 	    // We currently don't have a way to track moves here but if we use iterators
 	    // instead of for..in we can zip the iterators and check if an item has
 	    // moved.
@@ -25618,6 +25917,10 @@ return jQuery;
 	        // The child must be instantiated before it's mounted.
 	        var nextChildInstance = instantiateReactComponent(nextElement, true);
 	        nextChildren[name] = nextChildInstance;
+	        // Creating mount image now ensures refs are resolved in right order
+	        // (see https://github.com/facebook/react/pull/7101 for explanation).
+	        var nextChildMountImage = ReactReconciler.mountComponent(nextChildInstance, transaction, hostParent, hostContainerInfo, context);
+	        mountImages.push(nextChildMountImage);
 	      }
 	    }
 	    // Unmount children that are no longer present.
@@ -25652,7 +25955,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 123 */
+/* 126 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -25671,10 +25974,10 @@ return jQuery;
 	var _prodInvariant = __webpack_require__(7),
 	    _assign = __webpack_require__(4);
 
-	var ReactCompositeComponent = __webpack_require__(124);
-	var ReactEmptyComponent = __webpack_require__(127);
-	var ReactHostComponent = __webpack_require__(128);
-	var ReactInstrumentation = __webpack_require__(61);
+	var ReactCompositeComponent = __webpack_require__(127);
+	var ReactEmptyComponent = __webpack_require__(131);
+	var ReactHostComponent = __webpack_require__(132);
+	var ReactInstrumentation = __webpack_require__(63);
 
 	var invariant = __webpack_require__(8);
 	var warning = __webpack_require__(11);
@@ -25804,7 +26107,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 124 */
+/* 127 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -25823,22 +26126,28 @@ return jQuery;
 	var _prodInvariant = __webpack_require__(7),
 	    _assign = __webpack_require__(4);
 
-	var ReactComponentEnvironment = __webpack_require__(120);
+	var ReactComponentEnvironment = __webpack_require__(123);
 	var ReactCurrentOwner = __webpack_require__(10);
 	var ReactElement = __webpack_require__(9);
-	var ReactErrorUtils = __webpack_require__(45);
-	var ReactInstanceMap = __webpack_require__(121);
-	var ReactInstrumentation = __webpack_require__(61);
-	var ReactNodeTypes = __webpack_require__(125);
-	var ReactPropTypeLocations = __webpack_require__(21);
-	var ReactReconciler = __webpack_require__(58);
+	var ReactErrorUtils = __webpack_require__(47);
+	var ReactInstanceMap = __webpack_require__(124);
+	var ReactInstrumentation = __webpack_require__(63);
+	var ReactNodeTypes = __webpack_require__(128);
+	var ReactPropTypeLocations = __webpack_require__(22);
+	var ReactReconciler = __webpack_require__(60);
 
-	var checkReactTypeSpec = __webpack_require__(29);
-
+	var checkReactTypeSpec = __webpack_require__(30);
 	var emptyObject = __webpack_require__(19);
 	var invariant = __webpack_require__(8);
-	var shouldUpdateReactComponent = __webpack_require__(126);
+	var shallowEqual = __webpack_require__(129);
+	var shouldUpdateReactComponent = __webpack_require__(130);
 	var warning = __webpack_require__(11);
+
+	var CompositeTypes = {
+	  ImpureClass: 0,
+	  PureClass: 1,
+	  StatelessFunctional: 2
+	};
 
 	function StatelessComponent(Component) {}
 	StatelessComponent.prototype.render = function () {
@@ -25878,7 +26187,11 @@ return jQuery;
 	}
 
 	function shouldConstruct(Component) {
-	  return Component.prototype && Component.prototype.isReactComponent;
+	  return !!(Component.prototype && Component.prototype.isReactComponent);
+	}
+
+	function isPureComponent(Component) {
+	  return !!(Component.prototype && Component.prototype.isPureReactComponent);
 	}
 
 	/**
@@ -25931,6 +26244,7 @@ return jQuery;
 	  construct: function (element) {
 	    this._currentElement = element;
 	    this._rootNodeID = null;
+	    this._compositeType = null;
 	    this._instance = null;
 	    this._hostParent = null;
 	    this._hostContainerInfo = null;
@@ -25971,6 +26285,8 @@ return jQuery;
 	   * @internal
 	   */
 	  mountComponent: function (transaction, hostParent, hostContainerInfo, context) {
+	    var _this = this;
+
 	    this._context = context;
 	    this._mountOrder = nextMountID++;
 	    this._hostParent = hostParent;
@@ -25984,15 +26300,23 @@ return jQuery;
 	    var updateQueue = transaction.getUpdateQueue();
 
 	    // Initialize the public class
-	    var inst = this._constructComponent(publicProps, publicContext, updateQueue);
+	    var doConstruct = shouldConstruct(Component);
+	    var inst = this._constructComponent(doConstruct, publicProps, publicContext, updateQueue);
 	    var renderedElement;
 
 	    // Support functional components
-	    if (!shouldConstruct(Component) && (inst == null || inst.render == null)) {
+	    if (!doConstruct && (inst == null || inst.render == null)) {
 	      renderedElement = inst;
 	      warnIfInvalidElement(Component, renderedElement);
 	      !(inst === null || inst === false || ReactElement.isValidElement(inst)) ? process.env.NODE_ENV !== 'production' ? invariant(false, '%s(...): A valid React element (or null) must be returned. You may have returned undefined, an array or some other invalid object.', Component.displayName || Component.name || 'Component') : _prodInvariant('105', Component.displayName || Component.name || 'Component') : void 0;
 	      inst = new StatelessComponent(Component);
+	      this._compositeType = CompositeTypes.StatelessFunctional;
+	    } else {
+	      if (isPureComponent(Component)) {
+	        this._compositeType = CompositeTypes.PureClass;
+	      } else {
+	        this._compositeType = CompositeTypes.ImpureClass;
+	      }
 	    }
 
 	    if (process.env.NODE_ENV !== 'production') {
@@ -26058,26 +26382,35 @@ return jQuery;
 	      }
 	    }
 
+	    if (process.env.NODE_ENV !== 'production') {
+	      if (this._debugID) {
+	        var callback = function (component) {
+	          return ReactInstrumentation.debugTool.onComponentHasMounted(_this._debugID);
+	        };
+	        transaction.getReactMountReady().enqueue(callback, this);
+	      }
+	    }
+
 	    return markup;
 	  },
 
-	  _constructComponent: function (publicProps, publicContext, updateQueue) {
+	  _constructComponent: function (doConstruct, publicProps, publicContext, updateQueue) {
 	    if (process.env.NODE_ENV !== 'production') {
 	      ReactCurrentOwner.current = this;
 	      try {
-	        return this._constructComponentWithoutOwner(publicProps, publicContext, updateQueue);
+	        return this._constructComponentWithoutOwner(doConstruct, publicProps, publicContext, updateQueue);
 	      } finally {
 	        ReactCurrentOwner.current = null;
 	      }
 	    } else {
-	      return this._constructComponentWithoutOwner(publicProps, publicContext, updateQueue);
+	      return this._constructComponentWithoutOwner(doConstruct, publicProps, publicContext, updateQueue);
 	    }
 	  },
 
-	  _constructComponentWithoutOwner: function (publicProps, publicContext, updateQueue) {
+	  _constructComponentWithoutOwner: function (doConstruct, publicProps, publicContext, updateQueue) {
 	    var Component = this._currentElement.type;
 	    var instanceOrElement;
-	    if (shouldConstruct(Component)) {
+	    if (doConstruct) {
 	      if (process.env.NODE_ENV !== 'production') {
 	        if (this._debugID !== 0) {
 	          ReactInstrumentation.debugTool.onBeginLifeCycleTimer(this._debugID, 'ctor');
@@ -26381,7 +26714,6 @@ return jQuery;
 
 	    var willReceive = false;
 	    var nextContext;
-	    var nextProps;
 
 	    // Determine if the context has changed or not
 	    if (this._context === nextUnmaskedContext) {
@@ -26391,7 +26723,8 @@ return jQuery;
 	      willReceive = true;
 	    }
 
-	    nextProps = nextParentElement.props;
+	    var prevProps = prevParentElement.props;
+	    var nextProps = nextParentElement.props;
 
 	    // Not a simple state update but a props update
 	    if (prevParentElement !== nextParentElement) {
@@ -26418,16 +26751,22 @@ return jQuery;
 	    var nextState = this._processPendingState(nextProps, nextContext);
 	    var shouldUpdate = true;
 
-	    if (!this._pendingForceUpdate && inst.shouldComponentUpdate) {
-	      if (process.env.NODE_ENV !== 'production') {
-	        if (this._debugID !== 0) {
-	          ReactInstrumentation.debugTool.onBeginLifeCycleTimer(this._debugID, 'shouldComponentUpdate');
+	    if (!this._pendingForceUpdate) {
+	      if (inst.shouldComponentUpdate) {
+	        if (process.env.NODE_ENV !== 'production') {
+	          if (this._debugID !== 0) {
+	            ReactInstrumentation.debugTool.onBeginLifeCycleTimer(this._debugID, 'shouldComponentUpdate');
+	          }
 	        }
-	      }
-	      shouldUpdate = inst.shouldComponentUpdate(nextProps, nextState, nextContext);
-	      if (process.env.NODE_ENV !== 'production') {
-	        if (this._debugID !== 0) {
-	          ReactInstrumentation.debugTool.onEndLifeCycleTimer(this._debugID, 'shouldComponentUpdate');
+	        shouldUpdate = inst.shouldComponentUpdate(nextProps, nextState, nextContext);
+	        if (process.env.NODE_ENV !== 'production') {
+	          if (this._debugID !== 0) {
+	            ReactInstrumentation.debugTool.onEndLifeCycleTimer(this._debugID, 'shouldComponentUpdate');
+	          }
+	        }
+	      } else {
+	        if (this._compositeType === CompositeTypes.PureClass) {
+	          shouldUpdate = !shallowEqual(prevProps, nextProps) || !shallowEqual(inst.state, nextState);
 	        }
 	      }
 	    }
@@ -26489,6 +26828,8 @@ return jQuery;
 	   * @private
 	   */
 	  _performComponentUpdate: function (nextElement, nextProps, nextState, nextContext, transaction, unmaskedContext) {
+	    var _this2 = this;
+
 	    var inst = this._instance;
 
 	    var hasComponentDidUpdate = Boolean(inst.componentDidUpdate);
@@ -26528,6 +26869,15 @@ return jQuery;
 	        transaction.getReactMountReady().enqueue(invokeComponentDidUpdateWithTimer.bind(this, prevProps, prevState, prevContext), this);
 	      } else {
 	        transaction.getReactMountReady().enqueue(inst.componentDidUpdate.bind(inst, prevProps, prevState, prevContext), inst);
+	      }
+	    }
+
+	    if (process.env.NODE_ENV !== 'production') {
+	      if (this._debugID) {
+	        var callback = function () {
+	          return ReactInstrumentation.debugTool.onComponentHasUpdated(_this2._debugID);
+	        };
+	        transaction.getReactMountReady().enqueue(callback, this);
 	      }
 	    }
 	  },
@@ -26615,11 +26965,15 @@ return jQuery;
 	   */
 	  _renderValidatedComponent: function () {
 	    var renderedComponent;
-	    ReactCurrentOwner.current = this;
-	    try {
+	    if (process.env.NODE_ENV !== 'production' || this._compositeType !== CompositeTypes.StatelessFunctional) {
+	      ReactCurrentOwner.current = this;
+	      try {
+	        renderedComponent = this._renderValidatedComponentWithoutOwnerOrContext();
+	      } finally {
+	        ReactCurrentOwner.current = null;
+	      }
+	    } else {
 	      renderedComponent = this._renderValidatedComponentWithoutOwnerOrContext();
-	    } finally {
-	      ReactCurrentOwner.current = null;
 	    }
 	    !(
 	    // TODO: An `isValidNode` function would probably be more appropriate
@@ -26682,7 +27036,7 @@ return jQuery;
 	   */
 	  getPublicInstance: function () {
 	    var inst = this._instance;
-	    if (inst instanceof StatelessComponent) {
+	    if (this._compositeType === CompositeTypes.StatelessFunctional) {
 	      return null;
 	    }
 	    return inst;
@@ -26703,7 +27057,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 125 */
+/* 128 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -26749,7 +27103,78 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 126 */
+/* 129 */
+/***/ function(module, exports) {
+
+	/**
+	 * Copyright (c) 2013-present, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @typechecks
+	 * 
+	 */
+
+	/*eslint-disable no-self-compare */
+
+	'use strict';
+
+	var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+	/**
+	 * inlined Object.is polyfill to avoid requiring consumers ship their own
+	 * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is
+	 */
+	function is(x, y) {
+	  // SameValue algorithm
+	  if (x === y) {
+	    // Steps 1-5, 7-10
+	    // Steps 6.b-6.e: +0 != -0
+	    return x !== 0 || 1 / x === 1 / y;
+	  } else {
+	    // Step 6.a: NaN == NaN
+	    return x !== x && y !== y;
+	  }
+	}
+
+	/**
+	 * Performs equality by iterating through keys on an object and returning false
+	 * when any key has values which are not strictly equal between the arguments.
+	 * Returns true when the values of all keys are strictly equal.
+	 */
+	function shallowEqual(objA, objB) {
+	  if (is(objA, objB)) {
+	    return true;
+	  }
+
+	  if (typeof objA !== 'object' || objA === null || typeof objB !== 'object' || objB === null) {
+	    return false;
+	  }
+
+	  var keysA = Object.keys(objA);
+	  var keysB = Object.keys(objB);
+
+	  if (keysA.length !== keysB.length) {
+	    return false;
+	  }
+
+	  // Test for A's keys different from B.
+	  for (var i = 0; i < keysA.length; i++) {
+	    if (!hasOwnProperty.call(objB, keysA[i]) || !is(objA[keysA[i]], objB[keysA[i]])) {
+	      return false;
+	    }
+	  }
+
+	  return true;
+	}
+
+	module.exports = shallowEqual;
+
+/***/ },
+/* 130 */
 /***/ function(module, exports) {
 
 	/**
@@ -26796,7 +27221,7 @@ return jQuery;
 	module.exports = shouldUpdateReactComponent;
 
 /***/ },
-/* 127 */
+/* 131 */
 /***/ function(module, exports) {
 
 	/**
@@ -26831,7 +27256,7 @@ return jQuery;
 	module.exports = ReactEmptyComponent;
 
 /***/ },
-/* 128 */
+/* 132 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -26913,7 +27338,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 129 */
+/* 133 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -26934,6 +27359,17 @@ return jQuery;
 	var traverseAllChildren = __webpack_require__(14);
 	var warning = __webpack_require__(11);
 
+	var ReactComponentTreeDevtool;
+
+	if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
+	  // Temporary hack.
+	  // Inline requires don't work well with Jest:
+	  // https://github.com/facebook/react/issues/7240
+	  // Remove the inline requires when we don't need them anymore:
+	  // https://github.com/facebook/react/pull/7178
+	  ReactComponentTreeDevtool = __webpack_require__(29);
+	}
+
 	/**
 	 * @param {function} traverseContext Context passed through traversal.
 	 * @param {?ReactComponent} child React child component.
@@ -26946,7 +27382,9 @@ return jQuery;
 	    var result = traverseContext;
 	    var keyUnique = result[name] === undefined;
 	    if (process.env.NODE_ENV !== 'production') {
-	      var ReactComponentTreeDevtool = __webpack_require__(28);
+	      if (!ReactComponentTreeDevtool) {
+	        ReactComponentTreeDevtool = __webpack_require__(29);
+	      }
 	      process.env.NODE_ENV !== 'production' ? warning(keyUnique, 'flattenChildren(...): Encountered two children with the same key, ' + '`%s`. Child keys must be unique; when two children share a key, only ' + 'the first child will be used.%s', KeyEscapeUtils.unescape(name), ReactComponentTreeDevtool.getStackAddendumByID(selfDebugID)) : void 0;
 	    }
 	    if (keyUnique && child != null) {
@@ -26980,7 +27418,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 130 */
+/* 134 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -26999,9 +27437,9 @@ return jQuery;
 	var _assign = __webpack_require__(4);
 
 	var PooledClass = __webpack_require__(6);
-	var Transaction = __webpack_require__(67);
-	var ReactInstrumentation = __webpack_require__(61);
-	var ReactServerUpdateQueue = __webpack_require__(131);
+	var Transaction = __webpack_require__(70);
+	var ReactInstrumentation = __webpack_require__(63);
+	var ReactServerUpdateQueue = __webpack_require__(135);
 
 	/**
 	 * Executed within the scope of the `Transaction` instance. Consider these as
@@ -27076,7 +27514,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 131 */
+/* 135 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -27095,8 +27533,8 @@ return jQuery;
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var ReactUpdateQueue = __webpack_require__(132);
-	var Transaction = __webpack_require__(67);
+	var ReactUpdateQueue = __webpack_require__(136);
+	var Transaction = __webpack_require__(70);
 	var warning = __webpack_require__(11);
 
 	function warnNoop(publicInstance, callerName) {
@@ -27223,7 +27661,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 132 */
+/* 136 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -27242,9 +27680,9 @@ return jQuery;
 	var _prodInvariant = __webpack_require__(7);
 
 	var ReactCurrentOwner = __webpack_require__(10);
-	var ReactInstanceMap = __webpack_require__(121);
-	var ReactInstrumentation = __webpack_require__(61);
-	var ReactUpdates = __webpack_require__(55);
+	var ReactInstanceMap = __webpack_require__(124);
+	var ReactInstrumentation = __webpack_require__(63);
+	var ReactUpdates = __webpack_require__(57);
 
 	var invariant = __webpack_require__(8);
 	var warning = __webpack_require__(11);
@@ -27270,10 +27708,11 @@ return jQuery;
 	  var internalInstance = ReactInstanceMap.get(publicInstance);
 	  if (!internalInstance) {
 	    if (process.env.NODE_ENV !== 'production') {
+	      var ctor = publicInstance.constructor;
 	      // Only warn when we have a callerName. Otherwise we should be silent.
 	      // We're probably calling from enqueueCallback. We don't want to warn
 	      // there because we already warned for the corresponding lifecycle method.
-	      process.env.NODE_ENV !== 'production' ? warning(!callerName, '%s(...): Can only update a mounted or mounting component. ' + 'This usually means you called %s() on an unmounted component. ' + 'This is a no-op. Please check the code for the %s component.', callerName, callerName, publicInstance.constructor.displayName) : void 0;
+	      process.env.NODE_ENV !== 'production' ? warning(!callerName, '%s(...): Can only update a mounted or mounting component. ' + 'This usually means you called %s() on an unmounted component. ' + 'This is a no-op. Please check the code for the %s component.', callerName, callerName, ctor && (ctor.displayName || ctor.name) || 'ReactClass') : void 0;
 	    }
 	    return null;
 	  }
@@ -27454,78 +27893,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 133 */
-/***/ function(module, exports) {
-
-	/**
-	 * Copyright (c) 2013-present, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @typechecks
-	 * 
-	 */
-
-	/*eslint-disable no-self-compare */
-
-	'use strict';
-
-	var hasOwnProperty = Object.prototype.hasOwnProperty;
-
-	/**
-	 * inlined Object.is polyfill to avoid requiring consumers ship their own
-	 * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is
-	 */
-	function is(x, y) {
-	  // SameValue algorithm
-	  if (x === y) {
-	    // Steps 1-5, 7-10
-	    // Steps 6.b-6.e: +0 != -0
-	    return x !== 0 || 1 / x === 1 / y;
-	  } else {
-	    // Step 6.a: NaN == NaN
-	    return x !== x && y !== y;
-	  }
-	}
-
-	/**
-	 * Performs equality by iterating through keys on an object and returning false
-	 * when any key has values which are not strictly equal between the arguments.
-	 * Returns true when the values of all keys are strictly equal.
-	 */
-	function shallowEqual(objA, objB) {
-	  if (is(objA, objB)) {
-	    return true;
-	  }
-
-	  if (typeof objA !== 'object' || objA === null || typeof objB !== 'object' || objB === null) {
-	    return false;
-	  }
-
-	  var keysA = Object.keys(objA);
-	  var keysB = Object.keys(objB);
-
-	  if (keysA.length !== keysB.length) {
-	    return false;
-	  }
-
-	  // Test for A's keys different from B.
-	  for (var i = 0; i < keysA.length; i++) {
-	    if (!hasOwnProperty.call(objB, keysA[i]) || !is(objA[keysA[i]], objB[keysA[i]])) {
-	      return false;
-	    }
-	  }
-
-	  return true;
-	}
-
-	module.exports = shallowEqual;
-
-/***/ },
-/* 134 */
+/* 137 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -27900,7 +28268,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 135 */
+/* 138 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -27918,8 +28286,8 @@ return jQuery;
 
 	var _assign = __webpack_require__(4);
 
-	var DOMLazyTree = __webpack_require__(80);
-	var ReactDOMComponentTree = __webpack_require__(35);
+	var DOMLazyTree = __webpack_require__(83);
+	var ReactDOMComponentTree = __webpack_require__(37);
 
 	var ReactDOMEmptyComponent = function (instantiate) {
 	  // ReactCompositeComponent uses this:
@@ -27965,7 +28333,7 @@ return jQuery;
 	module.exports = ReactDOMEmptyComponent;
 
 /***/ },
-/* 136 */
+/* 139 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -28107,7 +28475,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 137 */
+/* 140 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -28126,14 +28494,14 @@ return jQuery;
 	var _prodInvariant = __webpack_require__(7),
 	    _assign = __webpack_require__(4);
 
-	var DOMChildrenOperations = __webpack_require__(79);
-	var DOMLazyTree = __webpack_require__(80);
-	var ReactDOMComponentTree = __webpack_require__(35);
-	var ReactInstrumentation = __webpack_require__(61);
+	var DOMChildrenOperations = __webpack_require__(82);
+	var DOMLazyTree = __webpack_require__(83);
+	var ReactDOMComponentTree = __webpack_require__(37);
+	var ReactInstrumentation = __webpack_require__(63);
 
-	var escapeTextContentForBrowser = __webpack_require__(85);
+	var escapeTextContentForBrowser = __webpack_require__(88);
 	var invariant = __webpack_require__(8);
-	var validateDOMNesting = __webpack_require__(134);
+	var validateDOMNesting = __webpack_require__(137);
 
 	/**
 	 * Text nodes violate a couple assumptions that React makes about components:
@@ -28284,7 +28652,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 138 */
+/* 141 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -28302,8 +28670,8 @@ return jQuery;
 
 	var _assign = __webpack_require__(4);
 
-	var ReactUpdates = __webpack_require__(55);
-	var Transaction = __webpack_require__(67);
+	var ReactUpdates = __webpack_require__(57);
+	var Transaction = __webpack_require__(70);
 
 	var emptyFunction = __webpack_require__(12);
 
@@ -28357,7 +28725,7 @@ return jQuery;
 	module.exports = ReactDefaultBatchingStrategy;
 
 /***/ },
-/* 139 */
+/* 142 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -28375,14 +28743,14 @@ return jQuery;
 
 	var _assign = __webpack_require__(4);
 
-	var EventListener = __webpack_require__(140);
-	var ExecutionEnvironment = __webpack_require__(48);
+	var EventListener = __webpack_require__(143);
+	var ExecutionEnvironment = __webpack_require__(50);
 	var PooledClass = __webpack_require__(6);
-	var ReactDOMComponentTree = __webpack_require__(35);
-	var ReactUpdates = __webpack_require__(55);
+	var ReactDOMComponentTree = __webpack_require__(37);
+	var ReactUpdates = __webpack_require__(57);
 
-	var getEventTarget = __webpack_require__(68);
-	var getUnboundedScrollPosition = __webpack_require__(141);
+	var getEventTarget = __webpack_require__(71);
+	var getUnboundedScrollPosition = __webpack_require__(144);
 
 	/**
 	 * Find the deepest React component completely containing the root of the
@@ -28519,7 +28887,7 @@ return jQuery;
 	module.exports = ReactEventListener;
 
 /***/ },
-/* 140 */
+/* 143 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -28608,7 +28976,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 141 */
+/* 144 */
 /***/ function(module, exports) {
 
 	/**
@@ -28651,7 +29019,7 @@ return jQuery;
 	module.exports = getUnboundedScrollPosition;
 
 /***/ },
-/* 142 */
+/* 145 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -28667,15 +29035,15 @@ return jQuery;
 
 	'use strict';
 
-	var DOMProperty = __webpack_require__(36);
-	var EventPluginHub = __webpack_require__(42);
-	var EventPluginUtils = __webpack_require__(44);
-	var ReactComponentEnvironment = __webpack_require__(120);
-	var ReactClass = __webpack_require__(20);
-	var ReactEmptyComponent = __webpack_require__(127);
-	var ReactBrowserEventEmitter = __webpack_require__(109);
-	var ReactHostComponent = __webpack_require__(128);
-	var ReactUpdates = __webpack_require__(55);
+	var DOMProperty = __webpack_require__(38);
+	var EventPluginHub = __webpack_require__(44);
+	var EventPluginUtils = __webpack_require__(46);
+	var ReactComponentEnvironment = __webpack_require__(123);
+	var ReactClass = __webpack_require__(21);
+	var ReactEmptyComponent = __webpack_require__(131);
+	var ReactBrowserEventEmitter = __webpack_require__(112);
+	var ReactHostComponent = __webpack_require__(132);
+	var ReactUpdates = __webpack_require__(57);
 
 	var ReactInjection = {
 	  Component: ReactComponentEnvironment.injection,
@@ -28692,7 +29060,7 @@ return jQuery;
 	module.exports = ReactInjection;
 
 /***/ },
-/* 143 */
+/* 146 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -28710,13 +29078,13 @@ return jQuery;
 
 	var _assign = __webpack_require__(4);
 
-	var CallbackQueue = __webpack_require__(56);
+	var CallbackQueue = __webpack_require__(58);
 	var PooledClass = __webpack_require__(6);
-	var ReactBrowserEventEmitter = __webpack_require__(109);
-	var ReactInputSelection = __webpack_require__(144);
-	var ReactInstrumentation = __webpack_require__(61);
-	var Transaction = __webpack_require__(67);
-	var ReactUpdateQueue = __webpack_require__(132);
+	var ReactBrowserEventEmitter = __webpack_require__(112);
+	var ReactInputSelection = __webpack_require__(147);
+	var ReactInstrumentation = __webpack_require__(63);
+	var Transaction = __webpack_require__(70);
+	var ReactUpdateQueue = __webpack_require__(136);
 
 	/**
 	 * Ensures that, when possible, the selection range (currently selected text
@@ -28876,7 +29244,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 144 */
+/* 147 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -28892,11 +29260,11 @@ return jQuery;
 
 	'use strict';
 
-	var ReactDOMSelection = __webpack_require__(145);
+	var ReactDOMSelection = __webpack_require__(148);
 
-	var containsNode = __webpack_require__(147);
-	var focusNode = __webpack_require__(94);
-	var getActiveElement = __webpack_require__(150);
+	var containsNode = __webpack_require__(150);
+	var focusNode = __webpack_require__(97);
+	var getActiveElement = __webpack_require__(153);
 
 	function isInDocument(node) {
 	  return containsNode(document.documentElement, node);
@@ -29005,7 +29373,7 @@ return jQuery;
 	module.exports = ReactInputSelection;
 
 /***/ },
-/* 145 */
+/* 148 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -29021,10 +29389,10 @@ return jQuery;
 
 	'use strict';
 
-	var ExecutionEnvironment = __webpack_require__(48);
+	var ExecutionEnvironment = __webpack_require__(50);
 
-	var getNodeForCharacterOffset = __webpack_require__(146);
-	var getTextContentAccessor = __webpack_require__(50);
+	var getNodeForCharacterOffset = __webpack_require__(149);
+	var getTextContentAccessor = __webpack_require__(52);
 
 	/**
 	 * While `isCollapsed` is available on the Selection object and `collapsed`
@@ -29222,7 +29590,7 @@ return jQuery;
 	module.exports = ReactDOMSelection;
 
 /***/ },
-/* 146 */
+/* 149 */
 /***/ function(module, exports) {
 
 	/**
@@ -29301,7 +29669,7 @@ return jQuery;
 	module.exports = getNodeForCharacterOffset;
 
 /***/ },
-/* 147 */
+/* 150 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29317,7 +29685,7 @@ return jQuery;
 	 * 
 	 */
 
-	var isTextNode = __webpack_require__(148);
+	var isTextNode = __webpack_require__(151);
 
 	/*eslint-disable no-bitwise */
 
@@ -29345,7 +29713,7 @@ return jQuery;
 	module.exports = containsNode;
 
 /***/ },
-/* 148 */
+/* 151 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29361,7 +29729,7 @@ return jQuery;
 	 * @typechecks
 	 */
 
-	var isNode = __webpack_require__(149);
+	var isNode = __webpack_require__(152);
 
 	/**
 	 * @param {*} object The object to check.
@@ -29374,7 +29742,7 @@ return jQuery;
 	module.exports = isTextNode;
 
 /***/ },
-/* 149 */
+/* 152 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -29401,7 +29769,7 @@ return jQuery;
 	module.exports = isNode;
 
 /***/ },
-/* 150 */
+/* 153 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -29440,7 +29808,7 @@ return jQuery;
 	module.exports = getActiveElement;
 
 /***/ },
-/* 151 */
+/* 154 */
 /***/ function(module, exports) {
 
 	/**
@@ -29708,6 +30076,8 @@ return jQuery;
 	  xlinkTitle: 'xlink:title',
 	  xlinkType: 'xlink:type',
 	  xmlBase: 'xml:base',
+	  xmlns: 0,
+	  xmlnsXlink: 'xmlns:xlink',
 	  xmlLang: 'xml:lang',
 	  xmlSpace: 'xml:space',
 	  y: 0,
@@ -29745,7 +30115,7 @@ return jQuery;
 	module.exports = SVGDOMPropertyConfig;
 
 /***/ },
-/* 152 */
+/* 155 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -29761,17 +30131,17 @@ return jQuery;
 
 	'use strict';
 
-	var EventConstants = __webpack_require__(40);
-	var EventPropagators = __webpack_require__(41);
-	var ExecutionEnvironment = __webpack_require__(48);
-	var ReactDOMComponentTree = __webpack_require__(35);
-	var ReactInputSelection = __webpack_require__(144);
-	var SyntheticEvent = __webpack_require__(52);
+	var EventConstants = __webpack_require__(42);
+	var EventPropagators = __webpack_require__(43);
+	var ExecutionEnvironment = __webpack_require__(50);
+	var ReactDOMComponentTree = __webpack_require__(37);
+	var ReactInputSelection = __webpack_require__(147);
+	var SyntheticEvent = __webpack_require__(54);
 
-	var getActiveElement = __webpack_require__(150);
-	var isTextInputElement = __webpack_require__(70);
-	var keyOf = __webpack_require__(24);
-	var shallowEqual = __webpack_require__(133);
+	var getActiveElement = __webpack_require__(153);
+	var isTextInputElement = __webpack_require__(73);
+	var keyOf = __webpack_require__(25);
+	var shallowEqual = __webpack_require__(129);
 
 	var topLevelTypes = EventConstants.topLevelTypes;
 
@@ -29946,7 +30316,7 @@ return jQuery;
 	module.exports = SelectEventPlugin;
 
 /***/ },
-/* 153 */
+/* 156 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -29964,26 +30334,26 @@ return jQuery;
 
 	var _prodInvariant = __webpack_require__(7);
 
-	var EventConstants = __webpack_require__(40);
-	var EventListener = __webpack_require__(140);
-	var EventPropagators = __webpack_require__(41);
-	var ReactDOMComponentTree = __webpack_require__(35);
-	var SyntheticAnimationEvent = __webpack_require__(154);
-	var SyntheticClipboardEvent = __webpack_require__(155);
-	var SyntheticEvent = __webpack_require__(52);
-	var SyntheticFocusEvent = __webpack_require__(156);
-	var SyntheticKeyboardEvent = __webpack_require__(157);
-	var SyntheticMouseEvent = __webpack_require__(73);
-	var SyntheticDragEvent = __webpack_require__(160);
-	var SyntheticTouchEvent = __webpack_require__(161);
-	var SyntheticTransitionEvent = __webpack_require__(162);
-	var SyntheticUIEvent = __webpack_require__(74);
-	var SyntheticWheelEvent = __webpack_require__(163);
+	var EventConstants = __webpack_require__(42);
+	var EventListener = __webpack_require__(143);
+	var EventPropagators = __webpack_require__(43);
+	var ReactDOMComponentTree = __webpack_require__(37);
+	var SyntheticAnimationEvent = __webpack_require__(157);
+	var SyntheticClipboardEvent = __webpack_require__(158);
+	var SyntheticEvent = __webpack_require__(54);
+	var SyntheticFocusEvent = __webpack_require__(159);
+	var SyntheticKeyboardEvent = __webpack_require__(160);
+	var SyntheticMouseEvent = __webpack_require__(76);
+	var SyntheticDragEvent = __webpack_require__(163);
+	var SyntheticTouchEvent = __webpack_require__(164);
+	var SyntheticTransitionEvent = __webpack_require__(165);
+	var SyntheticUIEvent = __webpack_require__(77);
+	var SyntheticWheelEvent = __webpack_require__(166);
 
 	var emptyFunction = __webpack_require__(12);
-	var getEventCharCode = __webpack_require__(158);
+	var getEventCharCode = __webpack_require__(161);
 	var invariant = __webpack_require__(8);
-	var keyOf = __webpack_require__(24);
+	var keyOf = __webpack_require__(25);
 
 	var topLevelTypes = EventConstants.topLevelTypes;
 
@@ -30436,6 +30806,10 @@ return jQuery;
 	var ON_CLICK_KEY = keyOf({ onClick: null });
 	var onClickListeners = {};
 
+	function getDictionaryKey(inst) {
+	  return '.' + inst._rootNodeID;
+	}
+
 	var SimpleEventPlugin = {
 
 	  eventTypes: eventTypes,
@@ -30559,19 +30933,19 @@ return jQuery;
 	    // fire. The workaround for this bug involves attaching an empty click
 	    // listener on the target node.
 	    if (registrationName === ON_CLICK_KEY) {
-	      var id = inst._rootNodeID;
+	      var key = getDictionaryKey(inst);
 	      var node = ReactDOMComponentTree.getNodeFromInstance(inst);
-	      if (!onClickListeners[id]) {
-	        onClickListeners[id] = EventListener.listen(node, 'click', emptyFunction);
+	      if (!onClickListeners[key]) {
+	        onClickListeners[key] = EventListener.listen(node, 'click', emptyFunction);
 	      }
 	    }
 	  },
 
 	  willDeleteListener: function (inst, registrationName) {
 	    if (registrationName === ON_CLICK_KEY) {
-	      var id = inst._rootNodeID;
-	      onClickListeners[id].remove();
-	      delete onClickListeners[id];
+	      var key = getDictionaryKey(inst);
+	      onClickListeners[key].remove();
+	      delete onClickListeners[key];
 	    }
 	  }
 
@@ -30581,7 +30955,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 154 */
+/* 157 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -30597,7 +30971,7 @@ return jQuery;
 
 	'use strict';
 
-	var SyntheticEvent = __webpack_require__(52);
+	var SyntheticEvent = __webpack_require__(54);
 
 	/**
 	 * @interface Event
@@ -30625,7 +30999,7 @@ return jQuery;
 	module.exports = SyntheticAnimationEvent;
 
 /***/ },
-/* 155 */
+/* 158 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -30641,7 +31015,7 @@ return jQuery;
 
 	'use strict';
 
-	var SyntheticEvent = __webpack_require__(52);
+	var SyntheticEvent = __webpack_require__(54);
 
 	/**
 	 * @interface Event
@@ -30668,7 +31042,7 @@ return jQuery;
 	module.exports = SyntheticClipboardEvent;
 
 /***/ },
-/* 156 */
+/* 159 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -30684,7 +31058,7 @@ return jQuery;
 
 	'use strict';
 
-	var SyntheticUIEvent = __webpack_require__(74);
+	var SyntheticUIEvent = __webpack_require__(77);
 
 	/**
 	 * @interface FocusEvent
@@ -30709,7 +31083,7 @@ return jQuery;
 	module.exports = SyntheticFocusEvent;
 
 /***/ },
-/* 157 */
+/* 160 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -30725,11 +31099,11 @@ return jQuery;
 
 	'use strict';
 
-	var SyntheticUIEvent = __webpack_require__(74);
+	var SyntheticUIEvent = __webpack_require__(77);
 
-	var getEventCharCode = __webpack_require__(158);
-	var getEventKey = __webpack_require__(159);
-	var getEventModifierState = __webpack_require__(76);
+	var getEventCharCode = __webpack_require__(161);
+	var getEventKey = __webpack_require__(162);
+	var getEventModifierState = __webpack_require__(79);
 
 	/**
 	 * @interface KeyboardEvent
@@ -30798,7 +31172,7 @@ return jQuery;
 	module.exports = SyntheticKeyboardEvent;
 
 /***/ },
-/* 158 */
+/* 161 */
 /***/ function(module, exports) {
 
 	/**
@@ -30853,7 +31227,7 @@ return jQuery;
 	module.exports = getEventCharCode;
 
 /***/ },
-/* 159 */
+/* 162 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -30869,7 +31243,7 @@ return jQuery;
 
 	'use strict';
 
-	var getEventCharCode = __webpack_require__(158);
+	var getEventCharCode = __webpack_require__(161);
 
 	/**
 	 * Normalization of deprecated HTML5 `key` values
@@ -30960,7 +31334,7 @@ return jQuery;
 	module.exports = getEventKey;
 
 /***/ },
-/* 160 */
+/* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -30976,7 +31350,7 @@ return jQuery;
 
 	'use strict';
 
-	var SyntheticMouseEvent = __webpack_require__(73);
+	var SyntheticMouseEvent = __webpack_require__(76);
 
 	/**
 	 * @interface DragEvent
@@ -31001,7 +31375,7 @@ return jQuery;
 	module.exports = SyntheticDragEvent;
 
 /***/ },
-/* 161 */
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -31017,9 +31391,9 @@ return jQuery;
 
 	'use strict';
 
-	var SyntheticUIEvent = __webpack_require__(74);
+	var SyntheticUIEvent = __webpack_require__(77);
 
-	var getEventModifierState = __webpack_require__(76);
+	var getEventModifierState = __webpack_require__(79);
 
 	/**
 	 * @interface TouchEvent
@@ -31051,7 +31425,7 @@ return jQuery;
 	module.exports = SyntheticTouchEvent;
 
 /***/ },
-/* 162 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -31067,7 +31441,7 @@ return jQuery;
 
 	'use strict';
 
-	var SyntheticEvent = __webpack_require__(52);
+	var SyntheticEvent = __webpack_require__(54);
 
 	/**
 	 * @interface Event
@@ -31095,7 +31469,7 @@ return jQuery;
 	module.exports = SyntheticTransitionEvent;
 
 /***/ },
-/* 163 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -31111,7 +31485,7 @@ return jQuery;
 
 	'use strict';
 
-	var SyntheticMouseEvent = __webpack_require__(73);
+	var SyntheticMouseEvent = __webpack_require__(76);
 
 	/**
 	 * @interface WheelEvent
@@ -31154,7 +31528,7 @@ return jQuery;
 	module.exports = SyntheticWheelEvent;
 
 /***/ },
-/* 164 */
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -31172,27 +31546,27 @@ return jQuery;
 
 	var _prodInvariant = __webpack_require__(7);
 
-	var DOMLazyTree = __webpack_require__(80);
-	var DOMProperty = __webpack_require__(36);
-	var ReactBrowserEventEmitter = __webpack_require__(109);
+	var DOMLazyTree = __webpack_require__(83);
+	var DOMProperty = __webpack_require__(38);
+	var ReactBrowserEventEmitter = __webpack_require__(112);
 	var ReactCurrentOwner = __webpack_require__(10);
-	var ReactDOMComponentTree = __webpack_require__(35);
-	var ReactDOMContainerInfo = __webpack_require__(165);
-	var ReactDOMFeatureFlags = __webpack_require__(166);
+	var ReactDOMComponentTree = __webpack_require__(37);
+	var ReactDOMContainerInfo = __webpack_require__(168);
+	var ReactDOMFeatureFlags = __webpack_require__(169);
 	var ReactElement = __webpack_require__(9);
-	var ReactFeatureFlags = __webpack_require__(57);
-	var ReactInstanceMap = __webpack_require__(121);
-	var ReactInstrumentation = __webpack_require__(61);
-	var ReactMarkupChecksum = __webpack_require__(167);
-	var ReactReconciler = __webpack_require__(58);
-	var ReactUpdateQueue = __webpack_require__(132);
-	var ReactUpdates = __webpack_require__(55);
+	var ReactFeatureFlags = __webpack_require__(59);
+	var ReactInstanceMap = __webpack_require__(124);
+	var ReactInstrumentation = __webpack_require__(63);
+	var ReactMarkupChecksum = __webpack_require__(170);
+	var ReactReconciler = __webpack_require__(60);
+	var ReactUpdateQueue = __webpack_require__(136);
+	var ReactUpdates = __webpack_require__(57);
 
 	var emptyObject = __webpack_require__(19);
-	var instantiateReactComponent = __webpack_require__(123);
+	var instantiateReactComponent = __webpack_require__(126);
 	var invariant = __webpack_require__(8);
-	var setInnerHTML = __webpack_require__(82);
-	var shouldUpdateReactComponent = __webpack_require__(126);
+	var setInnerHTML = __webpack_require__(85);
+	var shouldUpdateReactComponent = __webpack_require__(130);
 	var warning = __webpack_require__(11);
 
 	var ATTR_NAME = DOMProperty.ID_ATTRIBUTE_NAME;
@@ -31659,7 +32033,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 165 */
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -31675,7 +32049,7 @@ return jQuery;
 
 	'use strict';
 
-	var validateDOMNesting = __webpack_require__(134);
+	var validateDOMNesting = __webpack_require__(137);
 
 	var DOC_NODE_TYPE = 9;
 
@@ -31698,7 +32072,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 166 */
+/* 169 */
 /***/ function(module, exports) {
 
 	/**
@@ -31721,7 +32095,7 @@ return jQuery;
 	module.exports = ReactDOMFeatureFlags;
 
 /***/ },
-/* 167 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -31737,7 +32111,7 @@ return jQuery;
 
 	'use strict';
 
-	var adler32 = __webpack_require__(168);
+	var adler32 = __webpack_require__(171);
 
 	var TAG_END = /\/?>/;
 	var COMMENT_START = /^<\!\-\-/;
@@ -31776,7 +32150,7 @@ return jQuery;
 	module.exports = ReactMarkupChecksum;
 
 /***/ },
-/* 168 */
+/* 171 */
 /***/ function(module, exports) {
 
 	/**
@@ -31825,7 +32199,7 @@ return jQuery;
 	module.exports = adler32;
 
 /***/ },
-/* 169 */
+/* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -31844,10 +32218,10 @@ return jQuery;
 	var _prodInvariant = __webpack_require__(7);
 
 	var ReactCurrentOwner = __webpack_require__(10);
-	var ReactDOMComponentTree = __webpack_require__(35);
-	var ReactInstanceMap = __webpack_require__(121);
+	var ReactDOMComponentTree = __webpack_require__(37);
+	var ReactInstanceMap = __webpack_require__(124);
 
-	var getHostComponentFromComposite = __webpack_require__(170);
+	var getHostComponentFromComposite = __webpack_require__(173);
 	var invariant = __webpack_require__(8);
 	var warning = __webpack_require__(11);
 
@@ -31891,7 +32265,7 @@ return jQuery;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 170 */
+/* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -31907,7 +32281,7 @@ return jQuery;
 
 	'use strict';
 
-	var ReactNodeTypes = __webpack_require__(125);
+	var ReactNodeTypes = __webpack_require__(128);
 
 	function getHostComponentFromComposite(inst) {
 	  var type;
@@ -31926,7 +32300,7 @@ return jQuery;
 	module.exports = getHostComponentFromComposite;
 
 /***/ },
-/* 171 */
+/* 174 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -31942,7 +32316,7 @@ return jQuery;
 
 	'use strict';
 
-	var ReactMount = __webpack_require__(164);
+	var ReactMount = __webpack_require__(167);
 
 	module.exports = ReactMount.renderSubtreeIntoContainer;
 
@@ -32148,14 +32522,8078 @@ return jQuery;
 
 
 
-(function() {
-  this.Beacon = React.createClass({
-    render: function() {
-      return React.DOM.tr(null, React.DOM.td(null, this.props.record.beacon_uuid), React.DOM.td(null, this.props.record.beacon_name), React.DOM.td(null, this.props.record.beacon_status), React.DOM.td(null, this.props.record.power), React.DOM.td(null, this.props.record.created_at));
-    }
-  });
+/*
+	Redactor v10.0.4
+	Updated: November 10, 2014
 
-}).call(this);
+	http://imperavi.com/redactor/
+
+	Copyright (c) 2009-2014, Imperavi LLC.
+	License: http://imperavi.com/redactor/license/
+
+	Usage: $('#content').redactor();
+*/
+
+
+(function($)
+{
+	'use strict';
+
+	if (!Function.prototype.bind)
+	{
+		Function.prototype.bind = function(scope)
+		{
+			var fn = this;
+			return function()
+			{
+				return fn.apply(scope);
+			};
+		};
+	}
+
+	var uuid = 0;
+
+	var reUrlYoutube = /https?:\/\/(?:[0-9A-Z-]+\.)?(?:youtu\.be\/|youtube\.com\S*[^\w\-\s])([\w\-]{11})(?=[^\w\-]|$)(?![?=&+%\w.\-]*(?:['"][^<>]*>|<\/a>))[?=&+%\w.-]*/ig;
+	var reUrlVimeo = /https?:\/\/(www\.)?vimeo.com\/(\d+)($|\/)/;
+
+	// Plugin
+	$.fn.redactor = function(options)
+	{
+		var val = [];
+		var args = Array.prototype.slice.call(arguments, 1);
+
+		if (typeof options === 'string')
+		{
+			this.each(function()
+			{
+				var instance = $.data(this, 'redactor');
+				var func;
+
+				if (options.search(/\./) != '-1')
+				{
+					func = options.split('.');
+					if (typeof instance[func[0]] != 'undefined')
+					{
+						func = instance[func[0]][func[1]];
+					}
+				}
+				else
+				{
+					func = instance[options];
+				}
+
+				if (typeof instance !== 'undefined' && $.isFunction(func))
+				{
+					var methodVal = func.apply(instance, args);
+					if (methodVal !== undefined && methodVal !== instance)
+					{
+						val.push(methodVal);
+					}
+				}
+				else
+				{
+					$.error('No such method "' + options + '" for Redactor');
+				}
+			});
+		}
+		else
+		{
+			this.each(function()
+			{
+				$.data(this, 'redactor', {});
+				$.data(this, 'redactor', Redactor(this, options));
+			});
+		}
+
+		if (val.length === 0) return this;
+		else if (val.length === 1) return val[0];
+		else return val;
+
+	};
+
+	// Initialization
+	function Redactor(el, options)
+	{
+		return new Redactor.prototype.init(el, options);
+	}
+
+	// Functionality
+	$.Redactor = Redactor;
+	$.Redactor.VERSION = '10.0.4';
+	$.Redactor.modules = ['alignment', 'autosave', 'block', 'buffer', 'build', 'button',
+						  'caret', 'clean', 'code', 'core', 'dropdown', 'file', 'focus',
+						  'image', 'indent', 'inline', 'insert', 'keydown', 'keyup',
+						  'lang', 'line', 'link', 'list', 'modal', 'observe', 'paragraphize',
+						  'paste', 'placeholder', 'progress', 'selection', 'shortcuts',
+						  'tabifier', 'tidy',  'toolbar', 'upload', 'utils'];
+
+	$.Redactor.opts = {
+
+		// settings
+		lang: 'en',
+		direction: 'ltr', // ltr or rtl
+
+		plugins: false, // array
+
+		focus: false,
+		focusEnd: false,
+
+		placeholder: false,
+
+		visual: true,
+		tabindex: false,
+
+		minHeight: false,
+		maxHeight: false,
+
+		linebreaks: false,
+		replaceDivs: true,
+		paragraphize: true,
+		cleanStyleOnEnter: false,
+		enterKey: true,
+
+		cleanOnPaste: true,
+		cleanSpaces: true,
+		pastePlainText: false,
+
+		autosave: false, // false or url
+		autosaveName: false,
+		autosaveInterval: 60, // seconds
+		autosaveOnChange: false,
+
+		linkTooltip: true,
+		linkProtocol: 'http',
+		linkNofollow: false,
+		linkSize: 50,
+
+		imageEditable: true,
+		imageLink: true,
+		imagePosition: true,
+		imageFloatMargin: '10px',
+		imageResizable: true,
+
+		imageUpload: false,
+		imageUploadParam: 'file',
+
+		uploadImageField: false,
+
+		dragImageUpload: true,
+
+		fileUpload: false,
+		fileUploadParam: 'file',
+
+		dragFileUpload: true,
+
+		s3: false,
+
+		convertLinks: true,
+		convertUrlLinks: true,
+		convertImageLinks: true,
+		convertVideoLinks: true,
+
+		preSpaces: 4, // or false
+		tabAsSpaces: false, // true or number of spaces
+		tabFocus: true,
+
+		scrollTarget: false,
+
+		toolbar: true,
+		toolbarFixed: true,
+		toolbarFixedTarget: document,
+		toolbarFixedTopOffset: 0, // pixels
+		toolbarExternal: false, // ID selector
+		toolbarOverflow: false,
+
+		buttonSource: false,
+		buttons: ['html', 'formatting', 'bold', 'italic', 'deleted', 'unorderedlist', 'orderedlist',
+				  'outdent', 'indent', 'image', 'file', 'link', 'alignment', 'horizontalrule'], // + 'underline'
+
+		buttonsHide: [],
+		buttonsHideOnMobile: [],
+
+		formatting: ['p', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+		formattingAdd: false,
+
+		tabifier: true,
+
+		deniedTags: ['html', 'head', 'link', 'body', 'meta', 'script', 'style', 'applet'],
+		allowedTags: false, // or array
+
+		removeComments: false,
+		replaceTags: [
+			['strike', 'del']
+		],
+		replaceStyles: [
+            ['font-weight:\\s?bold', "strong"],
+            ['font-style:\\s?italic', "em"],
+            ['text-decoration:\\s?underline', "u"],
+            ['text-decoration:\\s?line-through', 'del']
+        ],
+        removeDataAttr: false,
+
+		removeAttr: false, // or multi array
+		allowedAttr: false, // or multi array
+
+		removeWithoutAttr: ['span'], // or false
+		removeEmpty: ['p'], // or false;
+
+		activeButtons: ['deleted', 'italic', 'bold', 'underline', 'unorderedlist', 'orderedlist',
+						'alignleft', 'aligncenter', 'alignright', 'justify'],
+		activeButtonsStates: {
+			b: 'bold',
+			strong: 'bold',
+			i: 'italic',
+			em: 'italic',
+			del: 'deleted',
+			strike: 'deleted',
+			ul: 'unorderedlist',
+			ol: 'orderedlist',
+			u: 'underline'
+		},
+
+		shortcuts: {
+			'ctrl+shift+m, meta+shift+m': { func: 'inline.removeFormat' },
+			'ctrl+b, meta+b': { func: 'inline.format', params: ['bold'] },
+			'ctrl+i, meta+i': { func: 'inline.format', params: ['italic'] },
+			'ctrl+h, meta+h': { func: 'inline.format', params: ['superscript'] },
+			'ctrl+l, meta+l': { func: 'inline.format', params: ['subscript'] },
+			'ctrl+k, meta+k': { func: 'link.show' },
+			'ctrl+shift+7':   { func: 'list.toggle', params: ['orderedlist'] },
+			'ctrl+shift+8':   { func: 'list.toggle', params: ['unorderedlist'] }
+		},
+		shortcutsAdd: false,
+
+		// private
+		buffer: [],
+		rebuffer: [],
+		emptyHtml: '<p>&#x200b;</p>',
+		invisibleSpace: '&#x200b;',
+		imageTypes: ['image/png', 'image/jpeg', 'image/gif'],
+		indentValue: 20,
+		verifiedTags: 		['a', 'img', 'b', 'strong', 'sub', 'sup', 'i', 'em', 'u', 'small', 'strike', 'del', 'cite', 'ul', 'ol', 'li'], // and for span tag special rule
+		inlineTags: 		['strong', 'b', 'u', 'em', 'i', 'code', 'del', 'ins', 'samp', 'kbd', 'sup', 'sub', 'mark', 'var', 'cite', 'small'],
+		alignmentTags: 		['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6',  'DL', 'DT', 'DD', 'DIV', 'TD', 'BLOCKQUOTE', 'OUTPUT', 'FIGCAPTION', 'ADDRESS', 'SECTION', 'HEADER', 'FOOTER', 'ASIDE', 'ARTICLE'],
+		blockLevelElements: ['PRE', 'UL', 'OL', 'LI'],
+
+
+		// lang
+		langs: {
+			en: {
+				html: 'HTML',
+				video: 'Insert Video',
+				image: 'Insert Image',
+				table: 'Table',
+				link: 'Link',
+				link_insert: 'Insert link',
+				link_edit: 'Edit link',
+				unlink: 'Unlink',
+				formatting: 'Formatting',
+				paragraph: 'Normal text',
+				quote: 'Quote',
+				code: 'Code',
+				header1: 'Header 1',
+				header2: 'Header 2',
+				header3: 'Header 3',
+				header4: 'Header 4',
+				header5: 'Header 5',
+				bold: 'Bold',
+				italic: 'Italic',
+				fontcolor: 'Font Color',
+				backcolor: 'Back Color',
+				unorderedlist: 'Unordered List',
+				orderedlist: 'Ordered List',
+				outdent: 'Outdent',
+				indent: 'Indent',
+				cancel: 'Cancel',
+				insert: 'Insert',
+				save: 'Save',
+				_delete: 'Delete',
+				insert_table: 'Insert Table',
+				insert_row_above: 'Add Row Above',
+				insert_row_below: 'Add Row Below',
+				insert_column_left: 'Add Column Left',
+				insert_column_right: 'Add Column Right',
+				delete_column: 'Delete Column',
+				delete_row: 'Delete Row',
+				delete_table: 'Delete Table',
+				rows: 'Rows',
+				columns: 'Columns',
+				add_head: 'Add Head',
+				delete_head: 'Delete Head',
+				title: 'Title',
+				image_position: 'Position',
+				none: 'None',
+				left: 'Left',
+				right: 'Right',
+				center: 'Center',
+				image_web_link: 'Image Web Link',
+				text: 'Text',
+				mailto: 'Email',
+				web: 'URL',
+				video_html_code: 'Video Embed Code or Youtube/Vimeo Link',
+				file: 'Insert File',
+				upload: 'Upload',
+				download: 'Download',
+				choose: 'Choose',
+				or_choose: 'Or choose',
+				drop_file_here: 'Drop file here',
+				align_left: 'Align text to the left',
+				align_center: 'Center text',
+				align_right: 'Align text to the right',
+				align_justify: 'Justify text',
+				horizontalrule: 'Insert Horizontal Rule',
+				deleted: 'Deleted',
+				anchor: 'Anchor',
+				link_new_tab: 'Open link in new tab',
+				underline: 'Underline',
+				alignment: 'Alignment',
+				filename: 'Name (optional)',
+				edit: 'Edit'
+			}
+		}
+	};
+
+	// Functionality
+	Redactor.fn = $.Redactor.prototype = {
+
+		keyCode: {
+			BACKSPACE: 8,
+			DELETE: 46,
+			DOWN: 40,
+			ENTER: 13,
+			SPACE: 32,
+			ESC: 27,
+			TAB: 9,
+			CTRL: 17,
+			META: 91,
+			SHIFT: 16,
+			ALT: 18,
+			LEFT: 37,
+			LEFT_WIN: 91
+		},
+
+		// Initialization
+		init: function(el, options)
+		{
+			this.$element = $(el);
+			this.uuid = uuid++;
+
+			// if paste event detected = true
+			this.rtePaste = false;
+			this.$pasteBox = false;
+
+			this.loadOptions(options);
+			this.loadModules();
+
+			// formatting storage
+			this.formatting = {};
+
+			// block level tags
+			$.merge(this.opts.blockLevelElements, this.opts.alignmentTags);
+			this.reIsBlock = new RegExp('^(' + this.opts.blockLevelElements.join('|' ) + ')$', 'i');
+
+			// setup allowed and denied tags
+			this.tidy.setupAllowed();
+
+			// load lang
+			this.lang.load();
+
+			// extend shortcuts
+			$.extend(this.opts.shortcuts, this.opts.shortcutsAdd);
+
+			// start callback
+			this.core.setCallback('start');
+
+			// build
+			this.start = true;
+			this.build.run();
+		},
+
+		loadOptions: function(options)
+		{
+			this.opts = $.extend(
+				{},
+				$.extend(true, {}, $.Redactor.opts),
+				this.$element.data(),
+				options
+			);
+		},
+		getModuleMethods: function(object)
+		{
+			return Object.getOwnPropertyNames(object).filter(function(property)
+			{
+				return typeof object[property] == 'function';
+			});
+		},
+		loadModules: function()
+		{
+			var len = $.Redactor.modules.length;
+			for (var i = 0; i < len; i++)
+			{
+				this.bindModuleMethods($.Redactor.modules[i]);
+			}
+		},
+		bindModuleMethods: function(module)
+		{
+			if (typeof this[module] == 'undefined') return;
+
+			// init module
+			this[module] = this[module]();
+
+			var methods = this.getModuleMethods(this[module]);
+			var len = methods.length;
+
+			// bind methods
+			for (var z = 0; z < len; z++)
+			{
+				this[module][methods[z]] = this[module][methods[z]].bind(this);
+			}
+		},
+
+		alignment: function()
+		{
+			return {
+				left: function()
+				{
+					this.alignment.set('');
+				},
+				right: function()
+				{
+					this.alignment.set('right');
+				},
+				center: function()
+				{
+					this.alignment.set('center');
+				},
+				justify: function()
+				{
+					this.alignment.set('justify');
+				},
+				set: function(type)
+				{
+					if (!this.utils.browser('msie')) this.$editor.focus();
+
+					this.buffer.set();
+					this.selection.save();
+
+					this.alignment.blocks = this.selection.getBlocks();
+					if (this.opts.linebreaks && this.alignment.blocks[0] === false)
+					{
+						this.alignment.setText(type);
+					}
+					else
+					{
+						this.alignment.setBlocks(type);
+					}
+
+					this.selection.restore();
+					this.code.sync();
+				},
+				setText: function(type)
+				{
+					var wrapper = this.selection.wrap('div');
+					$(wrapper).attr('data-tagblock', 'redactor');
+					$(wrapper).css('text-align', type);
+				},
+				setBlocks: function(type)
+				{
+					$.each(this.alignment.blocks, $.proxy(function(i, el)
+					{
+						var $el = this.utils.getAlignmentElement(el);
+
+						if (!$el) return;
+
+						if (type === '' && typeof($el.data('tagblock')) !== 'undefined')
+						{
+							$el.replaceWith($el.html());
+						}
+						else
+						{
+							$el.css('text-align', type);
+							this.utils.removeEmptyAttr($el, 'style');
+						}
+
+
+					}, this));
+				}
+			};
+		},
+		autosave: function()
+		{
+			return {
+				enable: function()
+				{
+					if (!this.opts.autosave) return;
+
+					this.autosave.html = false;
+					this.autosave.name = (this.opts.autosaveName) ? this.opts.autosaveName : this.$textarea.attr('name');
+
+					if (!this.opts.autosaveOnChange)
+					{
+						this.autosaveInterval = setInterval($.proxy(this.autosave.load, this), this.opts.autosaveInterval * 1000);
+					}
+				},
+				onChange: function()
+				{
+					if (!this.opts.autosaveOnChange) return;
+
+					this.autosave.load();
+				},
+				load: function()
+				{
+					var html = this.code.get();
+					if (this.autosave.html === html) return;
+					if (this.utils.isEmpty(html)) return;
+
+					$.ajax({
+						url: this.opts.autosave,
+						type: 'post',
+						data: 'name=' + this.autosave.name + '&' + this.autosave.name + '=' + escape(encodeURIComponent(html)),
+						success: $.proxy(function(data)
+						{
+							this.autosave.success(data, html);
+
+						}, this)
+					});
+				},
+				success: function(data, html)
+				{
+					var json;
+					try
+					{
+						json = $.parseJSON(data);
+					}
+					catch(e)
+					{
+						//data has already been parsed
+						json = data;
+					}
+
+					var callbackName = (typeof json.error == 'undefined') ? 'autosave' :  'autosaveError';
+
+					this.core.setCallback(callbackName, this.autosave.name, json);
+					this.autosave.html = html;
+				},
+				disable: function()
+				{
+					clearInterval(this.autosaveInterval);
+				}
+			};
+		},
+		block: function()
+		{
+			return {
+				formatting: function(name)
+				{
+					var type, value;
+
+					if (typeof this.formatting[name].data != 'undefined') type = 'data';
+					else if (typeof this.formatting[name].attr != 'undefined') type = 'attr';
+					else if (typeof this.formatting[name].class != 'undefined') type = 'class';
+
+					if (type) value = this.formatting[name][type];
+
+					this.block.format(this.formatting[name].tag, type, value);
+
+				},
+				format: function(tag, type, value)
+				{
+					if (tag == 'quote') tag = 'blockquote';
+
+					var formatTags = ['p', 'pre', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+					if ($.inArray(tag, formatTags) == -1) return;
+
+					this.block.isRemoveInline = (tag == 'pre' || tag.search(/h[1-6]/i) != -1);
+
+					// focus
+					if (!this.utils.browser('msie')) this.$editor.focus();
+
+					this.block.blocks = this.selection.getBlocks();
+
+					this.block.blocksSize = this.block.blocks.length;
+					this.block.type = type;
+					this.block.value = value;
+
+					this.buffer.set();
+					this.selection.save();
+
+					this.block.set(tag);
+
+					this.selection.restore();
+					this.code.sync();
+
+				},
+				set: function(tag)
+				{
+					this.selection.get();
+					this.block.containerTag = this.range.commonAncestorContainer.tagName;
+
+					if (this.range.collapsed)
+					{
+						this.block.setCollapsed(tag);
+					}
+					else
+					{
+						this.block.setMultiple(tag);
+					}
+				},
+				setCollapsed: function(tag)
+				{
+					var block = this.block.blocks[0];
+					if (block === false) return;
+
+					if (block.tagName == 'LI')
+					{
+						if (tag != 'blockquote') return;
+
+						this.block.formatListToBlockquote();
+						return;
+					}
+
+					var isContainerTable = (this.block.containerTag  == 'TD' || this.block.containerTag  == 'TH');
+					if (isContainerTable && !this.opts.linebreaks)
+					{
+
+						document.execCommand('formatblock', false, '<' + tag + '>');
+
+						block = this.selection.getBlock();
+						this.block.toggle($(block));
+
+					}
+					else if (block.tagName.toLowerCase() != tag)
+					{
+						if (this.opts.linebreaks && tag == 'p')
+						{
+							$(block).prepend('<br>').append('<br>');
+							this.utils.replaceWithContents(block);
+						}
+						else
+						{
+							var $formatted = this.utils.replaceToTag(block, tag);
+
+							this.block.toggle($formatted);
+
+							if (tag != 'p' && tag != 'blockquote') $formatted.find('img').remove();
+							if (this.block.isRemoveInline) this.utils.removeInlineTags($formatted);
+							if (tag == 'p' || this.block.headTag) $formatted.find('p').contents().unwrap();
+
+							this.block.formatTableWrapping($formatted);
+						}
+					}
+					else if (tag == 'blockquote' && block.tagName.toLowerCase() == tag)
+					{
+						// blockquote off
+						if (this.opts.linebreaks)
+						{
+							$(block).prepend('<br>').append('<br>');
+							this.utils.replaceWithContents(block);
+						}
+						else
+						{
+							var $el = this.utils.replaceToTag(block, 'p');
+							this.block.toggle($el);
+						}
+					}
+					else if (block.tagName.toLowerCase() == tag)
+					{
+						this.block.toggle($(block));
+					}
+
+				},
+				setMultiple: function(tag)
+				{
+					var block = this.block.blocks[0];
+					var isContainerTable = (this.block.containerTag  == 'TD' || this.block.containerTag  == 'TH');
+
+					if (block !== false && this.block.blocksSize === 1)
+					{
+						if (block.tagName.toLowerCase() == tag &&  tag == 'blockquote')
+						{
+							// blockquote off
+							if (this.opts.linebreaks)
+							{
+								$(block).prepend('<br>').append('<br>');
+								this.utils.replaceWithContents(block);
+							}
+							else
+							{
+								var $el = this.utils.replaceToTag(block, 'p');
+								this.block.toggle($el);
+							}
+						}
+						else if (block.tagName == 'LI')
+						{
+							if (tag != 'blockquote') return;
+
+							this.block.formatListToBlockquote();
+						}
+						else if (this.block.containerTag == 'BLOCKQUOTE')
+						{
+							this.block.formatBlockquote(tag);
+						}
+						else if (this.opts.linebreaks && ((isContainerTable) || (this.range.commonAncestorContainer != block)))
+						{
+							this.block.formatWrap(tag);
+						}
+						else
+						{
+							if (this.opts.linebreaks && tag == 'p')
+							{
+								$(block).prepend('<br>').append('<br>');
+								this.utils.replaceWithContents(block);
+							}
+							else if (block.tagName === 'TD')
+							{
+								this.block.formatWrap(tag);
+							}
+							else
+							{
+								var $formatted = this.utils.replaceToTag(block, tag);
+
+								this.block.toggle($formatted);
+
+								if (this.block.isRemoveInline) this.utils.removeInlineTags($formatted);
+								if (tag == 'p' || this.block.headTag) $formatted.find('p').contents().unwrap();
+							}
+						}
+					}
+					else
+					{
+						if (this.opts.linebreaks || tag != 'p')
+						{
+							if (tag == 'blockquote')
+							{
+								var count = 0;
+								for (var i = 0; i < this.block.blocksSize; i++)
+								{
+									if (this.block.blocks[i].tagName == 'BLOCKQUOTE') count++;
+								}
+
+								// only blockquote selected
+								if (count == this.block.blocksSize)
+								{
+									$.each(this.block.blocks, $.proxy(function(i,s)
+									{
+										if (this.opts.linebreaks)
+										{
+											$(s).prepend('<br>').append('<br>');
+											this.utils.replaceWithContents(s);
+										}
+										else
+										{
+											this.utils.replaceToTag(s, 'p');
+										}
+
+									}, this));
+
+									return;
+								}
+
+							}
+
+							this.block.formatWrap(tag);
+						}
+						else
+						{
+							var classSize = 0;
+							var toggleType = false;
+							if (this.block.type == 'class')
+							{
+								toggleType = 'toggle';
+								classSize = $(this.block.blocks).filter('.' + this.block.value).size();
+
+								if (this.block.blocksSize == classSize) toggleType = 'toggle';
+								else if (this.block.blocksSize > classSize) toggleType = 'set';
+								else if (classSize === 0) toggleType = 'set';
+
+							}
+
+							var exceptTags = ['ul', 'ol', 'li', 'td', 'th', 'dl', 'dt', 'dd'];
+							$.each(this.block.blocks, $.proxy(function(i,s)
+							{
+								if ($.inArray(s.tagName.toLowerCase(), exceptTags) != -1) return;
+
+								var $formatted = this.utils.replaceToTag(s, tag);
+
+								if (toggleType)
+								{
+									if (toggleType == 'toggle') this.block.toggle($formatted);
+									else if (toggleType == 'remove') this.block.remove($formatted);
+									else if (toggleType == 'set')  this.block.set2($formatted);
+								}
+								else this.block.toggle($formatted);
+
+								if (tag != 'p' && tag != 'blockquote') $formatted.find('img').remove();
+								if (this.block.isRemoveInline) this.utils.removeInlineTags($formatted);
+								if (tag == 'p' || this.block.headTag) $formatted.find('p').contents().unwrap();
+
+
+							}, this));
+						}
+					}
+				},
+				toggle: function($el)
+				{
+					if (this.block.type == 'class')
+					{
+						$el.toggleClass(this.block.value);
+						return;
+					}
+					else if (this.block.type == 'attr' || this.block.type == 'data')
+					{
+						if ($el.attr(this.block.value.name) == this.block.value.value)
+						{
+							$el.removeAttr(this.block.value.name);
+						}
+						else
+						{
+							$el.attr(this.block.value.name, this.block.value.value);
+						}
+
+						return;
+					}
+					else
+					{
+						$el.removeAttr('style class');
+						return;
+					}
+				},
+				remove: function($el)
+				{
+					$el.removeClass(this.block.value);
+				},
+				formatListToBlockquote: function()
+				{
+					var block = $(this.block.blocks[0]).closest('ul, ol');
+
+					$(block).find('ul, ol').contents().unwrap();
+					$(block).find('li').append($('<br>')).contents().unwrap();
+
+					var $el = this.utils.replaceToTag(block, 'blockquote');
+					this.block.toggle($el);
+				},
+				formatBlockquote: function(tag)
+				{
+					document.execCommand('outdent');
+					document.execCommand('formatblock', false, tag);
+
+					this.clean.clearUnverified();
+					this.$editor.find('p:empty').remove();
+
+					var formatted = this.selection.getBlock();
+
+					if (tag != 'p')
+					{
+						$(formatted).find('img').remove();
+					}
+
+					if (!this.opts.linebreaks)
+					{
+						this.block.toggle($(formatted));
+					}
+
+					this.$editor.find('ul, ol, tr, blockquote, p').each($.proxy(this.utils.removeEmpty, this));
+
+					if (this.opts.linebreaks && tag == 'p')
+					{
+						this.utils.replaceWithContents(formatted);
+					}
+
+				},
+				formatWrap: function(tag)
+				{
+					if (this.block.containerTag == 'UL' || this.block.containerTag == 'OL')
+					{
+						if (tag == 'blockquote')
+						{
+							this.block.formatListToBlockquote();
+						}
+						else
+						{
+							return;
+						}
+					}
+
+					var formatted = this.selection.wrap(tag);
+					if (formatted === false) return;
+
+					var $formatted = $(formatted);
+
+					this.block.formatTableWrapping($formatted);
+
+					var $elements = $formatted.find(this.opts.blockLevelElements.join(',') + ', td, table, thead, tbody, tfoot, th, tr');
+
+					if ((this.opts.linebreaks && tag == 'p') || tag == 'pre' || tag == 'blockquote')
+					{
+						$elements.append('<br />');
+					}
+
+					$elements.contents().unwrap();
+
+					if (tag != 'p' && tag != 'blockquote') $formatted.find('img').remove();
+
+					$.each(this.block.blocks, $.proxy(this.utils.removeEmpty, this));
+
+					$formatted.append(this.selection.getMarker(2));
+
+					if (!this.opts.linebreaks)
+					{
+						this.block.toggle($formatted);
+					}
+
+					this.$editor.find('ul, ol, tr, blockquote, p').each($.proxy(this.utils.removeEmpty, this));
+					$formatted.find('blockquote:empty').remove();
+
+					if (this.block.isRemoveInline)
+					{
+						this.utils.removeInlineTags($formatted);
+					}
+
+					if (this.opts.linebreaks && tag == 'p')
+					{
+						this.utils.replaceWithContents($formatted);
+					}
+
+				},
+				formatTableWrapping: function($formatted)
+				{
+					if ($formatted.closest('table').size() === 0) return;
+
+					if ($formatted.closest('tr').size() === 0) $formatted.wrap('<tr>');
+					if ($formatted.closest('td').size() === 0 && $formatted.closest('th').size() === 0)
+					{
+						$formatted.wrap('<td>');
+					}
+				},
+				removeData: function(name, value)
+				{
+					var blocks = this.selection.getBlocks();
+					$(blocks).removeAttr('data-' + name);
+
+					this.code.sync();
+				},
+				setData: function(name, value)
+				{
+					var blocks = this.selection.getBlocks();
+					$(blocks).attr('data-' + name, value);
+
+					this.code.sync();
+				},
+				toggleData: function(name, value)
+				{
+					var blocks = this.selection.getBlocks();
+					$.each(blocks, function()
+					{
+						if ($(this).attr('data-' + name))
+						{
+							$(this).removeAttr('data-' + name);
+						}
+						else
+						{
+							$(this).attr('data-' + name, value);
+						}
+					});
+				},
+				removeAttr: function(attr, value)
+				{
+					var blocks = this.selection.getBlocks();
+					$(blocks).removeAttr(attr);
+
+					this.code.sync();
+				},
+				setAttr: function(attr, value)
+				{
+					var blocks = this.selection.getBlocks();
+					$(blocks).attr(attr, value);
+
+					this.code.sync();
+				},
+				toggleAttr: function(attr, value)
+				{
+					var blocks = this.selection.getBlocks();
+					$.each(blocks, function()
+					{
+						if ($(this).attr(name))
+						{
+							$(this).removeAttr(name);
+						}
+						else
+						{
+							$(this).attr(name, value);
+						}
+					});
+				},
+				removeClass: function(className)
+				{
+					var blocks = this.selection.getBlocks();
+					$(blocks).removeClass(className);
+
+					this.utils.removeEmptyAttr(blocks, 'class');
+
+					this.code.sync();
+				},
+				setClass: function(className)
+				{
+					var blocks = this.selection.getBlocks();
+					$(blocks).addClass(className);
+
+					this.code.sync();
+				},
+				toggleClass: function(className)
+				{
+					var blocks = this.selection.getBlocks();
+					$(blocks).toggleClass(className);
+
+					this.code.sync();
+				}
+			};
+		},
+		buffer: function()
+		{
+			return {
+				set: function(type)
+				{
+					if (typeof type == 'undefined' || type == 'undo')
+					{
+						this.buffer.setUndo();
+					}
+					else
+					{
+						this.buffer.setRedo();
+					}
+				},
+				setUndo: function()
+				{
+					this.selection.save();
+					this.opts.buffer.push(this.$editor.html());
+					this.selection.restore();
+				},
+				setRedo: function()
+				{
+					this.selection.save();
+					this.opts.rebuffer.push(this.$editor.html());
+					this.selection.restore();
+				},
+				getUndo: function()
+				{
+					this.$editor.html(this.opts.buffer.pop());
+				},
+				getRedo: function()
+				{
+					this.$editor.html(this.opts.rebuffer.pop());
+				},
+				add: function()
+				{
+					this.opts.buffer.push(this.$editor.html());
+				},
+				undo: function()
+				{
+					if (this.opts.buffer.length === 0) return;
+
+					this.buffer.set('redo');
+					this.buffer.getUndo();
+
+					this.selection.restore();
+
+					setTimeout($.proxy(this.observe.load, this), 50);
+				},
+				redo: function()
+				{
+					if (this.opts.rebuffer.length === 0) return;
+
+					this.buffer.set('undo');
+					this.buffer.getRedo();
+
+					this.selection.restore();
+
+					setTimeout($.proxy(this.observe.load, this), 50);
+				}
+			};
+		},
+		build: function()
+		{
+			return {
+				run: function()
+				{
+
+					this.build.createContainerBox();
+					this.build.loadContent();
+					this.build.loadEditor();
+					this.build.enableEditor();
+					this.build.setCodeAndCall();
+
+				},
+				isTextarea: function()
+				{
+					return (this.$element[0].tagName === 'TEXTAREA');
+				},
+				createContainerBox: function()
+				{
+					this.$box = $('<div class="redactor-box" />');
+				},
+				createTextarea: function()
+				{
+					this.$textarea = $('<textarea />').attr('name', this.build.getTextareaName());
+				},
+				getTextareaName: function()
+				{
+					var name = this.$element.attr('id');
+					if (typeof(name) == 'undefined')
+					{
+						name = 'content-' + this.uuid;
+					}
+
+					return name;
+				},
+				loadContent: function()
+				{
+					var func = (this.build.isTextarea()) ? 'val' : 'html';
+					this.content = $.trim(this.$element[func]());
+				},
+				enableEditor: function()
+				{
+					this.$editor.attr({ 'contenteditable': true, 'dir': this.opts.direction });
+				},
+				loadEditor: function()
+				{
+					var func = (this.build.isTextarea()) ? 'fromTextarea' : 'fromElement';
+					this.build[func]();
+				},
+				fromTextarea: function()
+				{
+					this.$editor = $('<div />');
+					this.$textarea = this.$element;
+					this.$box.insertAfter(this.$element).append(this.$editor).append(this.$element);
+					this.$editor.addClass('redactor-editor');
+
+					this.$element.hide();
+				},
+				fromElement: function()
+				{
+					this.$editor = this.$element;
+					this.build.createTextarea();
+					this.$box.insertAfter(this.$editor).append(this.$editor).append(this.$textarea);
+					this.$editor.addClass('redactor-editor');
+
+					this.$textarea.hide();
+				},
+				setCodeAndCall: function()
+				{
+					// set code
+					this.code.set(this.content);
+
+					this.build.setOptions();
+					this.build.callEditor();
+
+					// code mode
+					if (!this.opts.visual)
+					{
+						setTimeout($.proxy(this.code.showCode, this), 200);
+					}
+				},
+				callEditor: function()
+				{
+					this.build.disableMozillaEditing();
+					this.build.setEvents();
+					this.build.setHelpers();
+
+					// load toolbar
+					if (this.opts.toolbar)
+					{
+						this.opts.toolbar = this.toolbar.init();
+						this.toolbar.build();
+					}
+
+					// modal templates init
+					this.modal.loadTemplates();
+
+					// plugins
+					this.build.plugins();
+
+					// observers
+					setTimeout($.proxy(this.observe.load, this), 4);
+
+					// init callback
+					this.core.setCallback('init');
+				},
+				setOptions: function()
+				{
+					// textarea direction
+					$(this.$textarea).attr('dir', this.opts.direction);
+
+					if (this.opts.linebreaks) this.$editor.addClass('redactor-linebreaks');
+
+					if (this.opts.tabindex) this.$editor.attr('tabindex', this.opts.tabindex);
+
+					if (this.opts.minHeight) this.$editor.css('minHeight', this.opts.minHeight);
+					if (this.opts.maxHeight) this.$editor.css('maxHeight', this.opts.maxHeight);
+
+				},
+				setEvents: function()
+				{
+					// drop
+					this.$editor.on('drop.redactor', $.proxy(function(e)
+					{
+						e = e.originalEvent || e;
+
+						if (window.FormData === undefined || !e.dataTransfer) return true;
+
+						var length = e.dataTransfer.files.length;
+						if (length === 0)
+						{
+							this.code.sync();
+							setTimeout($.proxy(this.clean.clearUnverified, this), 1);
+							this.core.setCallback('drop', e);
+
+							return true;
+						}
+						else
+						{
+							e.preventDefault();
+
+							if (this.opts.dragImageUpload || this.opts.dragFileUpload)
+							{
+								var files = e.dataTransfer.files;
+								this.upload.directUpload(files[0], e);
+							}
+						}
+
+						setTimeout($.proxy(this.clean.clearUnverified, this), 1);
+
+						this.core.setCallback('drop', e);
+
+					}, this));
+
+
+					// click
+					this.$editor.on('click.redactor', $.proxy(function(e)
+					{
+						var type = 'click';
+						if ((this.core.getEvent() == 'click' || this.core.getEvent() == 'arrow'))
+						{
+							type = false;
+						}
+
+						this.core.addEvent(type);
+						this.utils.disableSelectAll();
+						this.core.setCallback('click', e);
+
+					}, this));
+
+					// paste
+					this.$editor.on('paste.redactor', $.proxy(this.paste.init, this));
+
+					// keydown
+					this.$editor.on('keydown.redactor', $.proxy(this.keydown.init, this));
+
+					// keyup
+					this.$editor.on('keyup.redactor', $.proxy(this.keyup.init, this));
+
+					// textarea keydown
+					if ($.isFunction(this.opts.codeKeydownCallback))
+					{
+						this.$textarea.on('keydown.redactor-textarea', $.proxy(this.opts.codeKeydownCallback, this));
+					}
+
+					// textarea keyup
+					if ($.isFunction(this.opts.codeKeyupCallback))
+					{
+						this.$textarea.on('keyup.redactor-textarea', $.proxy(this.opts.codeKeyupCallback, this));
+					}
+
+					// focus
+					if ($.isFunction(this.opts.focusCallback))
+					{
+						this.$editor.on('focus.redactor', $.proxy(this.opts.focusCallback, this));
+					}
+
+					var clickedElement;
+					$(document).on('mousedown', function(e) {
+						clickedElement = $(e.target);
+					});
+
+					// blur
+					this.$editor.on('blur.redactor', $.proxy(function(e)
+					{
+						if (this.rtePaste) return;
+
+						var $el = $(clickedElement);
+						if (!$el.hasClass('redactor-toolbar, redactor-dropdown') && !$el.is('#redactor-modal') && $el.parents('.redactor-toolbar, .redactor-dropdown, #redactor-modal').size() === 0)
+						{
+							this.utils.disableSelectAll();
+							if ($.isFunction(this.opts.blurCallback)) this.core.setCallback('blur', e);
+						}
+					}, this));
+				},
+				setHelpers: function()
+				{
+					// autosave
+					this.autosave.enable();
+
+					// placeholder
+					this.placeholder.enable();
+
+					// focus
+					if (this.opts.focus) setTimeout($.proxy(this.focus.setStart, this), 100);
+					if (this.opts.focusEnd) setTimeout($.proxy(this.focus.setEnd, this), 100);
+
+				},
+				plugins: function()
+				{
+					if (!this.opts.plugins) return;
+					if (!RedactorPlugins) return;
+
+					$.each(this.opts.plugins, $.proxy(function(i, s)
+					{
+						if (typeof RedactorPlugins[s] === 'undefined') return;
+
+						if ($.inArray(s, $.Redactor.modules) !== -1)
+						{
+							$.error('Plugin name "' + s + '" matches the name of the Redactor\'s module.');
+							return;
+						}
+
+						if (!$.isFunction(RedactorPlugins[s])) return;
+
+						this[s] = RedactorPlugins[s]();
+
+						var methods = this.getModuleMethods(this[s]);
+						var len = methods.length;
+
+						// bind methods
+						for (var z = 0; z < len; z++)
+						{
+							this[s][methods[z]] = this[s][methods[z]].bind(this);
+						}
+
+						if ($.isFunction(this[s].init)) this[s].init();
+
+
+					}, this));
+
+
+				},
+				disableMozillaEditing: function()
+				{
+					if (!this.utils.browser('mozilla')) return;
+
+					// FF fix
+					try {
+						document.execCommand('enableObjectResizing', false, false);
+						document.execCommand('enableInlineTableEditing', false, false);
+					} catch (e) {}
+				}
+			};
+		},
+		button: function()
+		{
+			return {
+				build: function(btnName, btnObject)
+				{
+					var $button = $('<a href="#" class="re-icon re-' + btnName + '" rel="' + btnName + '" />').attr('tabindex', '-1');
+
+					if (btnObject.func || btnObject.command || btnObject.dropdown)
+					{
+						$button.on('touchstart click', $.proxy(function(e)
+						{
+							if ($button.hasClass('redactor-button-disabled')) return false;
+
+							var type = 'func';
+							var callback = btnObject.func;
+							if (btnObject.command)
+							{
+								type = 'command';
+								callback = btnObject.command;
+							}
+							else if (btnObject.dropdown)
+							{
+								type = 'dropdown';
+								callback = false;
+							}
+
+							this.button.onClick(e, btnName, type, callback);
+
+						}, this));
+					}
+
+					// dropdown
+					if (btnObject.dropdown)
+					{
+						var $dropdown = $('<div class="redactor-dropdown redactor-dropdown-box-' + btnName + '" style="display: none;">');
+						$button.data('dropdown', $dropdown);
+						this.dropdown.build(btnName, $dropdown, btnObject.dropdown);
+					}
+
+					// tooltip
+					if (this.utils.isDesktop())
+					{
+						this.button.createTooltip($button, btnName, btnObject.title);
+					}
+
+					return $button;
+				},
+				createTooltip: function($button, name, title)
+				{
+					var $tooltip = $('<span>').addClass('redactor-toolbar-tooltip redactor-toolbar-tooltip-' + name).hide().html(title);
+					$tooltip.appendTo('body');
+
+					$button.on('mouseover', function()
+					{
+						if ($(this).hasClass('redactor-button-disabled')) return;
+
+						var pos = $button.offset();
+						var height = $button.innerHeight();
+						var width = $button.innerWidth();
+
+						$tooltip.show();
+						$tooltip.css({
+							top: (pos.top + height) + 'px',
+							left: (pos.left + width/2 - $tooltip.innerWidth()/2) + 'px'
+						});
+					});
+
+					$button.on('mouseout', function()
+					{
+						$tooltip.hide();
+					});
+
+				},
+				onClick: function(e, btnName, type, callback)
+				{
+					e.preventDefault();
+
+					if (this.utils.browser('msie')) e.returnValue = false;
+
+					if (type == 'command')
+					{
+						this.inline.format(callback);
+					}
+					else if (type == 'dropdown')
+					{
+						this.dropdown.show(e, btnName);
+					}
+					else
+					{
+						var func;
+						if ($.isFunction(callback))
+						{
+							callback.call(this, btnName);
+							this.observe.buttons(e, btnName);
+						}
+						else if (callback.search(/\./) != '-1')
+						{
+							func = callback.split('.');
+							if (typeof this[func[0]] != 'undefined')
+							{
+								this[func[0]][func[1]](btnName);
+								this.observe.buttons(e, btnName);
+							}
+						}
+						else
+						{
+							this[callback](btnName);
+							this.observe.buttons(e, btnName);
+						}
+					}
+
+				},
+				get: function(key)
+				{
+					return this.$toolbar.find('a.re-' + key);
+				},
+				setActive: function(key)
+				{
+					this.button.get(key).addClass('redactor-act');
+				},
+				setInactive: function(key)
+				{
+					this.button.get(key).removeClass('redactor-act');
+				},
+				setInactiveAll: function(key)
+				{
+					if (typeof key == 'undefined')
+					{
+						this.$toolbar.find('a.re-icon').removeClass('redactor-act');
+					}
+					else
+					{
+						this.$toolbar.find('a.re-icon').not('.re-' + key).removeClass('redactor-act');
+					}
+				},
+				setActiveInVisual: function()
+				{
+					this.$toolbar.find('a.re-icon').not('a.re-html').removeClass('redactor-button-disabled');
+				},
+				setInactiveInCode: function()
+				{
+					this.$toolbar.find('a.re-icon').not('a.re-html').addClass('redactor-button-disabled');
+				},
+				changeIcon: function(key, classname)
+				{
+					this.button.get(key).addClass('re-' + classname);
+				},
+				removeIcon: function(key, classname)
+				{
+					this.button.get(key).removeClass('re-' + classname);
+				},
+				setAwesome: function(key, name)
+				{
+					var $button = this.button.get(key);
+					$button.removeClass('redactor-btn-image').addClass('fa-redactor-btn');
+					$button.html('<i class="fa ' + name + '"></i>');
+				},
+				addCallback: function($btn, callback)
+				{
+					var type = (callback == 'dropdown') ? 'dropdown' : 'func';
+					var key = $btn.attr('rel');
+					$btn.on('touchstart click', $.proxy(function(e)
+					{
+						if ($btn.hasClass('redactor-button-disabled')) return false;
+						this.button.onClick(e, key, type, callback);
+
+					}, this));
+				},
+				addDropdown: function($btn, dropdown)
+				{
+					var key = $btn.attr('rel');
+					this.button.addCallback($btn, 'dropdown');
+
+					var $dropdown = $('<div class="redactor-dropdown redactor-dropdown-box-' + key + '" style="display: none;">');
+					$btn.data('dropdown', $dropdown);
+
+					if (dropdown)
+					{
+						this.dropdown.build(key, $dropdown, dropdown);
+					}
+
+					return $dropdown;
+				},
+				add: function(key, title)
+				{
+					if (!this.opts.toolbar) return;
+
+					var btn = this.button.build(key, { title: title });
+					btn.addClass('redactor-btn-image');
+
+					this.$toolbar.append($('<li>').append(btn));
+
+					return btn;
+				},
+				addFirst: function(key, title)
+				{
+					if (!this.opts.toolbar) return;
+
+					var btn = this.button.build(key, { title: title });
+					this.$toolbar.prepend($('<li>').append(btn));
+
+					return btn;
+				},
+				addAfter: function(afterkey, key, title)
+				{
+					if (!this.opts.toolbar) return;
+
+					var btn = this.button.build(key, { title: title });
+					var $btn = this.button.get(afterkey);
+
+					if ($btn.size() !== 0) $btn.parent().after($('<li>').append(btn));
+					else this.$toolbar.append($('<li>').append(btn));
+
+					return btn;
+				},
+				addBefore: function(beforekey, key, title)
+				{
+					if (!this.opts.toolbar) return;
+
+					var btn = this.button.build(key, { title: title });
+					var $btn = this.button.get(beforekey);
+
+					if ($btn.size() !== 0) $btn.parent().before($('<li>').append(btn));
+					else this.$toolbar.append($('<li>').append(btn));
+
+					return btn;
+				},
+				remove: function(key)
+				{
+					this.button.get(key).remove();
+				}
+			};
+		},
+		caret: function()
+		{
+			return {
+				setStart: function(node)
+				{
+					// inline tag
+					if (!this.utils.isBlock(node))
+					{
+						var space = this.utils.createSpaceElement();
+
+						$(node).prepend(space);
+						this.caret.setEnd(space);
+					}
+					else
+					{
+						this.caret.set(node, 0, node, 0);
+					}
+				},
+				setEnd: function(node)
+				{
+					this.caret.set(node, 1, node, 1);
+				},
+				set: function(orgn, orgo, focn, foco)
+				{
+					// focus
+					if (!this.utils.browser('msie')) this.$editor.focus();
+
+					orgn = orgn[0] || orgn;
+					focn = focn[0] || focn;
+
+					if (this.utils.isBlockTag(orgn.tagName) && orgn.innerHTML === '')
+					{
+						orgn.innerHTML = this.opts.invisibleSpace;
+					}
+
+					if (orgn.tagName == 'BR' && this.opts.linebreaks === false)
+					{
+						var par = $(this.opts.emptyHtml)[0];
+						$(orgn).replaceWith(par);
+						orgn = par;
+						focn = orgn;
+					}
+
+					this.selection.get();
+
+					try {
+						this.range.setStart(orgn, orgo);
+						this.range.setEnd(focn, foco);
+					}
+					catch (e) {}
+
+					this.selection.addRange();
+				},
+				setAfter: function(node)
+				{
+					try {
+						var tag = $(node)[0].tagName;
+
+						// inline tag
+						if (tag != 'BR' && !this.utils.isBlock(node))
+						{
+							var space = this.utils.createSpaceElement();
+
+							$(node).after(space);
+							this.caret.setEnd(space);
+						}
+						else
+						{
+							if (tag != 'BR' && this.utils.browser('msie'))
+							{
+								this.caret.setStart($(node).next());
+							}
+							else
+							{
+								this.caret.setAfterOrBefore(node, 'after');
+							}
+						}
+					}
+					catch (e) {
+						var space = this.utils.createSpaceElement();
+						$(node).after(space);
+						this.caret.setEnd(space);
+					}
+				},
+				setBefore: function(node)
+				{
+					// block tag
+					if (this.utils.isBlock(node))
+					{
+						this.caret.setEnd($(node).prev());
+					}
+					else
+					{
+						this.caret.setAfterOrBefore(node, 'before');
+					}
+				},
+				setAfterOrBefore: function(node, type)
+				{
+					// focus
+					if (!this.utils.browser('msie')) this.$editor.focus();
+
+					node = node[0] || node;
+
+					this.selection.get();
+
+					if (type == 'after')
+					{
+						try {
+
+							this.range.setStartAfter(node);
+							this.range.setEndAfter(node);
+						}
+						catch (e) {}
+					}
+					else
+					{
+						try {
+							this.range.setStartBefore(node);
+							this.range.setEndBefore(node);
+						}
+						catch (e) {}
+					}
+
+
+					this.range.collapse(false);
+					this.selection.addRange();
+				},
+				getOffsetOfElement: function(node)
+				{
+					node = node[0] || node;
+
+					this.selection.get();
+
+					var cloned = this.range.cloneRange();
+					cloned.selectNodeContents(node);
+					cloned.setEnd(this.range.endContainer, this.range.endOffset);
+
+					return $.trim(cloned.toString()).length;
+				},
+				getOffset: function()
+				{
+					var offset = 0;
+				    var sel = window.getSelection();
+				    if (sel.rangeCount > 0)
+				    {
+				        var range = window.getSelection().getRangeAt(0);
+				        var preCaretRange = range.cloneRange();
+				        preCaretRange.selectNodeContents(this.$editor[0]);
+				        preCaretRange.setEnd(range.endContainer, range.endOffset);
+				        offset = preCaretRange.toString().length;
+				    }
+
+					return offset;
+				},
+				setOffset: function(start, end)
+				{
+					if (typeof end == 'undefined') end = start;
+					if (!this.focus.isFocused()) this.focus.setStart();
+
+					var range = document.createRange();
+					var sel = document.getSelection();
+					var node, offset = 0;
+					var walker = document.createTreeWalker(this.$editor[0], NodeFilter.SHOW_TEXT, null, null);
+
+					while (node = walker.nextNode())
+					{
+						offset += node.nodeValue.length;
+						if (offset > start)
+						{
+							range.setStart(node, node.nodeValue.length + start - offset);
+							start = Infinity;
+						}
+
+						if (offset >= end)
+						{
+							range.setEnd(node, node.nodeValue.length + end - offset);
+							break;
+						}
+					}
+
+					sel.removeAllRanges();
+					sel.addRange(range);
+				},
+				setToPoint: function(start, end)
+				{
+					this.caret.setOffset(start, end);
+				},
+				getCoords: function()
+				{
+					return this.caret.getOffset();
+				}
+			};
+		},
+		clean: function()
+		{
+			return {
+				onSet: function(html)
+				{
+					html = this.clean.savePreCode(html);
+
+					// replace dollar sign to entity
+					html = html.replace(/\$/g, '&#36;');
+					html = html.replace(/”/g, '"');
+					html = html.replace(/‘/g, '\'');
+					html = html.replace(/’/g, '\'');
+
+					if (this.opts.replaceDivs) html = this.clean.replaceDivs(html);
+					if (this.opts.linebreaks)  html = this.clean.replaceParagraphsToBr(html);
+
+					// save form tag
+					html = this.clean.saveFormTags(html);
+
+					// convert font tag to span
+					var $div = $('<div>');
+					$div.html(html);
+					var fonts = $div.find('font[style]');
+					if (fonts.length !== 0)
+					{
+						fonts.replaceWith(function()
+						{
+							var $el = $(this);
+							var span = $('<span>').attr('style', $el.attr('style'));
+							return $span.append($el.contents());
+						});
+
+						html = $div.html();
+					}
+					$div.remove();
+
+					// remove font tag
+					html = html.replace(/<font(.*?[^<])>/gi, '');
+					html = html.replace(/<\/font>/gi, '');
+
+					// tidy html
+					html = this.tidy.load(html);
+
+					// paragraphize
+					if (this.opts.paragraphize) html = this.paragraphize.load(html);
+
+					// verified
+					html = this.clean.setVerified(html);
+
+					// convert inline tags
+					html = this.clean.convertInline(html);
+
+					return html;
+				},
+				onSync: function(html)
+				{
+					// remove spaces
+					html = html.replace(/[\u200B-\u200D\uFEFF]/g, '');
+					html = html.replace(/&#x200b;/gi, '');
+					html = html.replace(/&nbsp;/gi, ' ');
+
+					if (html.search(/^<p>(||\s||&nbsp;)<\/p>$/i) != -1)
+					{
+						return '';
+					}
+
+					// restore form tag
+					html = this.clean.restoreFormTags(html);
+
+					var chars = {
+						'\u2122': '&trade;',
+						'\u00a9': '&copy;',
+						'\u2026': '&hellip;',
+						'\u2014': '&mdash;',
+						'\u2010': '&dash;'
+					};
+					// replace special characters
+					$.each(chars, function(i,s)
+					{
+						html = html.replace(new RegExp(i, 'g'), s);
+					});
+
+					// remove br in the of li
+					html = html.replace(new RegExp('<br\\s?/?></li>', 'gi'), '</li>');
+					html = html.replace(new RegExp('</li><br\\s?/?>', 'gi'), '</li>');
+
+					// remove verified
+					html = html.replace(new RegExp('<div(.*?) data-tagblock="redactor"(.*?[^>])>', 'gi'), '<div$1$2>');
+					html = html.replace(new RegExp('<(.*?) data-verified="redactor"(.*?[^>])>', 'gi'), '<$1$2>');
+					html = html.replace(new RegExp('<span(.*?) rel="(.*?)"(.*?[^>])>', 'gi'), '<span$1$3>');
+					html = html.replace(new RegExp('<img(.*?) rel="(.*?)"(.*?[^>])>', 'gi'), '<img$1$3>');
+					html = html.replace(new RegExp('<img(.*?) style="" (.*?[^>])>', 'gi'), '<img$1 $2>');
+					html = html.replace(new RegExp('<img(.*?) style (.*?[^>])>', 'gi'), '<img$1 $2>');
+					html = html.replace(new RegExp('<span class="redactor-invisible-space">(.*?)</span>', 'gi'), '$1');
+					html = html.replace(/ data-save-url="(.*?[^>])"/gi, '');
+
+					// remove image resize
+					html = html.replace(/<span(.*?)id="redactor-image-box"(.*?[^>])>([\w\W]*?)<img(.*?)><\/span>/gi, '$3<img$4>');
+					html = html.replace(/<span(.*?)id="redactor-image-resizer"(.*?[^>])>(.*?)<\/span>/gi, '');
+					html = html.replace(/<span(.*?)id="redactor-image-editter"(.*?[^>])>(.*?)<\/span>/gi, '');
+
+					// remove font tag
+					html = html.replace(/<font(.*?[^<])>/gi, '');
+					html = html.replace(/<\/font>/gi, '');
+
+					// tidy html
+					html = this.tidy.load(html);
+
+					// link nofollow
+					if (this.opts.linkNofollow)
+					{
+						html = html.replace(/<a(.*?)rel="nofollow"(.*?[^>])>/gi, '<a$1$2>');
+						html = html.replace(/<a(.*?[^>])>/gi, '<a$1 rel="nofollow">');
+					}
+
+					// reconvert inline
+					html = html.replace(/<(.*?) data-redactor-tag="(.*?)"(.*?[^>])>/gi, '<$1$3>');
+					html = html.replace(/<(.*?) data-redactor-class="(.*?)"(.*?[^>])>/gi, '<$1$3>');
+					html = html.replace(/<(.*?) data-redactor-style="(.*?)"(.*?[^>])>/gi, '<$1$3>');
+					html = html.replace(new RegExp('<(.*?) data-verified="redactor"(.*?[^>])>', 'gi'), '<$1$2>');
+					html = html.replace(new RegExp('<(.*?) data-verified="redactor">', 'gi'), '<$1>');
+
+					return html;
+				},
+				onPaste: function(html, setMode)
+				{
+					html = $.trim(html);
+
+					html = html.replace(/\$/g, '&#36;');
+					html = html.replace(/”/g, '"');
+					html = html.replace(/“/g, '"');
+					html = html.replace(/‘/g, '\'');
+					html = html.replace(/’/g, '\'');
+
+					// convert dirty spaces
+					html = html.replace(/<span class="Apple-converted-space">&nbsp;<\/span>/gi, ' ');
+					html = html.replace(/<span class="Apple-tab-span"[^>]*>\t<\/span>/gi, '\t');
+					html = html.replace(/<span[^>]*>(\s|&nbsp;)<\/span>/gi, ' ');
+
+					if (this.opts.pastePlainText)
+					{
+						return this.clean.getPlainText(html);
+					}
+
+					if (!this.utils.isSelectAll() && typeof setMode == 'undefined')
+					{
+						if (this.utils.isCurrentOrParent(['FIGCAPTION', 'A']))
+						{
+							return this.clean.getPlainText(html, false);
+						}
+
+						if (this.utils.isCurrentOrParent('PRE'))
+						{
+							return this.clean.getPreCode(html);
+						}
+
+						if (this.utils.isCurrentOrParent(['BLOCKQUOTE', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6']))
+						{
+							html = this.clean.getOnlyImages(html);
+
+							if (!this.utils.browser('msie'))
+							{
+								var block = this.selection.getBlock();
+								if (block && block.tagName == 'P')
+								{
+									html = html.replace(/<img(.*?)>/gi, '<p><img$1></p>');
+								}
+							}
+
+							return html;
+						}
+
+						if (this.utils.isCurrentOrParent(['TD']))
+						{
+							html = this.clean.onPasteTidy(html, 'td');
+
+							if (this.opts.linebreaks) html = this.clean.replaceParagraphsToBr(html);
+
+							html = this.clean.replaceDivsToBr(html);
+
+							return html;
+						}
+
+
+						if (this.utils.isCurrentOrParent(['LI']))
+						{
+							return this.clean.onPasteTidy(html, 'li');
+						}
+					}
+
+
+					html = this.clean.isSingleLine(html, setMode);
+
+					if (!this.clean.singleLine)
+					{
+						if (this.opts.linebreaks)  html = this.clean.replaceParagraphsToBr(html);
+						if (this.opts.replaceDivs) html = this.clean.replaceDivs(html);
+
+						html = this.clean.saveFormTags(html);
+					}
+
+
+					html = this.clean.onPasteWord(html);
+					html = this.clean.onPasteExtra(html);
+
+					html = this.clean.onPasteTidy(html, 'all');
+
+
+					// paragraphize
+					if (!this.clean.singleLine && this.opts.paragraphize)
+					{
+						html = this.paragraphize.load(html);
+					}
+
+					html = this.clean.removeDirtyStyles(html);
+					html = this.clean.onPasteRemoveSpans(html);
+					html = this.clean.onPasteRemoveEmpty(html);
+
+					html = this.clean.convertInline(html);
+
+					return html;
+				},
+				onPasteWord: function(html)
+				{
+					// comments
+					html = html.replace(/<!--[\s\S]*?-->/gi, '');
+
+					// style
+					html = html.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+
+					if (/(class=\"?Mso|style=\"[^\"]*\bmso\-|w:WordDocument)/.test(html))
+					{
+						html = this.clean.onPasteIeFixLinks(html);
+
+						// shapes
+						html = html.replace(/<img(.*?)v:shapes=(.*?)>/gi, '');
+						html = html.replace(/src="file\:\/\/(.*?)"/, 'src=""');
+
+						// list
+						html = html.replace(/<p(.*?)class="MsoListParagraphCxSpFirst"([\w\W]*?)<\/p>/gi, '<ul><li$2</li>');
+						html = html.replace(/<p(.*?)class="MsoListParagraphCxSpMiddle"([\w\W]*?)<\/p>/gi, '<li$2</li>');
+						html = html.replace(/<p(.*?)class="MsoListParagraphCxSpLast"([\w\W]*?)<\/p>/gi, '<li$2</li></ul>');
+						// one line
+						html = html.replace(/<p(.*?)class="MsoListParagraph"([\w\W]*?)<\/p>/gi, '<ul><li$2</li></ul>');
+						// remove ms word's bullet
+						html = html.replace(/·/g, '');
+						html = html.replace(/<p class="Mso(.*?)"/gi, '<p');
+
+						// classes
+						html = html.replace(/ class=\"(mso[^\"]*)\"/gi,	"");
+						html = html.replace(/ class=(mso\w+)/gi, "");
+
+						// remove ms word tags
+						html = html.replace(/<o:p(.*?)>([\w\W]*?)<\/o:p>/gi, '$2');
+
+						// ms word break lines
+						html = html.replace(/\n/g, ' ');
+
+						// ms word lists break lines
+						html = html.replace(/<p>\n?<li>/gi, '<li>');
+					}
+
+					// remove nbsp
+					if (this.opts.cleanSpaces)
+					{
+						html = html.replace(/(\s|&nbsp;)+/g, ' ');
+					}
+
+					return html;
+				},
+				onPasteExtra: function(html)
+				{
+					// remove google docs markers
+					html = html.replace(/<b\sid="internal-source-marker(.*?)">([\w\W]*?)<\/b>/gi, "$2");
+					html = html.replace(/<b(.*?)id="docs-internal-guid(.*?)">([\w\W]*?)<\/b>/gi, "$3");
+
+					// google docs styles
+			 		html = html.replace(/<span[^>]*(font-style: italic; font-weight: bold|font-weight: bold; font-style: italic)[^>]*>/gi, '<span style="font-weight: bold;"><span style="font-style: italic;">');
+			 		html = html.replace(/<span[^>]*font-style: italic[^>]*>/gi, '<span style="font-style: italic;">');
+					html = html.replace(/<span[^>]*font-weight: bold[^>]*>/gi, '<span style="font-weight: bold;">');
+					html = html.replace(/<span[^>]*text-decoration: underline[^>]*>/gi, '<span style="text-decoration: underline;">');
+
+					html = html.replace(/<img>/gi, '');
+					html = html.replace(/\n{3,}/gi, '\n');
+					html = html.replace(/<font(.*?)>([\w\W]*?)<\/font>/gi, '$2');
+
+					// remove dirty p
+					html = html.replace(/<p><p>/gi, '<p>');
+					html = html.replace(/<\/p><\/p>/gi, '</p>');
+					html = html.replace(/<li>(\s*|\t*|\n*)<p>/gi, '<li>');
+					html = html.replace(/<\/p>(\s*|\t*|\n*)<\/li>/gi, '</li>');
+
+					// remove space between paragraphs
+					html = html.replace(/<\/p>\s<p/gi, '<\/p><p');
+
+					// remove safari local images
+					html = html.replace(/<img src="webkit-fake-url\:\/\/(.*?)"(.*?)>/gi, '');
+
+					// bullets
+					html = html.replace(/<p>•([\w\W]*?)<\/p>/gi, '<li>$1</li>');
+
+					// FF fix
+					if (this.utils.browser('mozilla'))
+					{
+						html = html.replace(/<br\s?\/?>$/gi, '');
+					}
+
+					return html;
+				},
+				onPasteTidy: function(html, type)
+				{
+					// remove all tags except these
+					var tags = ['span', 'a', 'pre', 'blockquote', 'small', 'em', 'strong', 'code', 'kbd', 'mark', 'address', 'cite', 'var', 'samp', 'dfn', 'sup', 'sub', 'b', 'i', 'u', 'del',
+								'ol', 'ul', 'li', 'dl', 'dt', 'dd', 'p', 'br', 'video', 'audio', 'iframe', 'embed', 'param', 'object', 'img', 'table',
+								'td', 'th', 'tr', 'tbody', 'tfoot', 'thead', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+					var tagsEmpty = false;
+					var attrAllowed =  [
+							['a', '*'],
+							['img', ['src', 'alt']],
+							['span', ['class', 'rel', 'data-verified']],
+							['iframe', '*'],
+							['video', '*'],
+							['audio', '*'],
+							['embed', '*'],
+							['object', '*'],
+							['param', '*'],
+							['source', '*']
+						];
+
+					if (type == 'all')
+					{
+						tagsEmpty = ['p', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+						attrAllowed =  [
+							['table', 'class'],
+							['td', ['colspan', 'rowspan']],
+							['a', '*'],
+							['img', ['src', 'alt', 'data-redactor-inserted-image']],
+							['span', ['class', 'rel', 'data-verified']],
+							['iframe', '*'],
+							['video', '*'],
+							['audio', '*'],
+							['embed', '*'],
+							['object', '*'],
+							['param', '*'],
+							['source', '*']
+						];
+					}
+					else if (type == 'td')
+					{
+						// remove all tags except these and remove all table tags: tr, td etc
+						tags = ['ul', 'ol', 'li', 'span', 'a', 'small', 'em', 'strong', 'code', 'kbd', 'mark', 'cite', 'var', 'samp', 'dfn', 'sup', 'sub', 'b', 'i', 'u', 'del',
+								'ol', 'ul', 'li', 'dl', 'dt', 'dd', 'br', 'iframe', 'video', 'audio', 'embed', 'param', 'object', 'img', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+
+					}
+					else if (type == 'li')
+					{
+						// only inline tags and ul, ol, li
+						tags = ['ul', 'ol', 'li', 'span', 'a', 'small', 'em', 'strong', 'code', 'kbd', 'mark', 'cite', 'var', 'samp', 'dfn', 'sup', 'sub', 'b', 'i', 'u', 'del', 'br',
+								'iframe', 'video', 'audio', 'embed', 'param', 'object', 'img'];
+					}
+
+					var options = {
+						deniedTags: false,
+						allowedTags: tags,
+						removeComments: true,
+						removePhp: true,
+						removeAttr: false,
+						allowedAttr: attrAllowed,
+						removeEmpty: tagsEmpty
+					};
+
+
+					return this.tidy.load(html, options);
+
+				},
+				onPasteRemoveEmpty: function(html)
+				{
+					html = html.replace(/<(p|h[1-6])>(|\s|\n|\t|<br\s?\/?>)<\/(p|h[1-6])>/gi, '');
+
+					// remove br in the end
+					if (!this.opts.linebreaks) html = html.replace(/<br>$/i, '');
+
+					return html;
+				},
+				onPasteRemoveSpans: function(html)
+				{
+					html = html.replace(/<span>(.*?)<\/span>/gi, '$1');
+					html = html.replace(/<span[^>]*>\s|&nbsp;<\/span>/gi, ' ');
+
+					return html;
+				},
+				onPasteIeFixLinks: function(html)
+				{
+					if (!this.utils.browser('msie')) return html;
+
+					var tmp = $.trim(html);
+					if (tmp.search(/^<a(.*?)>(.*?)<\/a>$/i) === 0)
+					{
+						html = html.replace(/^<a(.*?)>(.*?)<\/a>$/i, "$2");
+					}
+
+					return html;
+				},
+				isSingleLine: function(html, setMode)
+				{
+					this.clean.singleLine = false;
+
+					if (!this.utils.isSelectAll() && typeof setMode == 'undefined')
+					{
+						var blocks = this.opts.blockLevelElements.join('|').replace('P|', '').replace('DIV|', '');
+
+						var matchBlocks = html.match(new RegExp('</(' + blocks + ')>', 'gi'));
+						var matchContainers = html.match(/<\/(p|div)>/gi);
+
+						if (!matchBlocks && (matchContainers === null || (matchContainers && matchContainers.length <= 1)))
+						{
+							var matchBR = html.match(/<br\s?\/?>/gi);
+							var matchIMG = html.match(/<img(.*?[^>])>/gi);
+							if (!matchBR && !matchIMG)
+							{
+								this.clean.singleLine = true;
+								html = html.replace(/<\/?(p|div)(.*?)>/gi, '');
+							}
+						}
+					}
+
+					return html;
+				},
+				stripTags: function(input, allowed)
+				{
+				    allowed = (((allowed || '') + '').toLowerCase().match(/<[a-z][a-z0-9]*>/g) || []).join('');
+				    var tags = /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi;
+
+				    return input.replace(tags, function ($0, $1) {
+				        return allowed.indexOf('<' + $1.toLowerCase() + '>') > -1 ? $0 : '';
+				    });
+				},
+				savePreCode: function(html)
+				{
+					var pre = html.match(/<(pre|code)(.*?)>([\w\W]*?)<\/(pre|code)>/gi);
+					if (pre !== null)
+					{
+						$.each(pre, $.proxy(function(i,s)
+						{
+							var arr = s.match(/<(pre|code)(.*?)>([\w\W]*?)<\/(pre|code)>/i);
+
+							arr[3] = arr[3].replace(/<br\s?\/?>/g, '\n');
+							arr[3] = arr[3].replace(/&nbsp;/g, ' ');
+
+							if (this.opts.preSpaces)
+							{
+								arr[3] = arr[3].replace(/\t/g, Array(this.opts.preSpaces + 1).join(' '));
+							}
+
+							arr[3] = this.clean.encodeEntities(arr[3]);
+
+							// $ fix
+							arr[3] = arr[3].replace(/\$/g, '&#36;');
+
+							html = html.replace(s, '<' + arr[1] + arr[2] + '>' + arr[3] + '</' + arr[1] + '>');
+
+						}, this));
+					}
+
+					return html;
+				},
+				getTextFromHtml: function(html)
+				{
+					html = html.replace(/<br\s?\/?>|<\/H[1-6]>|<\/p>|<\/div>|<\/li>|<\/td>/gi, '\n');
+
+					var tmp = document.createElement('div');
+					tmp.innerHTML = html;
+					html = tmp.textContent || tmp.innerText;
+
+					return $.trim(html);
+				},
+				getPlainText: function(html, paragraphize)
+				{
+					html = this.clean.getTextFromHtml(html);
+					html = html.replace(/\n/g, '<br />');
+
+					if (this.opts.paragraphize && typeof paragraphize == 'undefined')
+					{
+						html = this.paragraphize.load(html);
+					}
+
+					return html;
+				},
+				getPreCode: function(html)
+				{
+					html = html.replace(/<img(.*?) style="(.*?)"(.*?[^>])>/gi, '<img$1$3>');
+					html = html.replace(/<img(.*?)>/gi, '&lt;img$1&gt;');
+					html = this.clean.getTextFromHtml(html);
+
+					if (this.opts.preSpaces)
+					{
+						html = html.replace(/\t/g, Array(this.opts.preSpaces + 1).join(' '));
+					}
+
+					html = this.clean.encodeEntities(html);
+
+					return html;
+				},
+				getOnlyImages: function(html)
+				{
+					html = html.replace(/<img(.*?)>/gi, '[img$1]');
+
+					// remove all tags
+					html = html.replace(/<(.*?)>/gi, '');
+
+					html = html.replace(/\[img(.*?)\]/gi, '<img$1>');
+
+					return html;
+				},
+				getOnlyLinksAndImages: function(html)
+				{
+					html = html.replace(/<a(.*?)href="(.*?)"(.*?)>([\w\W]*?)<\/a>/gi, '[a href="$2"]$4[/a]');
+					html = html.replace(/<img(.*?)>/gi, '[img$1]');
+
+					// remove all tags
+					html = html.replace(/<(.*?)>/gi, '');
+
+					html = html.replace(/\[a href="(.*?)"\]([\w\W]*?)\[\/a\]/gi, '<a href="$1">$2</a>');
+					html = html.replace(/\[img(.*?)\]/gi, '<img$1>');
+
+					return html;
+				},
+				encodeEntities: function(str)
+				{
+					str = String(str).replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
+					return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+				},
+				removeDirtyStyles: function(html)
+				{
+					if (this.utils.browser('msie')) return html;
+
+					var div = document.createElement('div');
+					div.innerHTML = html;
+
+					this.clean.clearUnverifiedRemove($(div));
+
+					html = div.innerHTML;
+					$(div).remove();
+
+					return html;
+				},
+				clearUnverified: function()
+				{
+					if (this.utils.browser('msie')) return;
+
+					this.clean.clearUnverifiedRemove(this.$editor);
+
+					var headers = this.$editor.find('h1, h2, h3, h4, h5, h6');
+					headers.find('span').removeAttr('style');
+					headers.find(this.opts.verifiedTags.join(', ')).removeAttr('style');
+
+					this.code.sync();
+				},
+				clearUnverifiedRemove: function($editor)
+				{
+					$editor.find(this.opts.verifiedTags.join(', ')).removeAttr('style');
+					$editor.find('span').not('[data-verified="redactor"]').removeAttr('style');
+
+					$editor.find('span[data-verified="redactor"], img[data-verified="redactor"]').each(function(i, s)
+					{
+						var $s = $(s);
+						$s.attr('style', $s.attr('rel'));
+					});
+
+				},
+				setVerified: function(html)
+				{
+					if (this.utils.browser('msie')) return html;
+
+					html = html.replace(new RegExp('<img(.*?[^>])>', 'gi'), '<img$1 data-verified="redactor">');
+					html = html.replace(new RegExp('<span(.*?)>', 'gi'), '<span$1 data-verified="redactor">');
+
+					var matches = html.match(new RegExp('<(span|img)(.*?)style="(.*?)"(.*?[^>])>', 'gi'));
+					if (matches)
+					{
+						var len = matches.length;
+						for (var i = 0; i < len; i++)
+						{
+							try {
+								var newTag = matches[i].replace(/style="(.*?)"/i, 'style="$1" rel="$1"');
+								html = html.replace(new RegExp(matches[i], 'gi'), newTag);
+							}
+							catch (e) {}
+						}
+					}
+
+					return html;
+				},
+				convertInline: function(html)
+				{
+					var $div = $('<div />').html(html);
+
+					var tags = this.opts.inlineTags;
+					tags.push('span');
+
+					$div.find(tags.join(',')).each(function()
+					{
+						var $el = $(this);
+						var tag = this.tagName.toLowerCase();
+						$el.attr('data-redactor-tag', tag);
+
+						if (tag == 'span')
+						{
+							if ($el.attr('style')) $el.attr('data-redactor-style', $el.attr('style'));
+							else if ($el.attr('class')) $el.attr('data-redactor-class', $el.attr('class'));
+						}
+
+					});
+
+					html = $div.html();
+					$div.remove();
+
+					return html;
+				},
+				normalizeLists: function()
+				{
+					this.$editor.find('li').each(function(i,s)
+					{
+						var $next = $(s).next();
+						if ($next.length !== 0 && ($next[0].tagName == 'UL' || $next[0].tagName == 'OL'))
+						{
+							$(s).append($next);
+						}
+
+					});
+				},
+				removeSpaces: function(html)
+				{
+					html = html.replace(/\n/g, '');
+					html = html.replace(/[\t]*/g, '');
+					html = html.replace(/\n\s*\n/g, "\n");
+					html = html.replace(/^[\s\n]*/g, ' ');
+					html = html.replace(/[\s\n]*$/g, ' ');
+					html = html.replace( />\s{2,}</g, '> <'); // between inline tags can be only one space
+					html = html.replace(/\n\n/g, "\n");
+					html = html.replace(/[\u200B-\u200D\uFEFF]/g, '');
+
+					return html;
+				},
+				replaceDivs: function(html)
+				{
+					if (this.opts.linebreaks)
+					{
+						html = html.replace(/<div><br\s?\/?><\/div>/gi, '<br />');
+						html = html.replace(/<div(.*?)>([\w\W]*?)<\/div>/gi, '$2<br />');
+					}
+					else
+					{
+						html = html.replace(/<div(.*?)>([\w\W]*?)<\/div>/gi, '<p$1>$2</p>');
+					}
+
+					return html;
+				},
+				replaceDivsToBr: function(html)
+				{
+					html = html.replace(/<div\s(.*?)>/gi, '<p>');
+					html = html.replace(/<div><br\s?\/?><\/div>/gi, '<br /><br />');
+					html = html.replace(/<div>([\w\W]*?)<\/div>/gi, '$1<br /><br />');
+
+					return html;
+				},
+				replaceParagraphsToBr: function(html)
+				{
+					html = html.replace(/<p\s(.*?)>/gi, '<p>');
+					html = html.replace(/<p><br\s?\/?><\/p>/gi, '<br />');
+					html = html.replace(/<p>([\w\W]*?)<\/p>/gi, '$1<br /><br />');
+					html = html.replace(/(<br\s?\/?>){1,}\n?<\/blockquote>/gi, '</blockquote>');
+
+					return html;
+				},
+				saveFormTags: function(html)
+				{
+					return html.replace(/<form(.*?)>([\w\W]*?)<\/form>/gi, '<section$1 rel="redactor-form-tag">$2</section>');
+				},
+				restoreFormTags: function(html)
+				{
+					return html.replace(/<section(.*?) rel="redactor-form-tag"(.*?)>([\w\W]*?)<\/section>/gi, '<form$1$2>$3</form>');
+				}
+			};
+		},
+		code: function()
+		{
+			return {
+				set: function(html)
+				{
+					html = $.trim(html.toString());
+
+					// clean
+					html = this.clean.onSet(html);
+
+					this.$editor.html(html);
+					this.code.sync();
+
+					setTimeout($.proxy(this.buffer.add, this), 15);
+					if (this.start === false) this.observe.load();
+
+				},
+				get: function()
+				{
+					var code = this.$textarea.val();
+
+					// indent code
+					code = this.tabifier.get(code);
+
+					return code;
+				},
+				sync: function()
+				{
+					setTimeout($.proxy(this.code.startSync, this), 10);
+				},
+				startSync: function()
+				{
+					var html = this.$editor.html();
+
+					// is there a need to synchronize
+					if (this.code.syncCode && this.code.syncCode == html)
+					{
+						// do not sync
+						return;
+					}
+
+					// save code
+					this.code.syncCode = html;
+
+					// before clean callback
+					html = this.core.setCallback('syncBefore', html);
+
+					// clean
+					html = this.clean.onSync(html);
+
+					// set code
+					this.$textarea.val(html);
+
+					// after sync callback
+					this.core.setCallback('sync', html);
+
+					if (this.start === false)
+					{
+						this.core.setCallback('change', html);
+					}
+
+					this.start = false;
+
+					// autosave on change
+					this.autosave.onChange();
+				},
+				toggle: function()
+				{
+					if (this.opts.visual)
+					{
+						this.code.showCode();
+					}
+					else
+					{
+						this.code.showVisual();
+					}
+				},
+				showCode: function()
+				{
+					this.code.offset = this.caret.getOffset();
+					var scroll = $(window).scrollTop();
+
+					var height = this.$editor.innerHeight();
+
+					this.$editor.hide();
+
+					var html = this.$textarea.val();
+					this.modified = this.clean.removeSpaces(html);
+
+					// indent code
+					html = this.tabifier.get(html);
+
+					this.$textarea.val(html).height(height).show().focus();
+					this.$textarea.on('keydown.redactor-textarea-indenting', this.code.textareaIndenting);
+
+					$(window).scrollTop(scroll);
+
+					if (this.$textarea[0].setSelectionRange)
+					{
+						this.$textarea[0].setSelectionRange(0, 0);
+					}
+
+					this.$textarea[0].scrollTop = 0;
+
+					this.opts.visual = false;
+
+					this.button.setInactiveInCode();
+					this.button.setActive('html');
+					this.core.setCallback('source', html);
+				},
+				showVisual: function()
+				{
+					if (this.opts.visual) return;
+
+					var html = this.$textarea.hide().val();
+
+					if (this.modified !== this.clean.removeSpaces(html))
+					{
+						this.code.set(html);
+					}
+
+					this.$editor.show();
+
+					if (!this.utils.isEmpty(html))
+					{
+						this.placeholder.remove();
+					}
+
+					this.caret.setOffset(this.code.offset);
+
+					this.$textarea.off('keydown.redactor-textarea-indenting');
+
+					this.button.setActiveInVisual();
+					this.button.setInactive('html');
+
+					this.observe.load();
+					this.opts.visual = true;
+				},
+				textareaIndenting: function(e)
+				{
+					if (e.keyCode !== 9) return true;
+
+					var $el = this.$textarea;
+					var start = $el.get(0).selectionStart;
+					$el.val($el.val().substring(0, start) + "\t" + $el.val().substring($el.get(0).selectionEnd));
+					$el.get(0).selectionStart = $el.get(0).selectionEnd = start + 1;
+
+					return false;
+				}
+			};
+		},
+		core: function()
+		{
+			return {
+				getObject: function()
+				{
+					return $.extend({}, this);
+				},
+				getEditor: function()
+				{
+					return this.$editor;
+				},
+				getBox: function()
+				{
+					return this.$box;
+				},
+				getElement: function()
+				{
+					return this.$element;
+				},
+				getTextarea: function()
+				{
+					return this.$textarea;
+				},
+				getToolbar: function()
+				{
+					return (this.$toolbar) ? this.$toolbar : false;
+				},
+				addEvent: function(name)
+				{
+					this.core.event = name;
+				},
+				getEvent: function()
+				{
+					return this.core.event;
+				},
+				setCallback: function(type, e, data)
+				{
+					var callback = this.opts[type + 'Callback'];
+					if ($.isFunction(callback))
+					{
+						return (typeof data == 'undefined') ? callback.call(this, e) : callback.call(this, e, data);
+					}
+					else
+					{
+						return (typeof data == 'undefined') ? e : data;
+					}
+				},
+				destroy: function()
+				{
+					this.core.setCallback('destroy');
+
+					// off events and remove data
+					this.$element.off('.redactor').removeData('redactor');
+					this.$editor.off('.redactor');
+
+					// common
+					this.$editor.removeClass('redactor-editor redactor-linebreaks redactor-placeholder');
+					this.$editor.removeAttr('contenteditable');
+
+					var html = this.code.get();
+
+					if (this.build.isTextarea())
+					{
+						this.$box.after(this.$element);
+						this.$box.remove();
+						this.$element.val(html).show();
+					}
+					else
+					{
+						this.$box.after(this.$editor);
+						this.$box.remove();
+						this.$element.html(html).show();
+					}
+
+					// paste box
+					if (this.$pasteBox) this.$pasteBox.remove();
+
+					// modal
+					if (this.$modalBox) this.$modalBox.remove();
+					if (this.$modalOverlay) this.$modalOverlay.remove();
+
+					// buttons tooltip
+					$('.redactor-toolbar-tooltip').remove();
+
+					// autosave
+					clearInterval(this.autosaveInterval);
+
+				}
+			};
+		},
+		dropdown: function()
+		{
+			return {
+				build: function(name, $dropdown, dropdownObject)
+				{
+					if (name == 'formatting' && this.opts.formattingAdd)
+					{
+						$.each(this.opts.formattingAdd, $.proxy(function(i,s)
+						{
+							var name = s.tag;
+							if (typeof s.class != 'undefined')
+							{
+								name = name + '-' + s.class;
+							}
+
+							s.type = (this.utils.isBlockTag(s.tag)) ? 'block' : 'inline';
+							var func = (s.type == 'inline') ? 'inline.formatting' : 'block.formatting';
+
+							if (this.opts.linebreaks && s.type == 'block' && s.tag == 'p') return;
+
+							this.formatting[name] = {
+								tag: s.tag,
+								style: s.style,
+								'class': s.class,
+								attr: s.attr,
+								data: s.data
+							};
+
+							dropdownObject[name] = {
+								func: func,
+								title: s.title
+							};
+
+						}, this));
+
+					}
+
+					$.each(dropdownObject, $.proxy(function(btnName, btnObject)
+					{
+						var $item = $('<a href="#" class="redactor-dropdown-' + btnName + '">' + btnObject.title + '</a>');
+						if (name == 'formatting') $item.addClass('redactor-formatting-' + btnName);
+
+						$item.on('click', $.proxy(function(e)
+						{
+							var type = 'func';
+							var callback = btnObject.func;
+							if (btnObject.command)
+							{
+								type = 'command';
+								callback = btnObject.command;
+							}
+							else if (btnObject.dropdown)
+							{
+								type = 'dropdown';
+								callback = btnObject.dropdown;
+							}
+
+							this.button.onClick(e, btnName, type, callback);
+
+						}, this));
+
+						$dropdown.append($item);
+
+					}, this));
+				},
+				show: function(e, key)
+				{
+					if (!this.opts.visual)
+					{
+						e.preventDefault();
+						return false;
+					}
+
+					var $button = this.button.get(key);
+
+					// Always re-append it to the end of <body> so it always has the highest sub-z-index.
+					var $dropdown = $button.data('dropdown').appendTo(document.body);
+
+					// ios keyboard hide
+					document.activeElement.blur();
+
+					if ($button.hasClass('dropact'))
+					{
+						this.dropdown.hideAll();
+					}
+					else
+					{
+						this.dropdown.hideAll();
+						this.core.setCallback('dropdownShow', { dropdown: $dropdown, key: key, button: $button });
+
+						this.button.setActive(key);
+
+						$button.addClass('dropact');
+
+						var keyPosition = $button.offset();
+
+						// fix right placement
+						var dropdownWidth = $dropdown.width();
+						if ((keyPosition.left + dropdownWidth) > $(document).width())
+						{
+							keyPosition.left -= dropdownWidth;
+						}
+
+						var left = keyPosition.left + 'px';
+						if (this.$toolbar.hasClass('toolbar-fixed-box'))
+						{
+							var top = this.$toolbar.innerHeight() + this.opts.toolbarFixedTopOffset;
+							var position = 'fixed';
+							if (this.opts.toolbarFixedTarget !== document)
+							{
+								top = (this.$toolbar.innerHeight() + this.$toolbar.offset().top) + this.opts.toolbarFixedTopOffset;
+								position = 'absolute';
+							}
+
+							$dropdown.css({ position: position, left: left, top: top + 'px' }).show();
+						}
+						else
+						{
+							var top = ($button.innerHeight() + keyPosition.top) + 'px';
+
+							$dropdown.css({ position: 'absolute', left: left, top: top }).show();
+						}
+
+
+						this.core.setCallback('dropdownShown', { dropdown: $dropdown, key: key, button: $button });
+					}
+
+					$(document).one('click', $.proxy(this.dropdown.hide, this));
+					this.$editor.one('click', $.proxy(this.dropdown.hide, this));
+
+					// disable scroll whan dropdown scroll
+					var $body = $(document.body);
+					var width = $body.width();
+
+					$dropdown.on('mouseover', function() {
+
+						$body.addClass('body-hidden');
+						$body.css('margin-right', ($body.width() - width) + 'px');
+
+					 });
+
+					$dropdown.on('mouseout', function() {
+
+						$body.removeClass('body-hidden').css('margin-right', 0);
+
+					});
+
+
+					e.stopPropagation();
+				},
+				hideAll: function()
+				{
+					this.$toolbar.find('a.dropact').removeClass('redactor-act').removeClass('dropact');
+
+					$(document.body).removeClass('body-hidden').css('margin-right', 0);
+					$('.redactor-dropdown').hide();
+					this.core.setCallback('dropdownHide');
+				},
+				hide: function (e)
+				{
+					var $dropdown = $(e.target);
+					if (!$dropdown.hasClass('dropact'))
+					{
+						$dropdown.removeClass('dropact');
+						this.dropdown.hideAll();
+					}
+				}
+			};
+		},
+		file: function()
+		{
+			return {
+				show: function()
+				{
+					this.modal.load('file', this.lang.get('file'), 700);
+					this.upload.init('#redactor-modal-file-upload', this.opts.fileUpload, this.file.insert);
+
+					this.selection.save();
+
+					this.selection.get();
+					var text = this.sel.toString();
+
+					$('#redactor-filename').val(text);
+
+					this.modal.show();
+				},
+				insert: function(json, direct, e)
+				{
+					// error callback
+					if (typeof json.error != 'undefined')
+					{
+						this.modal.close();
+						this.selection.restore();
+						this.core.setCallback('fileUploadError', json);
+						return;
+					}
+
+					var link;
+					if (typeof json == 'string')
+					{
+						link = json;
+					}
+					else
+					{
+						var text = $('#redactor-filename').val();
+						if (typeof text == 'undefined' || text === '') text = json.filename;
+
+						link = '<a href="' + json.filelink + '" id="filelink-marker">' + text + '</a>';
+					}
+
+					if (direct)
+					{
+						this.selection.removeMarkers();
+						var marker = this.selection.getMarker();
+						this.insert.nodeToCaretPositionFromPoint(e, marker);
+					}
+					else
+					{
+						this.modal.close();
+					}
+
+					this.selection.restore();
+					this.buffer.set();
+
+					this.insert.html(link);
+
+					if (typeof json == 'string') return;
+
+					var linkmarker = $(this.$editor.find('a#filelink-marker'));
+					if (linkmarker.size() !== 0) linkmarker.removeAttr('id');
+					else linkmarker = false;
+
+					this.core.setCallback('fileUpload', linkmarker, json);
+
+				}
+			};
+		},
+		focus: function()
+		{
+			return {
+				setStart: function()
+				{
+					this.$editor.focus();
+
+					var first = this.$editor.children().first();
+
+					if (first.size() === 0) return;
+					if (first[0].length === 0 || first[0].tagName == 'BR' || first[0].nodeType == 3)
+					{
+						return;
+					}
+
+					if (first[0].tagName == 'UL' || first[0].tagName == 'OL')
+					{
+						first = first.find('li').first();
+						var child = first.children().first();
+						if (!this.utils.isBlock(child) && child.text() === '')
+						{
+							// empty inline tag in li
+							this.caret.setStart(child);
+							return;
+						}
+					}
+
+					if (this.opts.linebreaks && !this.utils.isBlockTag(first[0].tagName))
+					{
+						this.selection.get();
+						this.range.setStart(this.$editor[0], 0);
+						this.range.setEnd(this.$editor[0], 0);
+						this.selection.addRange();
+
+						return;
+					}
+
+					// if node is tag
+					this.caret.setStart(first);
+				},
+				setEnd: function()
+				{
+					if (this.utils.browser('mozilla') || this.utils.browser('msie'))
+					{
+						var last = this.$editor.children().last();
+						this.caret.setEnd(last);
+					}
+					else
+					{
+						this.selection.get();
+
+						try {
+							this.range.selectNodeContents(this.$editor[0]);
+							this.range.collapse(false);
+
+							this.selection.addRange();
+						}
+						catch (e) {}
+					}
+
+				},
+				isFocused: function()
+				{
+					var focusNode = document.getSelection().focusNode;
+					if (focusNode === null) return false;
+
+					if (this.opts.linebreaks && $(focusNode.parentNode).hasClass('redactor-linebreaks')) return true;
+					else if (!this.utils.isRedactorParent(focusNode.parentNode)) return false;
+
+					return this.$editor.is(':focus');
+				}
+			};
+		},
+		image: function()
+		{
+			return {
+				show: function()
+				{
+					this.modal.load('image', this.lang.get('image'), 700);
+					this.upload.init('#redactor-modal-image-droparea', this.opts.imageUpload, this.image.insert);
+
+					this.selection.save();
+					this.modal.show();
+
+				},
+				showEdit: function($image)
+				{
+					var $link = $image.closest('a');
+
+					this.modal.load('imageEdit', this.lang.get('edit'), 705);
+
+					this.modal.createCancelButton();
+					this.image.buttonDelete = this.modal.createDeleteButton(this.lang.get('_delete'));
+					this.image.buttonSave = this.modal.createActionButton(this.lang.get('save'));
+
+					this.image.buttonDelete.on('click', $.proxy(function()
+					{
+						this.image.remove($image);
+
+					}, this));
+
+					this.image.buttonSave.on('click', $.proxy(function()
+					{
+						this.image.update($image);
+
+					}, this));
+
+
+					$('#redactor-image-title').val($image.attr('alt'));
+
+					if (!this.opts.imageLink) $('.redactor-image-link-option').hide();
+					else
+					{
+						var $redactorImageLink = $('#redactor-image-link');
+
+						$redactorImageLink.attr('href', $image.attr('src'));
+						if ($link.size() !== 0)
+						{
+							$redactorImageLink.val($link.attr('href'));
+							if ($link.attr('target') == '_blank') $('#redactor-image-link-blank').prop('checked', true);
+						}
+					}
+
+					if (!this.opts.imagePosition) $('.redactor-image-position-option').hide();
+					else
+					{
+						var floatValue = ($image.css('display') == 'block' && $image.css('float') == 'none') ? 'center' : $image.css('float');
+						$('#redactor-image-align').val(floatValue);
+					}
+
+					this.modal.show();
+
+				},
+				setFloating: function($image)
+				{
+					var floating = $('#redactor-image-align').val();
+
+					var imageFloat = '';
+					var imageDisplay = '';
+					var imageMargin = '';
+
+					switch (floating)
+					{
+						case 'left':
+							imageFloat = 'left';
+							imageMargin = '0 ' + this.opts.imageFloatMargin + ' ' + this.opts.imageFloatMargin + ' 0';
+						break;
+						case 'right':
+							imageFloat = 'right';
+							imageMargin = '0 0 ' + this.opts.imageFloatMargin + ' ' + this.opts.imageFloatMargin;
+						break;
+						case 'center':
+							imageDisplay = 'block';
+							imageMargin = 'auto';
+						break;
+					}
+
+					$image.css({ 'float': imageFloat, display: imageDisplay, margin: imageMargin });
+					$image.attr('rel', $image.attr('style'));
+				},
+				update: function($image)
+				{
+					this.image.hideResize();
+					this.buffer.set();
+
+					var $link = $image.closest('a');
+
+					$image.attr('alt', $('#redactor-image-title').val());
+
+					this.image.setFloating($image);
+
+					// as link
+					var link = $.trim($('#redactor-image-link').val());
+					if (link !== '')
+					{
+						var target = ($('#redactor-image-link-blank').prop('checked')) ? true : false;
+
+						if ($link.size() === 0)
+						{
+							var a = $('<a href="' + link + '">' + this.utils.getOuterHtml($image) + '</a>');
+							if (target) a.attr('target', '_blank');
+
+							$image.replaceWith(a);
+						}
+						else
+						{
+							$link.attr('href', link);
+							if (target)
+							{
+								$link.attr('target', '_blank');
+							}
+							else
+							{
+								$link.removeAttr('target');
+							}
+						}
+					}
+					else if ($link.size() !== 0)
+					{
+						$link.replaceWith(this.utils.getOuterHtml($image));
+
+					}
+
+					this.modal.close();
+					this.observe.images();
+					this.code.sync();
+
+
+				},
+				setEditable: function($image)
+				{
+					if (!this.opts.imageEditable) return;
+
+					$image.on('dragstart', $.proxy(this.image.onDrag, this));
+
+					$image.on('mousedown', $.proxy(this.image.hideResize, this));
+					$image.on('click touchstart', $.proxy(function(e)
+					{
+						this.observe.image = $image;
+
+						if (this.$editor.find('#redactor-image-box').size() !== 0) return false;
+
+
+						this.image.resizer = this.image.loadEditableControls($image);
+
+						$(document).on('click.redactor-image-resize-hide', $.proxy(this.image.hideResize, this));
+						this.$editor.on('click.redactor-image-resize-hide', $.proxy(this.image.hideResize, this));
+
+						// resize
+						if (!this.opts.imageResizable) return;
+
+						this.image.resizer.on('mousedown.redactor touchstart.redactor', $.proxy(function(e)
+						{
+							e.preventDefault();
+
+						    this.image.resizeHandle = {
+						        x : e.pageX,
+						        y : e.pageY,
+						        el : $image,
+						        ratio: $image.width() / $image.height(),
+						        h: $image.height()
+						    };
+
+						    e = e.originalEvent || e;
+
+						    if (e.targetTouches)
+						    {
+						         this.image.resizeHandle.x = e.targetTouches[0].pageX;
+						         this.image.resizeHandle.y = e.targetTouches[0].pageY;
+						    }
+
+							this.image.startResize();
+
+						}, this));
+
+
+					}, this));
+				},
+				startResize: function()
+				{
+					$(document).on('mousemove.redactor-image-resize touchmove.redactor-image-resize', $.proxy(this.image.moveResize, this));
+					$(document).on('mouseup.redactor-image-resize touchend.redactor-image-resize', $.proxy(this.image.stopResize, this));
+				},
+				moveResize: function(e)
+				{
+					e.preventDefault();
+
+					e = e.originalEvent || e;
+
+					var height =  this.image.resizeHandle.h;
+
+		            if (e.targetTouches) height += (e.targetTouches[0].pageY -  this.image.resizeHandle.y);
+		            else height += (e.pageY -  this.image.resizeHandle.y);
+
+
+					var width = Math.round(height *  this.image.resizeHandle.ratio);
+
+					if (height < 50 || width < 100) return;
+
+		            this.image.resizeHandle.el.height(height);
+		            this.image.resizeHandle.el.width(width);
+
+		            this.code.sync();
+				},
+				stopResize: function()
+				{
+					this.handle = false;
+					$(document).off('.redactor-image-resize');
+
+					this.image.hideResize();
+				},
+				onDrag: function(e)
+				{
+					if (this.$editor.find('#redactor-image-box').size() !== 0)
+					{
+						e.preventDefault();
+						return false;
+					}
+
+					this.$editor.on('drop.redactor-image-inside-drop', $.proxy(function()
+					{
+						setTimeout($.proxy(this.image.onDrop, this), 1);
+
+					}, this));
+				},
+				onDrop: function()
+				{
+					this.image.fixImageSourceAfterDrop();
+					this.observe.images();
+					this.$editor.off('drop.redactor-image-inside-drop');
+					this.clean.clearUnverified();
+					this.code.sync();
+				},
+				fixImageSourceAfterDrop: function()
+				{
+					this.$editor.find('img[data-save-url]').each(function()
+					{
+						var $el = $(this);
+						$el.attr('src', $el.attr('data-save-url'));
+						$el.removeAttr('data-save-url');
+					});
+				},
+				hideResize: function(e)
+				{
+					if (e && $(e.target).closest('#redactor-image-box').length !== 0) return;
+					if (e && e.target.tagName == 'IMG')
+					{
+						var $image = $(e.target);
+						$image.attr('data-save-url', $image.attr('src'));
+					}
+
+					var imageBox = this.$editor.find('#redactor-image-box');
+					if (imageBox.size() === 0) return;
+
+					this.image.editter.remove();
+					$(this.image.resizer).remove();
+
+					imageBox.find('img').css({
+						marginTop: imageBox[0].style.marginTop,
+						marginBottom: imageBox[0].style.marginBottom,
+						marginLeft: imageBox[0].style.marginLeft,
+						marginRight: imageBox[0].style.marginRight
+					});
+
+					imageBox.css('margin', '');
+					imageBox.find('img').css('opacity', '');
+					imageBox.replaceWith(function()
+					{
+						return $(this).contents();
+					});
+
+					$(document).off('click.redactor-image-resize-hide');
+					this.$editor.off('click.redactor-image-resize-hide');
+
+					if (typeof this.image.resizeHandle !== 'undefined')
+					{
+						this.image.resizeHandle.el.attr('rel', this.image.resizeHandle.el.attr('style'));
+					}
+
+					this.code.sync();
+
+				},
+				loadEditableControls: function($image)
+				{
+					var imageBox = $('<span id="redactor-image-box" data-redactor="verified">');
+					imageBox.css('float', $image.css('float')).attr('contenteditable', false);
+
+					if ($image[0].style.margin != 'auto')
+					{
+						imageBox.css({
+							marginTop: $image[0].style.marginTop,
+							marginBottom: $image[0].style.marginBottom,
+							marginLeft: $image[0].style.marginLeft,
+							marginRight: $image[0].style.marginRight
+						});
+
+						$image.css('margin', '');
+					}
+					else
+					{
+						imageBox.css({ 'display': 'block', 'margin': 'auto' });
+					}
+
+					$image.css('opacity', '.5').after(imageBox);
+
+					// editter
+					this.image.editter = $('<span id="redactor-image-editter" data-redactor="verified">' + this.lang.get('edit') + '</span>');
+					this.image.editter.attr('contenteditable', false);
+					this.image.editter.on('click', $.proxy(function()
+					{
+						this.image.showEdit($image);
+					}, this));
+
+					imageBox.append(this.image.editter);
+
+					// position correction
+					var editerWidth = this.image.editter.innerWidth();
+					this.image.editter.css('margin-left', '-' + editerWidth/2 + 'px');
+
+
+					// resizer
+					if (this.opts.imageResizable && !this.utils.isMobile())
+					{
+						var imageResizer = $('<span id="redactor-image-resizer" data-redactor="verified"></span>');
+
+						if (!this.utils.isDesktop())
+						{
+							imageResizer.css({ width: '15px', height: '15px' });
+						}
+
+						imageResizer.attr('contenteditable', false);
+						imageBox.append(imageResizer);
+						imageBox.append($image);
+
+						return imageResizer;
+					}
+					else
+					{
+						imageBox.append($image);
+						return false;
+					}
+				},
+				remove: function(image)
+				{
+					var $image = $(image);
+					var $link = $image.closest('a');
+					var $figure = $image.closest('figure');
+					var $parent = $image.parent();
+					if ($('#redactor-image-box').size() !== 0)
+					{
+						$parent = $('#redactor-image-box').parent();
+					}
+
+					var $next;
+					if ($figure.size() !== 0)
+					{
+						$next = $figure.next();
+						$figure.remove();
+					}
+					else if ($link.size() !== 0)
+					{
+						$parent = $link.parent();
+						$link.remove();
+					}
+					else
+					{
+						$image.remove();
+					}
+
+					$('#redactor-image-box').remove();
+
+					if ($figure.size() !== 0)
+					{
+						this.caret.setStart($next);
+					}
+					else
+					{
+						this.caret.setStart($parent);
+					}
+
+					// delete callback
+					this.core.setCallback('imageDelete', $image[0].src, $image);
+
+					this.modal.close();
+					this.code.sync();
+				},
+				insert: function(json, direct, e)
+				{
+					// error callback
+					if (typeof json.error != 'undefined')
+					{
+						this.modal.close();
+						this.selection.restore();
+						this.core.setCallback('imageUploadError', json);
+						return;
+					}
+
+					var $img;
+					if (typeof json == 'string')
+					{
+						$img = $(json).attr('data-redactor-inserted-image', 'true');
+					}
+					else
+					{
+						$img = $('<img>');
+						$img.attr('src', json.filelink).attr('data-redactor-inserted-image', 'true');
+					}
+
+
+					var node = $img;
+					var isP = this.utils.isCurrentOrParent('P');
+					if (isP)
+					{
+						// will replace
+						node = $('<blockquote />').append($img);
+					}
+
+					if (direct)
+					{
+						this.selection.removeMarkers();
+						var marker = this.selection.getMarker();
+						this.insert.nodeToCaretPositionFromPoint(e, marker);
+					}
+					else
+					{
+						this.modal.close();
+					}
+
+					this.selection.restore();
+					this.buffer.set();
+
+
+					this.insert.html(this.utils.getOuterHtml(node), false);
+
+					var $image = this.$editor.find('img[data-redactor-inserted-image=true]').removeAttr('data-redactor-inserted-image');
+
+					if (isP)
+					{
+						$image.parent().contents().unwrap().wrap('<p />');
+					}
+					else if (this.opts.linebreaks)
+					{
+						$image.before('<br>').after('<br>');
+					}
+
+					if (typeof json == 'string') return;
+
+					this.core.setCallback('imageUpload', $image, json);
+
+				}
+			};
+		},
+		indent: function()
+		{
+			return {
+				increase: function()
+				{
+					// focus
+					if (!this.utils.browser('msie')) this.$editor.focus();
+
+					this.buffer.set();
+					this.selection.save();
+
+					var block = this.selection.getBlock();
+
+					if (block && block.tagName == 'LI')
+					{
+						this.indent.increaseLists();
+					}
+					else if (block === false && this.opts.linebreaks)
+					{
+						this.indent.increaseText();
+					}
+					else
+					{
+						this.indent.increaseBlocks();
+					}
+
+					this.selection.restore();
+					this.code.sync();
+				},
+				increaseLists: function()
+				{
+					document.execCommand('indent');
+
+					this.indent.fixEmptyIndent();
+					this.clean.normalizeLists();
+					this.clean.clearUnverified();
+				},
+				increaseBlocks: function()
+				{
+					$.each(this.selection.getBlocks(), $.proxy(function(i, elem)
+					{
+						if (elem.tagName === 'TD' || elem.tagName === 'TH') return;
+
+						var $el = this.utils.getAlignmentElement(elem);
+
+						var left = this.utils.normalize($el.css('margin-left')) + this.opts.indentValue;
+						$el.css('margin-left', left + 'px');
+
+					}, this));
+				},
+				increaseText: function()
+				{
+					var wrapper = this.selection.wrap('div');
+					$(wrapper).attr('data-tagblock', 'redactor');
+					$(wrapper).css('margin-left', this.opts.indentValue + 'px');
+				},
+				decrease: function()
+				{
+					this.buffer.set();
+					this.selection.save();
+
+					var block = this.selection.getBlock();
+					if (block && block.tagName == 'LI')
+					{
+						this.indent.decreaseLists();
+					}
+					else
+					{
+						this.indent.decreaseBlocks();
+					}
+
+					this.selection.restore();
+					this.code.sync();
+				},
+				decreaseLists: function ()
+				{
+					document.execCommand('outdent');
+
+					var current = this.selection.getCurrent();
+
+					var $item = $(current).closest('li');
+					var $parent = $item.parent();
+					if ($item.size() !== 0 && $parent.size() !== 0 && $parent[0].tagName == 'LI')
+					{
+						$parent.after($item);
+					}
+
+					this.indent.fixEmptyIndent();
+
+					if (!this.opts.linebreaks && $item.size() === 0)
+					{
+						document.execCommand('formatblock', false, 'p');
+						this.$editor.find('ul, ol, blockquote, p').each($.proxy(this.utils.removeEmpty, this));
+					}
+
+					this.clean.clearUnverified();
+				},
+				decreaseBlocks: function()
+				{
+					$.each(this.selection.getBlocks(), $.proxy(function(i, elem)
+					{
+						var $el = this.utils.getAlignmentElement(elem);
+						var left = this.utils.normalize($el.css('margin-left')) - this.opts.indentValue;
+
+						if (left <= 0)
+						{
+							if (this.opts.linebreaks && typeof($el.data('tagblock')) !== 'undefined')
+							{
+								$el.replaceWith($el.html() + '<br />');
+							}
+							else
+							{
+								$el.css('margin-left', '');
+								this.utils.removeEmptyAttr($el, 'style');
+							}
+						}
+						else
+						{
+							$el.css('margin-left', left + 'px');
+						}
+
+					}, this));
+				},
+				fixEmptyIndent: function()
+				{
+					var block = this.selection.getBlock();
+
+					if (this.range.collapsed && block && block.tagName == 'LI' && this.utils.isEmpty($(block).text()))
+					{
+						var $block = $(block);
+						$block.find('span').not('.redactor-selection-marker').contents().unwrap();
+						$block.append('<br>');
+					}
+				}
+			};
+		},
+		inline: function()
+		{
+			return {
+				formatting: function(name)
+				{
+					var type, value;
+
+					if (typeof this.formatting[name].style != 'undefined') type = 'style';
+					else if (typeof this.formatting[name].class != 'undefined') type = 'class';
+
+					if (type) value = this.formatting[name][type];
+
+					this.inline.format(this.formatting[name].tag, type, value);
+
+				},
+				format: function(tag, type, value)
+				{
+					// Stop formatting pre
+					if (this.utils.isCurrentOrParent('PRE')) return;
+
+					var tags = ['b', 'bold', 'i', 'italic', 'underline', 'strikethrough', 'deleted', 'superscript', 'subscript'];
+					var replaced = ['strong', 'strong', 'em', 'em', 'u', 'del', 'del', 'sup', 'sub'];
+
+					for (var i = 0; i < tags.length; i++)
+					{
+						if (tag == tags[i]) tag = replaced[i];
+					}
+
+					this.inline.type = type || false;
+					this.inline.value = value || false;
+
+					this.buffer.set();
+					this.$editor.focus();
+
+					this.selection.get();
+
+					if (this.range.collapsed)
+					{
+						this.inline.formatCollapsed(tag);
+					}
+					else
+					{
+						this.inline.formatMultiple(tag);
+					}
+				},
+				formatCollapsed: function(tag)
+				{
+					var current = this.selection.getCurrent();
+					var $parent = $(current).closest(tag + '[data-redactor-tag=' + tag + ']');
+
+					// inline there is
+					if ($parent.size() !== 0)
+					{
+						this.caret.setAfter($parent[0]);
+
+						// remove empty
+						if (this.utils.isEmpty($parent.text())) $parent.remove();
+
+						this.code.sync();
+
+						return;
+					}
+
+					// create empty inline
+					var node = $('<' + tag + '>').attr('data-verified', 'redactor').attr('data-redactor-tag', tag);
+					node.html(this.opts.invisibleSpace);
+
+					node = this.inline.setFormat(node);
+
+					this.insert.node(node);
+					this.caret.setEnd(node);
+
+					this.code.sync();
+
+					return;
+				},
+				formatMultiple: function(tag)
+				{
+					this.inline.formatConvert(tag);
+
+					this.selection.save();
+					document.execCommand('strikethrough');
+
+
+					this.$editor.find('strike').each($.proxy(function(i,s)
+					{
+						var $el = $(s);
+
+						this.inline.formatRemoveSameChildren($el, tag);
+
+						var $span;
+						if (this.inline.type)
+						{
+							$span = $('<span>').attr('data-redactor-tag', tag).attr('data-verified', 'redactor');
+							$span = this.inline.setFormat($span);
+						}
+						else
+						{
+							$span = $('<' + tag + '>').attr('data-redactor-tag', tag).attr('data-verified', 'redactor');
+						}
+
+						$el.replaceWith($span.html($el.contents()));
+
+						if (tag == 'span')
+						{
+							var $parent = $span.parent();
+							if ($parent && $parent[0].tagName == 'SPAN' && this.inline.type == 'style')
+							{
+								var arr = this.inline.value.split(';');
+
+								for (var z = 0; z < arr.length; z++)
+								{
+									if (arr[z] === '') return;
+									var style = arr[z].split(':');
+									$parent.css(style[0], '');
+
+									if (this.utils.removeEmptyAttr($parent, 'style'))
+									{
+										$parent.replaceWith($parent.contents());
+									}
+
+								}
+
+							}
+						}
+
+					}, this));
+
+					// clear text decoration
+					if (tag != 'span')
+					{
+						this.$editor.find(this.opts.inlineTags.join(', ')).each($.proxy(function(i,s)
+						{
+							var $el = $(s);
+							var property = $el.css('text-decoration');
+							if (property == 'line-through')
+							{
+								$el.css('text-decoration', '');
+								this.utils.removeEmptyAttr($el, 'style');
+							}
+						}, this));
+					}
+
+					if (tag != 'del')
+					{
+						var _this = this;
+						this.$editor.find('inline').each(function(i,s)
+						{
+							_this.utils.replaceToTag(s, 'del');
+						});
+					}
+
+					this.selection.restore();
+					this.code.sync();
+
+				},
+				formatRemoveSameChildren: function($el, tag)
+				{
+					$el.children(tag).each(function()
+					{
+						var $child = $(this);
+						if (!$child.hasClass('redactor-selection-marker'))
+						{
+							$child.contents().unwrap();
+						}
+					});
+				},
+				formatConvert: function(tag)
+				{
+					this.selection.save();
+
+					var find = '';
+					if (this.inline.type == 'class') find = '[data-redactor-class=' + this.inline.value + ']';
+					else if (this.inline.type == 'style')
+					{
+						find = '[data-redactor-style="' + this.inline.value + '"]';
+					}
+
+					if (tag != 'del')
+					{
+						var self = this;
+						this.$editor.find('del').each(function(i,s)
+						{
+							self.utils.replaceToTag(s, 'inline');
+						});
+					}
+
+					this.$editor.find('[data-redactor-tag="' + tag + '"]' + find).each(function()
+					{
+						if (find === '' && tag == 'span' && this.tagName.toLowerCase() == tag) return;
+
+						var $el = $(this);
+						$el.replaceWith($('<strike />').html($el.contents()));
+
+					});
+
+					this.selection.restore();
+				},
+				setFormat: function(node)
+				{
+					switch (this.inline.type)
+					{
+						case 'class':
+
+							if (node.hasClass(this.inline.value))
+							{
+								node.removeClass(this.inline.value);
+								node.removeAttr('data-redactor-class');
+							}
+							else
+							{
+								node.addClass(this.inline.value);
+								node.attr('data-redactor-class', this.inline.value);
+							}
+
+
+						break;
+						case 'style':
+
+							node[0].style.cssText = this.inline.value;
+							node.attr('data-redactor-style', this.inline.value);
+
+						break;
+					}
+
+					return node;
+				},
+				removeStyle: function()
+				{
+					this.buffer.set();
+					var current = this.selection.getCurrent();
+					var nodes = this.selection.getInlines();
+
+					this.selection.save();
+
+					if (current && current.tagName === 'SPAN')
+					{
+						var $s = $(current);
+
+						$s.removeAttr('style');
+						if ($s[0].attributes.length === 0)
+						{
+							$s.replaceWith($s.contents());
+						}
+					}
+
+					$.each(nodes, $.proxy(function(i,s)
+					{
+						var $s = $(s);
+						if ($.inArray(s.tagName.toLowerCase(), this.opts.inlineTags) != -1 && !$s.hasClass('redactor-selection-marker'))
+						{
+							$s.removeAttr('style');
+							if ($s[0].attributes.length === 0)
+							{
+								$s.replaceWith($s.contents());
+							}
+						}
+					}, this));
+
+					this.selection.restore();
+					this.code.sync();
+
+				},
+				removeStyleRule: function(name)
+				{
+					this.buffer.set();
+					var parent = this.selection.getParent();
+					var nodes = this.selection.getInlines();
+
+					this.selection.save();
+
+					if (parent && parent.tagName === 'SPAN')
+					{
+						var $s = $(parent);
+
+						$s.css(name, '');
+						this.utils.removeEmptyAttr($s, 'style');
+						if ($s[0].attributes.length === 0)
+						{
+							$s.replaceWith($s.contents());
+						}
+					}
+
+					$.each(nodes, $.proxy(function(i,s)
+					{
+						var $s = $(s);
+						if ($.inArray(s.tagName.toLowerCase(), this.opts.inlineTags) != -1 && !$s.hasClass('redactor-selection-marker'))
+						{
+							$s.css(name, '');
+							this.utils.removeEmptyAttr($s, 'style');
+							if ($s[0].attributes.length === 0)
+							{
+								$s.replaceWith($s.contents());
+							}
+						}
+					}, this));
+
+					this.selection.restore();
+					this.code.sync();
+				},
+				removeFormat: function()
+				{
+					this.buffer.set();
+					var current = this.selection.getCurrent();
+
+					this.selection.save();
+
+					document.execCommand('removeFormat');
+
+					if (current && current.tagName === 'SPAN')
+					{
+						$(current).replaceWith($(current).contents());
+					}
+
+
+					$.each(this.selection.getNodes(), $.proxy(function(i,s)
+					{
+						var $s = $(s);
+						if ($.inArray(s.tagName.toLowerCase(), this.opts.inlineTags) != -1 && !$s.hasClass('redactor-selection-marker'))
+						{
+							$s.replaceWith($s.contents());
+						}
+					}, this));
+
+					this.selection.restore();
+					this.code.sync();
+
+				},
+				toggleClass: function(className)
+				{
+					this.inline.format('span', 'class', className);
+				},
+				toggleStyle: function(value)
+				{
+					this.inline.format('span', 'style', value);
+				}
+			};
+		},
+		insert: function()
+		{
+			return {
+				set: function(html, clean)
+				{
+					this.placeholder.remove();
+
+					html = this.clean.setVerified(html);
+
+					if (typeof clean == 'undefined')
+					{
+						html = this.clean.onPaste(html, false);
+					}
+
+					this.$editor.html(html);
+					this.selection.remove();
+					this.focus.setEnd();
+					this.clean.normalizeLists();
+					this.code.sync();
+					this.observe.load();
+
+					if (typeof clean == 'undefined')
+					{
+						setTimeout($.proxy(this.clean.clearUnverified, this), 10);
+					}
+				},
+				text: function(text)
+				{
+					this.placeholder.remove();
+
+					text = text.toString();
+					text = $.trim(text);
+					text = this.clean.getPlainText(text, false);
+
+					this.$editor.focus();
+
+					if (this.utils.browser('msie'))
+					{
+						this.insert.htmlIe(text);
+					}
+					else
+					{
+						this.selection.get();
+
+						this.range.deleteContents();
+						var el = document.createElement("div");
+						el.innerHTML = text;
+						var frag = document.createDocumentFragment(), node, lastNode;
+						while ((node = el.firstChild))
+						{
+							lastNode = frag.appendChild(node);
+						}
+
+						this.range.insertNode(frag);
+
+						if (lastNode)
+						{
+							var range = this.range.cloneRange();
+							range.setStartAfter(lastNode);
+							range.collapse(true);
+							this.sel.removeAllRanges();
+							this.sel.addRange(range);
+						}
+					}
+
+					this.code.sync();
+					this.clean.clearUnverified();
+				},
+				htmlWithoutClean: function(html)
+				{
+					this.insert.html(html, false);
+				},
+				html: function(html, clean)
+				{
+					this.placeholder.remove();
+
+					if (typeof clean == 'undefined') clean = true;
+
+					this.$editor.focus();
+
+					html = this.clean.setVerified(html);
+
+					if (clean)
+					{
+						html = this.clean.onPaste(html);
+					}
+
+					if (this.utils.browser('msie'))
+					{
+						this.insert.htmlIe(html);
+					}
+					else
+					{
+						if (this.clean.singleLine) this.insert.execHtml(html);
+						else document.execCommand('insertHTML', null, html);
+
+						this.insert.htmlFixMozilla();
+					}
+
+					this.clean.normalizeLists();
+
+					// remove empty paragraphs finaly
+					if (!this.opts.linebreaks)
+					{
+						this.$editor.find('p').each($.proxy(this.utils.removeEmpty, this));
+					}
+
+					this.code.sync();
+					this.observe.load();
+
+					if (clean)
+					{
+						this.clean.clearUnverified();
+					}
+
+				},
+				htmlFixMozilla: function()
+				{
+					// FF inserts empty p when content was selected dblclick
+					if (!this.utils.browser('mozilla')) return;
+
+					var $next = $(this.selection.getBlock()).next();
+					if ($next.length > 0 && $next[0].tagName == 'P' && $next.html() === '')
+					{
+						$next.remove();
+					}
+
+				},
+				htmlIe: function(html)
+				{
+					if (this.utils.isIe11())
+					{
+						var parent = this.utils.isCurrentOrParent('P');
+						var $html = $('<div>').append(html);
+						var blocksMatch = $html.contents().is('p, :header, dl, ul, ol, div, table, td, blockquote, pre, address, section, header, footer, aside, article');
+
+						if (parent && blocksMatch) this.insert.ie11FixInserting(parent, html);
+						else this.insert.ie11PasteFrag(html);
+
+						return;
+					}
+
+					document.selection.createRange().pasteHTML(html);
+
+				},
+				execHtml: function(html)
+				{
+					html = this.clean.setVerified(html);
+
+					this.selection.get();
+
+					this.range.deleteContents();
+
+					var el = document.createElement('div');
+					el.innerHTML = html;
+
+					var frag = document.createDocumentFragment(), node, lastNode;
+					while ((node = el.firstChild))
+					{
+						lastNode = frag.appendChild(node);
+					}
+
+					this.range.insertNode(frag);
+
+					this.range.collapse(true);
+					this.caret.setAfter(lastNode);
+
+				},
+				node: function(node, deleteContents)
+				{
+					node = node[0] || node;
+
+					var html = this.utils.getOuterHtml(node);
+					html = this.clean.setVerified(html);
+
+					node = $(html)[0];
+
+					this.selection.get();
+
+					if (deleteContents !== false)
+					{
+						this.range.deleteContents();
+					}
+
+					this.range.insertNode(node);
+					this.range.collapse(false);
+					this.selection.addRange();
+
+					return node;
+				},
+				nodeToPoint: function(node, x, y)
+				{
+					node = node[0] || node;
+
+					this.selection.get();
+
+					var range;
+					if (document.caretPositionFromPoint)
+					{
+					    var pos = document.caretPositionFromPoint(x, y);
+
+					    this.range.setStart(pos.offsetNode, pos.offset);
+					    this.range.collapse(true);
+					    this.range.insertNode(node);
+					}
+					else if (document.caretRangeFromPoint)
+					{
+					    range = document.caretRangeFromPoint(x, y);
+					    range.insertNode(node);
+					}
+					else if (typeof document.body.createTextRange != "undefined")
+					{
+				        range = document.body.createTextRange();
+				        range.moveToPoint(x, y);
+				        var endRange = range.duplicate();
+				        endRange.moveToPoint(x, y);
+				        range.setEndPoint("EndToEnd", endRange);
+				        range.select();
+					}
+				},
+				nodeToCaretPositionFromPoint: function(e, node)
+				{
+					node = node[0] || node;
+
+					var range;
+					var x = e.clientX, y = e.clientY;
+					if (document.caretPositionFromPoint)
+					{
+					    var pos = document.caretPositionFromPoint(x, y);
+					    var sel = document.getSelection();
+					    range = sel.getRangeAt(0);
+					    range.setStart(pos.offsetNode, pos.offset);
+					    range.collapse(true);
+					    range.insertNode(node);
+					}
+					else if (document.caretRangeFromPoint)
+					{
+					    range = document.caretRangeFromPoint(x, y);
+					    range.insertNode(node);
+					}
+					else if (typeof document.body.createTextRange != "undefined")
+					{
+				        range = document.body.createTextRange();
+				        range.moveToPoint(x, y);
+				        var endRange = range.duplicate();
+				        endRange.moveToPoint(x, y);
+				        range.setEndPoint("EndToEnd", endRange);
+				        range.select();
+					}
+
+				},
+				ie11FixInserting: function(parent, html)
+				{
+					var node = document.createElement('span');
+					node.className = 'redactor-ie-paste';
+					this.insert.node(node);
+
+					var parHtml = $(parent).html();
+
+					parHtml = '<p>' + parHtml.replace(/<span class="redactor-ie-paste"><\/span>/gi, '</p>' + html + '<p>') + '</p>';
+					$(parent).replaceWith(parHtml);
+				},
+				ie11PasteFrag: function(html)
+				{
+					this.selection.get();
+					this.range.deleteContents();
+
+					var el = document.createElement("div");
+					el.innerHTML = html;
+
+					var frag = document.createDocumentFragment(), node, lastNode;
+					while ((node = el.firstChild))
+					{
+						lastNode = frag.appendChild(node);
+					}
+
+					this.range.insertNode(frag);
+				}
+			};
+		},
+		keydown: function()
+		{
+			return {
+				init: function(e)
+				{
+					if (this.rtePaste) return;
+
+					var key = e.which;
+					var arrow = (key >= 37 && key <= 40);
+
+					this.keydown.ctrl = e.ctrlKey || e.metaKey;
+					this.keydown.current = this.selection.getCurrent();
+					this.keydown.parent = this.selection.getParent();
+					this.keydown.block = this.selection.getBlock();
+
+			        // detect tags
+					this.keydown.pre = this.utils.isTag(this.keydown.current, 'pre');
+					this.keydown.blockquote = this.utils.isTag(this.keydown.current, 'blockquote');
+					this.keydown.figcaption = this.utils.isTag(this.keydown.current, 'figcaption');
+
+					// shortcuts setup
+					this.shortcuts.init(e, key);
+
+					this.keydown.checkEvents(arrow, key);
+					this.keydown.setupBuffer(e, key);
+					this.keydown.addArrowsEvent(arrow);
+					this.keydown.setupSelectAll(e, key);
+
+					// callback
+					var keydownStop = this.core.setCallback('keydown', e);
+					if (keydownStop === false)
+					{
+						e.preventDefault();
+						return false;
+					}
+
+					// down
+					if (this.opts.enterKey && key === this.keyCode.DOWN)
+					{
+						this.keydown.onArrowDown();
+					}
+
+					// turn off enter key
+					if (!this.opts.enterKey && key === this.keyCode.ENTER)
+					{
+						e.preventDefault();
+						// remove selected
+						if (!this.range.collapsed) this.range.deleteContents();
+						return;
+					}
+
+					// on enter
+					if (key == this.keyCode.ENTER && !e.shiftKey && !e.ctrlKey && !e.metaKey)
+					{
+						var stop = this.core.setCallback('enter', e);
+						if (stop === false)
+						{
+							e.preventDefault();
+							return false;
+						}
+
+						if (this.keydown.blockquote && this.keydown.exitFromBlockquote(e) === true)
+						{
+							return false;
+						}
+
+						var current, $next;
+						if (this.keydown.pre)
+						{
+							return this.keydown.insertNewLine(e);
+						}
+						else if (this.keydown.blockquote || this.keydown.figcaption)
+						{
+							current = this.selection.getCurrent();
+							$next = $(current).next();
+
+							if ($next.size() !== 0 && $next[0].tagName == 'BR')
+							{
+								return this.keydown.insertBreakLine(e);
+							}
+							else if (this.utils.isEndOfElement() && (current && current != 'SPAN'))
+							{
+								return this.keydown.insertDblBreakLine(e);
+							}
+							else
+							{
+								return this.keydown.insertBreakLine(e);
+							}
+						}
+						else if (this.opts.linebreaks && !this.keydown.block)
+						{
+							current = this.selection.getCurrent();
+							$next = $(this.keydown.current).next();
+
+							if (current !== false && $(current).hasClass('redactor-invisible-space'))
+							{
+								$(current).remove();
+								return this.keydown.insertDblBreakLine(e);
+							}
+							else
+							{
+								if ($next.length === 0 && current === false && typeof $next.context != 'undefined')
+								{
+									return this.keydown.insertDblBreakLine(e);
+								}
+
+								return this.keydown.insertBreakLine(e);
+							}
+						}
+						else if (this.opts.linebreaks && this.keydown.block)
+						{
+							setTimeout($.proxy(this.keydown.replaceDivToBreakLine, this), 1);
+						}
+						// paragraphs
+						else if (!this.opts.linebreaks && this.keydown.block && this.keydown.block.tagName !== 'LI')
+						{
+							setTimeout($.proxy(this.keydown.replaceDivToParagraph, this), 1);
+						}
+						else if (!this.opts.linebreaks && !this.keydown.block)
+						{
+							return this.keydown.insertParagraph(e);
+						}
+					}
+
+
+					// Shift+Enter or Ctrl+Enter
+					if (key === this.keyCode.ENTER && (e.ctrlKey || e.shiftKey))
+					{
+						return this.keydown.onShiftEnter(e);
+					}
+
+
+					// tab or cmd + [
+					if (key === this.keyCode.TAB || e.metaKey && key === 221 || e.metaKey && key === 219)
+					{
+						return this.keydown.onTab(e, key);
+					}
+
+
+					// image delete and backspace
+					if (key === this.keyCode.BACKSPACE || key === this.keyCode.DELETE)
+					{
+						var nodes = this.selection.getNodes();
+						if (nodes)
+						{
+							var len = nodes.length;
+							var last;
+							for (var i = 0; i < len; i++)
+							{
+								var children = $(nodes[i]).children('img');
+								if (children.size() !== 0)
+								{
+									var self = this;
+									$.each(children, function(z,s)
+									{
+										var $s = $(s);
+										if ($s.css('float') != 'none') return;
+
+										// image delete callback
+										self.core.setCallback('imageDelete', s.src, $s);
+										last = s;
+									});
+								}
+								else if (nodes[i].tagName == 'IMG')
+								{
+									if (last != nodes[i])
+									{
+										// image delete callback
+										this.core.setCallback('imageDelete', nodes[i].src, $(nodes[i]));
+										last = nodes[i];
+									}
+								}
+							}
+						}
+					}
+
+					// backspace
+					if (key === this.keyCode.BACKSPACE)
+					{
+						this.keydown.removeInvisibleSpace();
+						this.keydown.removeEmptyListInTable(e);
+					}
+
+					this.code.sync();
+				},
+				checkEvents: function(arrow, key)
+				{
+					if (!arrow && (this.core.getEvent() == 'click' || this.core.getEvent() == 'arrow'))
+					{
+						this.core.addEvent(false);
+
+						if (this.keydown.checkKeyEvents(key))
+						{
+							this.buffer.set();
+						}
+					}
+				},
+				checkKeyEvents: function(key)
+				{
+					var k = this.keyCode;
+					var keys = [k.BACKSPACE, k.DELETE, k.ENTER, k.SPACE, k.ESC, k.TAB, k.CTRL, k.META, k.ALT, k.SHIFT];
+
+					return ($.inArray(key, keys) == -1) ? true : false;
+
+				},
+				addArrowsEvent: function(arrow)
+				{
+					if (!arrow) return;
+
+					if ((this.core.getEvent() == 'click' || this.core.getEvent() == 'arrow'))
+					{
+						this.core.addEvent(false);
+						return;
+					}
+
+				    this.core.addEvent('arrow');
+				},
+				setupBuffer: function(e, key)
+				{
+					if (this.keydown.ctrl && key === 90 && !e.shiftKey && !e.altKey && this.opts.buffer.length) // z key
+					{
+						e.preventDefault();
+						this.buffer.undo();
+						return;
+					}
+					// undo
+					else if (this.keydown.ctrl && key === 90 && e.shiftKey && !e.altKey && this.opts.rebuffer.length !== 0)
+					{
+						e.preventDefault();
+						this.buffer.redo();
+						return;
+					}
+					else if (!this.keydown.ctrl)
+					{
+						if (key == this.keyCode.BACKSPACE || key == this.keyCode.DELETE || (key == this.keyCode.ENTER && !e.ctrlKey && !e.shiftKey) || key == this.keyCode.SPACE)
+						{
+							this.buffer.set();
+						}
+					}
+				},
+				setupSelectAll: function(e, key)
+				{
+					if (this.keydown.ctrl && key === 65)
+					{
+						this.utils.enableSelectAll();
+					}
+					else if (key != this.keyCode.LEFT_WIN && !this.keydown.ctrl)
+					{
+						this.utils.disableSelectAll();
+					}
+				},
+				onArrowDown: function()
+				{
+					var tags = [this.keydown.blockquote, this.keydown.pre, this.keydown.figcaption];
+
+					for (var i = 0; i < tags.length; i++)
+					{
+						if (tags[i])
+						{
+							this.keydown.insertAfterLastElement(tags[i]);
+							return false;
+						}
+					}
+				},
+				onShiftEnter: function(e)
+				{
+					this.buffer.set();
+
+					if (this.keydown.blockquote && this.utils.isEndOfElement())
+					{
+						return this.keydown.insertDblBreakLine(e);
+					}
+
+					return this.keydown.insertBreakLine(e);
+				},
+				onTab: function(e, key)
+				{
+					if (!this.opts.tabFocus) return true;
+					if (this.utils.isEmpty(this.code.get()) && this.opts.tabAsSpaces === false) return true;
+
+					e.preventDefault();
+
+					var node;
+					if (this.keydown.pre && !e.shiftKey)
+					{
+						node = (this.opts.preSpaces) ? document.createTextNode(Array(this.opts.preSpaces + 1).join('\u00a0')) : document.createTextNode('\t');
+						this.insert.node(node);
+						this.code.sync();
+					}
+					else if (this.opts.tabAsSpaces !== false)
+					{
+						node = document.createTextNode(Array(this.opts.tabAsSpaces + 1).join('\u00a0'));
+						this.insert.node(node);
+						this.code.sync();
+					}
+					else
+					{
+						if (e.metaKey && key === 219) this.indent.decrease();
+						else if (e.metaKey && key === 221) this.indent.increase();
+						else if (!e.shiftKey) this.indent.increase();
+						else this.indent.decrease();
+					}
+
+					return false;
+				},
+				replaceDivToBreakLine: function()
+				{
+					var blockElem = this.selection.getBlock();
+					var blockHtml = blockElem.innerHTML.replace(/<br\s?\/?>/gi, '');
+					if ((blockElem.tagName === 'DIV' || blockElem.tagName === 'P') && blockHtml === '' && !$(blockElem).hasClass('redactor-editor'))
+					{
+						var br = document.createElement('br');
+
+						$(blockElem).replaceWith(br);
+						this.caret.setBefore(br);
+
+						this.code.sync();
+
+						return false;
+					}
+				},
+				replaceDivToParagraph: function()
+				{
+					var blockElem = this.selection.getBlock();
+					var blockHtml = blockElem.innerHTML.replace(/<br\s?\/?>/gi, '');
+					if (blockElem.tagName === 'DIV' && blockHtml === '' && !$(blockElem).hasClass('redactor-editor'))
+					{
+						var p = document.createElement('p');
+						p.innerHTML = this.opts.invisibleSpace;
+
+						$(blockElem).replaceWith(p);
+						this.caret.setStart(p);
+
+						this.code.sync();
+
+						return false;
+					}
+					else if (this.opts.cleanStyleOnEnter && blockElem.tagName == 'P')
+					{
+						$(blockElem).removeAttr('class').removeAttr('style');
+					}
+				},
+				insertParagraph: function(e)
+				{
+					e.preventDefault();
+
+					this.selection.get();
+
+					var p = document.createElement('p');
+					p.innerHTML = this.opts.invisibleSpace;
+
+					this.range.deleteContents();
+					this.range.insertNode(p);
+
+					this.caret.setStart(p);
+
+					this.code.sync();
+
+					return false;
+				},
+				exitFromBlockquote: function(e)
+				{
+					if (!this.utils.isEndOfElement()) return;
+
+					var tmp = $.trim($(this.keydown.block).html());
+					if (tmp.search(/(<br\s?\/?>){2}$/i) != -1)
+					{
+						e.preventDefault();
+
+						if (this.opts.linebreaks)
+						{
+							var br = document.createElement('br');
+							$(this.keydown.blockquote).after(br);
+
+							this.caret.setBefore(br);
+							$(this.keydown.block).html(tmp.replace(/<br\s?\/?>$/i, ''));
+						}
+						else
+						{
+							var node = $(this.opts.emptyHtml);
+							$(this.keydown.blockquote).after(node);
+							this.caret.setStart(node);
+						}
+
+						return true;
+
+					}
+
+					return;
+
+				},
+				insertAfterLastElement: function(element)
+				{
+					if (!this.utils.isEndOfElement()) return;
+
+					this.buffer.set();
+
+					if (this.opts.linebreaks)
+					{
+						var contents = $('<div>').append($.trim(this.$editor.html())).contents();
+						var last = contents.last()[0];
+						if (last.tagName == 'SPAN' && last.innerHTML === '')
+						{
+							last = contents.prev()[0];
+						}
+
+						if (this.utils.getOuterHtml(last) != this.utils.getOuterHtml(element)) return;
+
+						var br = document.createElement('br');
+						$(element).after(br);
+						this.caret.setAfter(br);
+
+					}
+					else
+					{
+						if (this.$editor.contents().last()[0] !== element) return;
+
+						var node = $(this.opts.emptyHtml);
+						$(element).after(node);
+						this.caret.setStart(node);
+					}
+				},
+				insertNewLine: function(e)
+				{
+					e.preventDefault();
+
+					var node = document.createTextNode('\n');
+
+					this.selection.get();
+
+					this.range.deleteContents();
+					this.range.insertNode(node);
+
+					this.caret.setAfter(node);
+
+					this.code.sync();
+
+					return false;
+				},
+				insertBreakLine: function(e)
+				{
+					return this.keydown.insertBreakLineProcessing(e);
+				},
+				insertDblBreakLine: function(e)
+				{
+					return this.keydown.insertBreakLineProcessing(e, true);
+				},
+				insertBreakLineProcessing: function(e, dbl)
+				{
+					e.stopPropagation();
+
+					this.selection.get();
+					var br1 = document.createElement('br');
+
+					this.range.deleteContents();
+					this.range.insertNode(br1);
+
+					if (dbl === true)
+					{
+						var br2 = document.createElement('br');
+						this.range.insertNode(br2);
+						this.caret.setAfter(br2);
+					}
+					else
+					{
+						this.caret.setAfter(br1);
+					}
+
+					this.code.sync();
+
+					return false;
+				},
+				removeInvisibleSpace: function()
+				{
+					var $current = $(this.keydown.current);
+					if ($current.text().search(/^\u200B$/g) === 0)
+					{
+						$current.remove();
+					}
+				},
+				removeEmptyListInTable: function(e)
+				{
+					var $current = $(this.keydown.current);
+					var $parent = $(this.keydown.parent);
+					var td = $current.closest('td');
+
+					if (td.size() !== 0 && $current.closest('li') && $parent.children('li').size() === 1)
+					{
+						if (!this.utils.isEmpty($current.text())) return;
+
+						e.preventDefault();
+
+						$current.remove();
+						$parent.remove();
+
+						this.caret.setStart(td);
+					}
+				}
+			};
+		},
+		keyup: function()
+		{
+			return {
+				init: function(e)
+				{
+					if (this.rtePaste) return;
+
+					var key = e.which;
+
+					this.keyup.current = this.selection.getCurrent();
+					this.keyup.parent = this.selection.getParent();
+					var $parent = this.utils.isRedactorParent($(this.keyup.parent).parent());
+
+					// callback
+					var keyupStop = this.core.setCallback('keyup', e);
+					if (keyupStop === false)
+					{
+						e.preventDefault();
+						return false;
+					}
+
+					// replace to p before / after the table or body
+					if (!this.opts.linebreaks && this.keyup.current.nodeType == 3 && this.keyup.current.length <= 1 && (this.keyup.parent === false || this.keyup.parent.tagName == 'BODY'))
+					{
+						this.keyup.replaceToParagraph();
+					}
+
+					if (!this.opts.linebreaks && $(this.keyup.parent).hasClass('redactor-invisible-space') && ($parent === false || $parent[0].tagName == 'BODY'))
+					{
+						$(this.keyup.parent).contents().unwrap();
+						this.keyup.replaceToParagraph();
+					}
+
+					// linkify
+					if (this.opts.convertLinks && (this.opts.convertUrlLinks || this.opts.convertImageLinks || this.opts.convertVideoLinks) && key === this.keyCode.ENTER)
+					{
+						this.formatLinkify(this.opts.linkProtocol, this.opts.convertLinks, this.opts.convertUrlLinks, this.opts.convertImageLinks, this.opts.convertVideoLinks, this.opts.linkSize);
+
+						this.observe.load();
+						this.code.sync();
+					}
+
+					if (key === this.keyCode.DELETE || key === this.keyCode.BACKSPACE)
+					{
+						// clear unverified
+						this.clean.clearUnverified();
+
+						if (this.observe.image)
+						{
+							e.preventDefault();
+
+							this.image.hideResize();
+
+							this.buffer.set();
+							this.image.remove(this.observe.image);
+							this.observe.image = false;
+
+							return false;
+						}
+
+						// remove empty paragraphs
+						this.$editor.find('p').each($.proxy(this.utils.removeEmpty, this));
+
+						// remove invisible space
+						if (this.keyup.current && this.keyup.current.tagName == 'DIV' && this.utils.isEmpty(this.keyup.current.innerHTML))
+						{
+							if (this.opts.linebreaks)
+							{
+								$(this.keyup.current).after(this.selection.getMarkerAsHtml());
+								this.selection.restore();
+								$(this.keyup.current).remove();
+							}
+						}
+
+						// if empty
+						return this.keyup.formatEmpty(e);
+					}
+				},
+				replaceToParagraph: function()
+				{
+					var $current = $(this.keyup.current);
+					var node = $('<p>').append($current.clone());
+					$current.replaceWith(node);
+					var next = $(node).next();
+					if (typeof(next[0]) !== 'undefined' && next[0].tagName == 'BR')
+					{
+						next.remove();
+					}
+
+					this.caret.setEnd(node);
+				},
+				formatEmpty: function(e)
+				{
+					var html = $.trim(this.$editor.html());
+
+					if (!this.utils.isEmpty(html)) return;
+
+					e.preventDefault();
+
+					if (this.opts.linebreaks)
+					{
+						this.$editor.html(this.selection.getMarkerAsHtml());
+						this.selection.restore();
+					}
+					else
+					{
+						html = '<p><br /></p>';
+
+						this.$editor.html(html);
+						this.focus.setStart();
+					}
+
+					this.code.sync();
+
+					return false;
+				}
+			};
+		},
+		lang: function()
+		{
+			return {
+				load: function()
+				{
+					this.opts.curLang = this.opts.langs[this.opts.lang];
+				},
+				get: function(name)
+				{
+					return (typeof this.opts.curLang[name] != 'undefined') ? this.opts.curLang[name] : '';
+				}
+			};
+		},
+		line: function()
+		{
+			return {
+				insert: function()
+				{
+					this.buffer.set();
+
+					var blocks = this.selection.getBlocks();
+ 					if (blocks[0] !== false && this.line.isExceptLastOrFirst(blocks))
+	 				{
+	 					if (!this.utils.browser('msie')) this.$editor.focus();
+	 					return;
+					}
+
+					if (this.utils.browser('msie'))
+					{
+						this.line.insertInIe();
+					}
+					else
+					{
+						this.line.insertInOthersBrowsers();
+					}
+				},
+				isExceptLastOrFirst: function(blocks)
+				{
+					var exceptTags = ['li', 'td', 'th', 'blockquote', 'figcaption', 'pre', 'dl', 'dt', 'dd'];
+
+					var first = blocks[0].tagName.toLowerCase();
+					var last = this.selection.getLastBlock();
+
+					last = (typeof last == 'undefined') ? first : last.tagName.toLowerCase();
+
+					var firstFound = $.inArray(first, exceptTags) != -1;
+					var lastFound = $.inArray(last, exceptTags) != -1;
+
+					if ((firstFound && lastFound) || firstFound)
+					{
+						return true;
+					}
+				},
+				insertInIe: function()
+				{
+					this.utils.saveScroll();
+					this.buffer.set();
+
+					this.insert.node(document.createElement('hr'));
+
+					this.utils.restoreScroll();
+					this.code.sync();
+				},
+				insertInOthersBrowsers: function()
+				{
+					this.buffer.set();
+
+					var extra = '<p id="redactor-insert-line"><br /></p>';
+					if (this.opts.linebreaks) extra = '<br id="redactor-insert-line">';
+
+					document.execCommand('insertHTML', false, '<hr>' + extra);
+
+					this.line.setFocus();
+					this.code.sync();
+				},
+				setFocus: function()
+				{
+					var node = this.$editor.find('#redactor-insert-line');
+					var next = $(node).next()[0];
+
+					if (next)
+					{
+						this.caret.setAfter(node);
+						node.remove();
+					}
+					else
+					{
+						node.removeAttr('id');
+					}
+				}
+			};
+		},
+		link: function()
+		{
+			return {
+				show: function(e)
+				{
+					if (typeof e != 'undefined' && e.preventDefault) e.preventDefault();
+
+					this.modal.load('link', this.lang.get('link_insert'), 600);
+
+					this.modal.createCancelButton();
+					this.link.buttonInsert = this.modal.createActionButton(this.lang.get('insert'));
+
+					this.selection.get();
+
+					this.link.getData();
+					this.link.cleanUrl();
+
+					if (this.link.target == '_blank') $('#redactor-link-blank').prop('checked', true);
+
+					this.link.$inputUrl = $('#redactor-link-url');
+					this.link.$inputText = $('#redactor-link-url-text');
+
+					this.link.$inputText.val(this.link.text);
+					this.link.$inputUrl.val(this.link.url);
+
+					this.link.buttonInsert.on('click', $.proxy(this.link.insert, this));
+
+					// hide link's tooltip
+					$('.redactor-link-tooltip').remove();
+
+					// show modal
+					this.selection.save();
+					this.modal.show();
+					this.link.$inputUrl.focus();
+				},
+				cleanUrl: function()
+				{
+					var thref = self.location.href.replace(/\/$/i, '');
+					this.link.url = this.link.url.replace(thref, '');
+					this.link.url = this.link.url.replace(/^\/#/, '#');
+					this.link.url = this.link.url.replace('mailto:', '');
+
+					// remove host from href
+					if (!this.opts.linkProtocol)
+					{
+						var re = new RegExp('^(http|ftp|https)://' + self.location.host, 'i');
+						this.link.url = this.link.url.replace(re, '');
+					}
+
+				},
+				getData: function()
+				{
+					this.link.$node = false;
+
+					var $el = $(this.selection.getCurrent()).closest('a');
+					if ($el.size() !== 0 && $el[0].tagName === 'A')
+					{
+						this.link.$node = $el;
+
+						this.link.url = $el.attr('href');
+						this.link.text = $el.text();
+						this.link.target = $el.attr('target');
+					}
+					else
+					{
+						this.link.text = this.sel.toString();
+						this.link.url = '';
+						this.link.target = '';
+					}
+
+				},
+				insert: function()
+				{
+					var target = '';
+					var link = this.link.$inputUrl.val();
+					var text = this.link.$inputText.val();
+
+					if ($.trim(link) === '')
+					{
+						this.link.$inputUrl.addClass('redactor-input-error').on('keyup', function()
+						{
+							$(this).removeClass('redactor-input-error');
+							$(this).off('keyup');
+
+						});
+
+						return;
+					}
+
+					// mailto
+					if (link.search('@') != -1 && /(http|ftp|https):\/\//i.test(link) === false)
+					{
+						link = 'mailto:' + link;
+					}
+					// url, not anchor
+					else if (link.search('#') !== 0)
+					{
+						if ($('#redactor-link-blank').prop('checked'))
+						{
+							target = '_blank';
+						}
+
+						// test url (add protocol)
+						var pattern = '((xn--)?[a-z0-9]+(-[a-z0-9]+)*\\.)+[a-z]{2,}';
+						var re = new RegExp('^(http|ftp|https)://' + pattern, 'i');
+						var re2 = new RegExp('^' + pattern, 'i');
+
+						if (link.search(re) == -1 && link.search(re2) === 0 && this.opts.linkProtocol)
+						{
+							link = this.opts.linkProtocol + '://' + link;
+						}
+					}
+
+					this.link.set(text, link, target);
+					this.modal.close();
+				},
+				set: function(text, link, target)
+				{
+					text = $.trim(text.replace(/<|>/g, ''));
+
+					this.selection.restore();
+
+					if (text === '' && link === '') return;
+					if (text === '' && link !== '') text = link;
+
+					if (this.link.$node)
+					{
+						this.buffer.set();
+
+						this.link.$node.text(text).attr('href', link);
+						if (target !== '')
+						{
+							this.link.$node.attr('target', target);
+						}
+						else
+						{
+							this.link.$node.removeAttr('target');
+						}
+
+						this.code.sync();
+					}
+					else
+					{
+						if (this.utils.browser('mozilla') && this.link.text === '')
+						{
+							var $a = $('<a />').attr('href', link).text(text);
+							if (target !== '') $a.attr('target', target);
+
+							this.insert.node($a);
+							this.selection.selectElement($a);
+						}
+						else
+						{
+							var $a;
+							if (this.utils.browser('msie'))
+							{
+								$a = $('<a href="' + link + '">').text(text);
+								if (target !== '') $a.attr('target', target);
+
+								$a = $(this.insert.node($a));
+								this.selection.selectElement($a);
+							}
+							else
+							{
+								document.execCommand('createLink', false, link);
+
+								$a = $(this.selection.getCurrent()).closest('a');
+
+								if (target !== '') $a.attr('target', target);
+								$a.removeAttr('style');
+
+								if (this.link.text === '')
+								{
+									$a.text(text);
+									this.selection.selectElement($a);
+								}
+							}
+						}
+
+						this.code.sync();
+						this.core.setCallback('insertedLink', $a);
+
+					}
+
+					// link tooltip
+					setTimeout($.proxy(function()
+					{
+						this.observe.links();
+
+					}, this), 5);
+				},
+				unlink: function(e)
+				{
+					if (typeof e != 'undefined' && e.preventDefault) e.preventDefault();
+
+					var nodes = this.selection.getNodes();
+					if (!nodes) return;
+
+					this.buffer.set();
+
+					var len = nodes.length;
+					for (var i = 0; i < len; i++)
+					{
+						if (nodes[i].tagName == 'A')
+						{
+							var $node = $(nodes[i]);
+							$node.replaceWith($node.contents());
+						}
+					}
+
+					// hide link's tooltip
+					$('.redactor-link-tooltip').remove();
+
+					this.code.sync();
+
+				}
+			};
+		},
+		list: function()
+		{
+			return {
+				toggle: function(cmd)
+				{
+					if (!this.utils.browser('msie')) this.$editor.focus();
+
+					this.buffer.set();
+					this.selection.save();
+
+					var parent = this.selection.getParent();
+					var $list = $(parent).closest('ol, ul');
+
+					if (!this.utils.isRedactorParent($list) && $list.size() !== 0)
+					{
+						$list = false;
+					}
+
+					var isUnorderedCmdOrdered, isOrderedCmdUnordered;
+					var remove = false;
+					if ($list && $list.length)
+					{
+						remove = true;
+						var listTag = $list[0].tagName;
+
+						isUnorderedCmdOrdered = (cmd === 'orderedlist' && listTag === 'UL');
+						isOrderedCmdUnordered = (cmd === 'unorderedlist' && listTag === 'OL');
+					}
+
+					if (isUnorderedCmdOrdered)
+					{
+						this.utils.replaceToTag($list, 'ol');
+					}
+					else if (isOrderedCmdUnordered)
+					{
+						this.utils.replaceToTag($list, 'ul');
+					}
+					else
+					{
+						if (remove)
+						{
+							this.list.remove(cmd);
+						}
+						else
+						{
+							this.list.insert(cmd);
+						}
+					}
+
+
+					this.selection.restore();
+					this.code.sync();
+				},
+				insert: function(cmd)
+				{
+					if (this.utils.browser('msie') && this.opts.linebreaks)
+					{
+						this.list.insertInIe(cmd);
+					}
+					else
+					{
+						document.execCommand('insert' + cmd);
+					}
+
+					var parent = this.selection.getParent();
+					var $list = $(parent).closest('ol, ul');
+
+					if (this.utils.isEmpty($list.find('li').text()))
+					{
+						var $children = $list.children('li');
+						$children.find('br').remove();
+						$children.append(this.selection.getMarkerAsHtml());
+					}
+
+					if ($list.length)
+					{
+						// remove block-element list wrapper
+						var $listParent = $list.parent();
+						if (this.utils.isRedactorParent($listParent) && $listParent[0].tagName != 'LI' && this.utils.isBlock($listParent[0]))
+						{
+							$listParent.replaceWith($listParent.contents());
+						}
+					}
+
+					if (!this.utils.browser('msie'))
+					{
+						this.$editor.focus();
+					}
+
+					this.clean.clearUnverified();
+				},
+				insertInIe: function(cmd)
+				{
+					var wrapper = this.selection.wrap('div');
+					var wrapperHtml = $(wrapper).html();
+
+					var tmpList = (cmd == 'orderedlist') ? $('<ol>') : $('<ul>');
+					var tmpLi = $('<li>');
+
+					if ($.trim(wrapperHtml) === '')
+					{
+						tmpLi.append(this.selection.getMarkerAsHtml());
+						tmpList.append(tmpLi);
+						this.$editor.find('#selection-marker-1').replaceWith(tmpList);
+					}
+					else
+					{
+						var items = wrapperHtml.split(/<br\s?\/?>/gi);
+						if (items)
+						{
+							for (var i = 0; i < items.length; i++)
+							{
+								if ($.trim(items[i]) !== '')
+								{
+									tmpList.append($('<li>').html(items[i]));
+								}
+							}
+						}
+						else
+						{
+							tmpLi.append(wrapperHtml);
+							tmpList.append(tmpLi);
+						}
+
+						$(wrapper).replaceWith(tmpList);
+					}
+				},
+				remove: function(cmd)
+				{
+					document.execCommand('insert' + cmd);
+
+					var $current = $(this.selection.getCurrent());
+
+					this.indent.fixEmptyIndent();
+
+					if (!this.opts.linebreaks && $current.closest('li, th, td').size() === 0)
+					{
+						document.execCommand('formatblock', false, 'p');
+						this.$editor.find('ul, ol, blockquote').each($.proxy(this.utils.removeEmpty, this));
+					}
+
+					var $table = $(this.selection.getCurrent()).closest('table');
+					var $prev = $table.prev();
+					if (!this.opts.linebreaks && $table.size() !== 0 && $prev.size() !== 0 && $prev[0].tagName == 'BR')
+					{
+						$prev.remove();
+					}
+
+					this.clean.clearUnverified();
+
+				}
+			};
+		},
+		modal: function()
+		{
+			return {
+				callbacks: {},
+				loadTemplates: function()
+				{
+					this.opts.modal = {
+						imageEdit: String()
+						+ '<section id="redactor-modal-image-edit">'
+							+ '<label>' + this.lang.get('title') + '</label>'
+							+ '<input type="text" id="redactor-image-title" />'
+							+ '<label class="redactor-image-link-option">' + this.lang.get('link') + '</label>'
+							+ '<input type="text" id="redactor-image-link" class="redactor-image-link-option" />'
+							+ '<label class="redactor-image-link-option"><input type="checkbox" id="redactor-image-link-blank"> ' + this.lang.get('link_new_tab') + '</label>'
+							+ '<label class="redactor-image-position-option">' + this.lang.get('image_position') + '</label>'
+							+ '<select class="redactor-image-position-option" id="redactor-image-align">'
+								+ '<option value="none">' + this.lang.get('none') + '</option>'
+								+ '<option value="left">' + this.lang.get('left') + '</option>'
+								+ '<option value="center">' + this.lang.get('center') + '</option>'
+								+ '<option value="right">' + this.lang.get('right') + '</option>'
+							+ '</select>'
+						+ '</section>',
+
+						image: String()
+						+ '<section id="redactor-modal-image-insert">'
+							+ '<div id="redactor-modal-image-droparea"></div>'
+ 						+ '</section>',
+
+						file: String()
+						+ '<section id="redactor-modal-file-insert">'
+							+ '<div id="redactor-modal-file-upload-box">'
+								+ '<label>' + this.lang.get('filename') + '</label>'
+								+ '<input type="text" id="redactor-filename" /><br><br>'
+								+ '<div id="redactor-modal-file-upload"></div>'
+							+ '</div>'
+						+ '</section>',
+
+						link: String()
+						+ '<section id="redactor-modal-link-insert">'
+							+ '<label>URL</label>'
+							+ '<input type="url" id="redactor-link-url" />'
+							+ '<label>' + this.lang.get('text') + '</label>'
+							+ '<input type="text" id="redactor-link-url-text" />'
+							+ '<label><input type="checkbox" id="redactor-link-blank"> ' + this.lang.get('link_new_tab') + '</label>'
+						+ '</section>'
+					};
+
+
+					$.extend(this.opts, this.opts.modal);
+
+				},
+				addCallback: function(name, callback)
+				{
+					this.modal.callbacks[name] = callback;
+				},
+				createTabber: function($modal)
+				{
+					this.modal.$tabber = $('<div>').attr('id', 'redactor-modal-tabber');
+
+					$modal.prepend(this.modal.$tabber);
+				},
+				addTab: function(id, name, active)
+				{
+					var $tab = $('<a href="#" rel="tab' + id + '">').text(name);
+					if (active)
+					{
+						$tab.addClass('active');
+					}
+
+					var self = this;
+					$tab.on('click', function(e)
+					{
+						e.preventDefault();
+						$('.redactor-tab').hide();
+						$('.redactor-' + $(this).attr('rel')).show();
+
+						self.modal.$tabber.find('a').removeClass('active');
+						$(this).addClass('active');
+
+					});
+
+					this.modal.$tabber.append($tab);
+				},
+				addTemplate: function(name, template)
+				{
+					this.opts.modal[name] = template;
+				},
+				getTemplate: function(name)
+				{
+					return this.opts.modal[name];
+				},
+				getModal: function()
+				{
+					return this.$modalBody.find('section');
+				},
+				load: function(templateName, title, width)
+				{
+					this.modal.templateName = templateName;
+					this.modal.width = width;
+
+					this.modal.build();
+					this.modal.enableEvents();
+					this.modal.setTitle(title);
+					this.modal.setDraggable();
+					this.modal.setContent();
+
+					// callbacks
+					if (typeof this.modal.callbacks[templateName] != 'undefined')
+					{
+						this.modal.callbacks[templateName].call(this);
+					}
+
+				},
+				show: function()
+				{
+					// ios keyboard hide
+					document.activeElement.blur();
+
+					$(document.body).removeClass('body-hidden');
+					this.modal.bodyOveflow = $(document.body).css('overflow');
+					$(document.body).css('overflow', 'hidden');
+
+					if (this.utils.isMobile())
+					{
+						this.modal.showOnMobile();
+					}
+					else
+					{
+						this.modal.showOnDesktop();
+					}
+
+					this.$modalOverlay.show();
+					this.$modalBox.show();
+
+					this.modal.setButtonsWidth();
+
+					this.utils.saveScroll();
+
+					// resize
+					if (!this.utils.isMobile())
+					{
+						setTimeout($.proxy(this.modal.showOnDesktop, this), 0);
+						$(window).on('resize.redactor-modal', $.proxy(this.modal.resize, this));
+					}
+
+					// modal shown callback
+					this.core.setCallback('modalOpened', this.modal.templateName, this.$modal);
+
+					// fix bootstrap modal focus
+					$(document).off('focusin.modal');
+
+					// enter
+					this.$modal.find('input[type=text]').on('keydown.redactor-modal', $.proxy(this.modal.setEnter, this));
+
+				},
+				showOnDesktop: function()
+				{
+					var height = this.$modal.outerHeight();
+					var windowHeight = $(window).height();
+					var windowWidth = $(window).width();
+
+					if (this.modal.width > windowWidth)
+					{
+						this.$modal.css({
+							width: '96%',
+							marginTop: (windowHeight/2 - height/2) + 'px'
+						});
+						return;
+					}
+
+					if (height > windowHeight)
+					{
+						this.$modal.css({
+							width: this.modal.width + 'px',
+							marginTop: '20px'
+						});
+					}
+					else
+					{
+						this.$modal.css({
+							width: this.modal.width + 'px',
+							marginTop: (windowHeight/2 - height/2) + 'px'
+						});
+					}
+				},
+				showOnMobile: function()
+				{
+					this.$modal.css({
+						width: '96%',
+						marginTop: '2%'
+					});
+
+				},
+				resize: function()
+				{
+					if (this.utils.isMobile())
+					{
+						this.modal.showOnMobile();
+					}
+					else
+					{
+						this.modal.showOnDesktop();
+					}
+				},
+				setTitle: function(title)
+				{
+					this.$modalHeader.html(title);
+				},
+				setContent: function()
+				{
+					this.$modalBody.html(this.modal.getTemplate(this.modal.templateName));
+				},
+				setDraggable: function()
+				{
+					if (typeof $.fn.draggable === 'undefined') return;
+
+					this.$modal.draggable({ handle: this.$modalHeader });
+					this.$modalHeader.css('cursor', 'move');
+				},
+				setEnter: function(e)
+				{
+					if (e.which != 13) return;
+
+					e.preventDefault();
+					this.$modal.find('button.redactor-modal-action-btn').click();
+				},
+				createCancelButton: function()
+				{
+					var button = $('<button>').addClass('redactor-modal-btn redactor-modal-close-btn').html(this.lang.get('cancel'));
+					button.on('click', $.proxy(this.modal.close, this));
+
+					this.$modalFooter.append(button);
+				},
+				createDeleteButton: function(label)
+				{
+					return this.modal.createButton(label, 'delete');
+				},
+				createActionButton: function(label)
+				{
+					return this.modal.createButton(label, 'action');
+				},
+				createButton: function(label, className)
+				{
+					var button = $('<button>').addClass('redactor-modal-btn').addClass('redactor-modal-' + className + '-btn').html(label);
+					this.$modalFooter.append(button);
+
+					return button;
+				},
+				setButtonsWidth: function()
+				{
+					var buttons = this.$modalFooter.find('button');
+					var buttonsSize = buttons.size();
+					if (buttonsSize === 0) return;
+
+					buttons.css('width', (100/buttonsSize) + '%');
+				},
+				build: function()
+				{
+					this.modal.buildOverlay();
+
+					this.$modalBox = $('<div id="redactor-modal-box" />').hide();
+					this.$modal = $('<div id="redactor-modal" />');
+					this.$modalHeader = $('<header />');
+					this.$modalClose = $('<span id="redactor-modal-close" />').html('&times;');
+					this.$modalBody = $('<div id="redactor-modal-body" />');
+					this.$modalFooter = $('<footer />');
+
+					this.$modal.append(this.$modalHeader);
+					this.$modal.append(this.$modalClose);
+					this.$modal.append(this.$modalBody);
+					this.$modal.append(this.$modalFooter);
+					this.$modalBox.append(this.$modal);
+					this.$modalBox.appendTo(document.body);
+				},
+				buildOverlay: function()
+				{
+					this.$modalOverlay = $('<div id="redactor-modal-overlay">').hide();
+					$('body').prepend(this.$modalOverlay);
+				},
+				enableEvents: function()
+				{
+					this.$modalClose.on('click.redactor-modal', $.proxy(this.modal.close, this));
+					$(document).on('keyup.redactor-modal', $.proxy(this.modal.closeHandler, this));
+					this.$editor.on('keyup.redactor-modal', $.proxy(this.modal.closeHandler, this));
+					this.$modalBox.on('click.redactor-modal', $.proxy(this.modal.close, this));
+				},
+				disableEvents: function()
+				{
+					this.$modalClose.off('click.redactor-modal');
+					$(document).off('keyup.redactor-modal');
+					this.$editor.off('keyup.redactor-modal');
+					this.$modalBox.off('click.redactor-modal');
+					$(window).off('resize.redactor-modal');
+				},
+				closeHandler: function(e)
+				{
+					if (e.which != this.keyCode.ESC) return;
+
+					this.modal.close(false);
+				},
+				close: function(e)
+				{
+					if (e)
+					{
+						if (!$(e.target).hasClass('redactor-modal-close-btn') && e.target != this.$modalClose[0] && e.target != this.$modalBox[0])
+						{
+							return;
+						}
+
+						e.preventDefault();
+					}
+
+					if (!this.$modalBox) return;
+
+					this.modal.disableEvents();
+
+					this.$modalOverlay.remove();
+
+					this.$modalBox.fadeOut('fast', $.proxy(function()
+					{
+						this.$modalBox.remove();
+
+						setTimeout($.proxy(this.utils.restoreScroll, this), 0);
+
+						if (e !== undefined) this.selection.restore();
+
+						$(document.body).css('overflow', this.modal.bodyOveflow);
+						this.core.setCallback('modalClosed', this.modal.templateName);
+
+					}, this));
+
+				}
+			};
+		},
+		observe: function()
+		{
+			return {
+				load: function()
+				{
+					this.observe.images();
+					this.observe.links();
+				},
+				buttons: function(e, btnName)
+				{
+					var current = this.selection.getCurrent();
+					var parent = this.selection.getParent();
+
+					this.button.setInactiveAll(btnName);
+
+					if (e === false && btnName !== 'html')
+					{
+						if ($.inArray(btnName, this.opts.activeButtons) != -1) this.button.toggleActive(btnName);
+						return;
+					}
+
+					//var linkButtonName = (this.utils.isCurrentOrParent('A')) ? this.lang.get('link_edit') : this.lang.get('link_insert');
+					//$('body').find('a.redactor-dropdown-link').text(linkButtonName);
+
+					$.each(this.opts.activeButtonsStates, $.proxy(function(key, value)
+					{
+						var parentEl = $(parent).closest(key);
+						var currentEl = $(current).closest(key);
+
+						if (parentEl.length !== 0 && !this.utils.isRedactorParent(parentEl)) return;
+						if (!this.utils.isRedactorParent(currentEl)) return;
+						if (parentEl.length !== 0 || currentEl.closest(key).length !== 0)
+						{
+							this.button.setActive(value);
+						}
+
+					}, this));
+
+					var $parent = $(parent).closest(this.opts.alignmentTags.toString().toLowerCase());
+					if (this.utils.isRedactorParent(parent) && $parent.length)
+					{
+						var align = ($parent.css('text-align') === '') ? 'left' : $parent.css('text-align');
+						this.button.setActive('align' + align);
+					}
+				},
+				addButton: function(tag, btnName)
+				{
+					this.opts.activeButtons.push(btnName);
+					this.opts.activeButtonsStates[tag] = btnName;
+				},
+				images: function()
+				{
+					this.$editor.find('img').each($.proxy(function(i, img)
+					{
+						var $img = $(img);
+
+						// IE fix (when we clicked on an image and then press backspace IE does goes to image's url)
+						$img.closest('a').on('click', function(e) { e.preventDefault(); });
+
+						if (this.utils.browser('msie')) $img.attr('unselectable', 'on');
+
+						this.image.setEditable($img);
+
+					}, this));
+
+					$(document).on('click.redactor-image-delete', $.proxy(function(e)
+					{
+						this.observe.image = false;
+						if (e.target.tagName == 'IMG' && this.utils.isRedactorParent(e.target))
+						{
+							this.observe.image = (this.observe.image && this.observe.image == e.target) ? false : e.target;
+						}
+
+					}, this));
+
+				},
+				links: function()
+				{
+					if (!this.opts.linkTooltip) return;
+
+					this.$editor.find('a').on('touchstart click', $.proxy(this.observe.showTooltip, this));
+					this.$editor.on('touchstart click.redactor', $.proxy(this.observe.closeTooltip, this));
+					$(document).on('touchstart click.redactor', $.proxy(this.observe.closeTooltip, this));
+				},
+				getTooltipPosition: function($link)
+				{
+					return $link.offset();
+				},
+				showTooltip: function(e)
+				{
+					var $link = $(e.target);
+					if ($link.size() === 0 || $link[0].tagName !== 'A') return;
+
+					var pos = this.observe.getTooltipPosition($link);
+
+					var tooltip = $('<span class="redactor-link-tooltip"></span>');
+
+					var href = $link.attr('href');
+					if (href === undefined)
+					{
+						href = '';
+					}
+
+					if (href.length > 24) href = href.substring(0, 24) + '...';
+
+					var aLink = $('<a href="' + $link.attr('href') + '" target="_blank" />').html(href).addClass('redactor-link-tooltip-action');
+					var aEdit = $('<a href="#" />').html(this.lang.get('edit')).on('click', $.proxy(this.link.show, this)).addClass('redactor-link-tooltip-action');
+					var aUnlink = $('<a href="#" />').html(this.lang.get('unlink')).on('click', $.proxy(this.link.unlink, this)).addClass('redactor-link-tooltip-action');
+
+					tooltip.append(aLink).append(' | ').append(aEdit).append(' | ').append(aUnlink);
+					tooltip.css({
+						top: (pos.top + 20) + 'px',
+						left: pos.left + 'px'
+					});
+
+					$('.redactor-link-tooltip').remove();
+					$('body').append(tooltip);
+				},
+				closeTooltip: function(e)
+				{
+					e = e.originalEvent || e;
+
+					var target = e.target;
+					if ((target.tagName === 'A' && this.utils.isRedactorParent(target)) || $(target).hasClass('redactor-link-tooltip-action'))
+					{
+						return;
+					}
+
+					$('.redactor-link-tooltip').remove();
+				}
+
+			};
+		},
+		paragraphize: function()
+		{
+			return {
+				load: function(html)
+				{
+					if (this.opts.linebreaks) return html;
+					if (html === '' || html === '<p></p>') return this.opts.emptyHtml;
+
+					this.paragraphize.blocks = ['table', 'div', 'pre', 'form', 'ul', 'ol', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'dl', 'blockquote', 'figcaption',
+					'address', 'section', 'header', 'footer', 'aside', 'article', 'object', 'style', 'script', 'iframe', 'select', 'input', 'textarea',
+					'button', 'option', 'map', 'area', 'math', 'hr', 'fieldset', 'legend', 'hgroup', 'nav', 'figure', 'details', 'menu', 'summary', 'p'];
+
+					html = html + "\n";
+
+					this.paragraphize.safes = [];
+					this.paragraphize.z = 0;
+
+					html = html.replace(/(<br\s?\/?>){1,}\n?<\/blockquote>/gi, '</blockquote>');
+
+					html = this.paragraphize.getSafes(html);
+					html = this.paragraphize.getSafesComments(html);
+					html = this.paragraphize.replaceBreaksToNewLines(html);
+					html = this.paragraphize.replaceBreaksToParagraphs(html);
+					html = this.paragraphize.clear(html);
+					html = this.paragraphize.restoreSafes(html);
+
+					html = html.replace(new RegExp('<br\\s?/?>\n?<(' + this.paragraphize.blocks.join('|') + ')(.*?[^>])>', 'gi'), '<p><br /></p>\n<$1$2>');
+
+					return $.trim(html);
+				},
+				getSafes: function(html)
+				{
+					var $div = $('<div />').append(html);
+
+					// remove paragraphs in blockquotes
+					$div.find('blockquote p').replaceWith(function()
+					{
+						return $(this).append('<br />').contents();
+					});
+
+					html = $div.html();
+
+					$div.find(this.paragraphize.blocks.join(', ')).each($.proxy(function(i,s)
+					{
+						this.paragraphize.z++;
+						this.paragraphize.safes[this.paragraphize.z] = s.outerHTML;
+						html = html.replace(s.outerHTML, '\n{replace' + this.paragraphize.z + '}');
+
+					}, this));
+
+					return html;
+				},
+				getSafesComments: function(html)
+				{
+					var commentsMatches = html.match(/<!--([\w\W]*?)-->/gi);
+
+					if (!commentsMatches) return html;
+
+					$.each(commentsMatches, $.proxy(function(i,s)
+					{
+						this.paragraphize.z++;
+						this.paragraphize.safes[this.paragraphize.z] = s;
+						html = html.replace(s, '\n{replace' + this.paragraphize.z + '}');
+					}, this));
+
+					return html;
+				},
+				restoreSafes: function(html)
+				{
+					$.each(this.paragraphize.safes, function(i,s)
+					{
+						html = html.replace('{replace' + i + '}', s);
+					});
+
+					return html;
+				},
+				replaceBreaksToParagraphs: function(html)
+				{
+					var htmls = html.split(new RegExp('\n', 'g'), -1);
+
+					html = '';
+					if (htmls)
+					{
+						var len = htmls.length;
+						for (var i = 0; i < len; i++)
+						{
+							if (!htmls.hasOwnProperty(i)) return;
+
+							if (htmls[i].search('{replace') == -1)
+							{
+								htmls[i] = htmls[i].replace(/<p>\n\t?<\/p>/gi, '');
+								htmls[i] = htmls[i].replace(/<p><\/p>/gi, '');
+
+								if (htmls[i] !== '')
+								{
+									html += '<p>' +  htmls[i].replace(/^\n+|\n+$/g, "") + "</p>";
+								}
+							}
+							else html += htmls[i];
+						}
+					}
+
+					return html;
+				},
+				replaceBreaksToNewLines: function(html)
+				{
+					html = html.replace(/<br \/>\s*<br \/>/gi, "\n\n");
+					html = html.replace(/<br\s?\/?>\n?<br\s?\/?>/gi, "\n<br /><br />");
+
+					html = html.replace(new RegExp("\r\n", 'g'), "\n");
+					html = html.replace(new RegExp("\r", 'g'), "\n");
+					html = html.replace(new RegExp("/\n\n+/"), 'g', "\n\n");
+
+					return html;
+				},
+				clear: function(html)
+				{
+					html = html.replace(new RegExp('</blockquote></p>', 'gi'), '</blockquote>');
+					html = html.replace(new RegExp('<p></blockquote>', 'gi'), '</blockquote>');
+					html = html.replace(new RegExp('<p><blockquote>', 'gi'), '<blockquote>');
+					html = html.replace(new RegExp('<blockquote></p>', 'gi'), '<blockquote>');
+
+					html = html.replace(new RegExp('<p><p ', 'gi'), '<p ');
+					html = html.replace(new RegExp('<p><p>', 'gi'), '<p>');
+					html = html.replace(new RegExp('</p></p>', 'gi'), '</p>');
+					html = html.replace(new RegExp('<p>\\s?</p>', 'gi'), '');
+					html = html.replace(new RegExp("\n</p>", 'gi'), '</p>');
+					html = html.replace(new RegExp('<p>\t?\t?\n?<p>', 'gi'), '<p>');
+					html = html.replace(new RegExp('<p>\t*</p>', 'gi'), '');
+
+					return html;
+				}
+			};
+		},
+		paste: function()
+		{
+			return {
+				init: function(e)
+				{
+					if (!this.opts.cleanOnPaste) return;
+
+					this.rtePaste = true;
+
+					this.buffer.set();
+					this.selection.save();
+					this.utils.saveScroll();
+
+					this.paste.createPasteBox();
+
+					$(window).on('scroll.redactor-freeze', $.proxy(function()
+					{
+						$(window).scrollTop(this.saveBodyScroll);
+
+					}, this));
+
+					setTimeout($.proxy(function()
+					{
+						var html = this.$pasteBox.html();
+
+						this.$pasteBox.remove();
+
+						this.selection.restore();
+						this.utils.restoreScroll();
+
+						this.paste.insert(html);
+
+						$(window).off('scroll.redactor-freeze');
+
+					}, this), 1);
+
+				},
+				createPasteBox: function()
+				{
+					this.$pasteBox = $('<div>').html(' ').attr('contenteditable', 'true').css({ position: 'fixed', width: 0, top: 0, left: '-9999px' });
+
+					$(document.body).append(this.$pasteBox);
+					this.$pasteBox.focus();
+				},
+				insert: function(html)
+				{
+					html = this.core.setCallback('pasteBefore', html);
+
+					// clean
+					html = (this.utils.isSelectAll()) ? this.clean.onPaste(html, false) : this.clean.onPaste(html);
+
+					html = this.core.setCallback('paste', html);
+
+					if (this.utils.isSelectAll())
+					{
+						this.insert.set(html, false);
+					}
+					else
+					{
+						this.insert.html(html, false);
+					}
+
+					this.utils.disableSelectAll();
+					this.rtePaste = false;
+
+					setTimeout($.proxy(this.clean.clearUnverified, this), 10);
+
+				}
+			};
+		},
+		placeholder: function()
+		{
+			return {
+				enable: function()
+				{
+					if (!this.placeholder.is()) return;
+
+					this.$editor.attr('placeholder', this.$element.attr('placeholder'));
+
+					this.placeholder.toggle();
+					this.$editor.on('keyup.redactor-placeholder', $.proxy(this.placeholder.toggle, this));
+
+				},
+				toggle: function()
+				{
+					var func = 'removeClass';
+					if (this.utils.isEmpty(this.$editor.html(), false)) func = 'addClass';
+					this.$editor[func]('redactor-placeholder');
+				},
+				remove: function()
+				{
+					this.$editor.removeClass('redactor-placeholder');
+				},
+				is: function()
+				{
+					if (this.opts.placeholder)
+					{
+						return this.$element.attr('placeholder', this.opts.placeholder);
+					}
+					else
+					{
+						return !(typeof this.$element.attr('placeholder') == 'undefined' || this.$element.attr('placeholder') === '');
+					}
+				}
+			};
+		},
+		progress: function()
+		{
+			return {
+				show: function()
+				{
+					$(document.body).append($('<div id="redactor-progress"><span></span></div>'));
+					$('#redactor-progress').fadeIn();
+				},
+				hide: function()
+				{
+					$('#redactor-progress').fadeOut(1500, function()
+					{
+						$(this).remove();
+					});
+				}
+
+			};
+		},
+		selection: function()
+		{
+			return {
+				get: function()
+				{
+					this.sel = document.getSelection();
+
+					if (document.getSelection && this.sel.getRangeAt && this.sel.rangeCount)
+					{
+						this.range = this.sel.getRangeAt(0);
+					}
+					else
+					{
+						this.range = document.createRange();
+					}
+				},
+				addRange: function()
+				{
+					try {
+						this.sel.removeAllRanges();
+					} catch (e) {}
+
+					this.sel.addRange(this.range);
+				},
+				getCurrent: function()
+				{
+					var el = false;
+					this.selection.get();
+
+					if (this.sel && this.sel.rangeCount > 0)
+					{
+						el = this.sel.getRangeAt(0).startContainer;
+					}
+
+					return this.utils.isRedactorParent(el);
+				},
+				getParent: function(elem)
+				{
+					elem = elem || this.selection.getCurrent();
+					if (elem)
+					{
+						return this.utils.isRedactorParent($(elem).parent()[0]);
+					}
+
+					return false;
+				},
+				getBlock: function(node)
+				{
+					node = node || this.selection.getCurrent();
+
+					while (node)
+					{
+						if (this.utils.isBlockTag(node.tagName))
+						{
+							return ($(node).hasClass('redactor-editor')) ? false : node;
+						}
+
+						node = node.parentNode;
+					}
+
+					return false;
+				},
+				getInlines: function(nodes)
+				{
+					this.selection.get();
+
+					if (this.range && this.range.collapsed)
+					{
+						return false;
+					}
+
+					var inlines = [];
+					nodes = (typeof nodes == 'undefined') ? this.selection.getNodes() : nodes;
+					var inlineTags = this.opts.inlineTags;
+					inlineTags.push('span');
+					$.each(nodes, $.proxy(function(i,node)
+					{
+						if ($.inArray(node.tagName.toLowerCase(), inlineTags) != -1)
+						{
+							inlines.push(node);
+						}
+
+					}, this));
+
+					return (inlines.length === 0) ? false : inlines;
+				},
+				getBlocks: function(nodes)
+				{
+					this.selection.get();
+
+					if (this.range && this.range.collapsed)
+					{
+						return [this.selection.getBlock()];
+					}
+
+					var blocks = [];
+					nodes = (typeof nodes == 'undefined') ? this.selection.getNodes() : nodes;
+					$.each(nodes, $.proxy(function(i,node)
+					{
+						if (this.utils.isBlock(node))
+						{
+							this.selection.lastBlock = node;
+							blocks.push(node);
+						}
+
+					}, this));
+
+					return (blocks.length === 0) ? [this.selection.getBlock()] : blocks;
+				},
+				getLastBlock: function()
+				{
+					return this.selection.lastBlock;
+				},
+				getNodes: function()
+				{
+					this.selection.get();
+
+					var startNode = this.selection.getNodesMarker(1);
+					var endNode = this.selection.getNodesMarker(2);
+
+					this.selection.setNodesMarker(this.range, startNode, true);
+
+					if (this.range.collapsed === false)
+					{
+						this.selection.setNodesMarker(this.range, endNode, false);
+					}
+					else
+					{
+						endNode = startNode;
+					}
+
+					var nodes = [];
+					var counter = 0;
+
+					var self = this;
+					this.$editor.find('*').each(function()
+					{
+						if (this == startNode)
+						{
+							var parent = $(this).parent();
+							if (parent.length !== 0 && parent[0].tagName != 'BODY' && self.utils.isRedactorParent(parent[0]))
+							{
+								nodes.push(parent[0]);
+							}
+
+							nodes.push(this);
+							counter = 1;
+						}
+						else
+						{
+							if (counter > 0)
+							{
+								nodes.push(this);
+								counter = counter + 1;
+							}
+						}
+
+						if (this == endNode)
+						{
+							return false;
+						}
+
+					});
+
+					var finalNodes = [];
+					var len = nodes.length;
+					for (var i = 0; i < len; i++)
+					{
+						if (nodes[i].id != 'nodes-marker-1' && nodes[i].id != 'nodes-marker-2')
+						{
+							finalNodes.push(nodes[i]);
+						}
+					}
+
+					this.selection.removeNodesMarkers();
+
+					return finalNodes;
+
+				},
+				getNodesMarker: function(num)
+				{
+					return $('<span id="nodes-marker-' + num + '" class="redactor-nodes-marker" data-verified="redactor">' + this.opts.invisibleSpace + '</span>')[0];
+				},
+				setNodesMarker: function(range, node, type)
+				{
+					range = range.cloneRange();
+
+					try {
+						range.collapse(type);
+						range.insertNode(node);
+					}
+					catch (e) {}
+				},
+				removeNodesMarkers: function()
+				{
+					$(document).find('span.redactor-nodes-marker').remove();
+					this.$editor.find('span.redactor-nodes-marker').remove();
+				},
+				fromPoint: function(start, end)
+				{
+					this.caret.setOffset(start, end);
+				},
+				wrap: function(tag)
+				{
+					this.selection.get();
+
+					if (this.range.collapsed) return false;
+
+					var wrapper = document.createElement(tag);
+					wrapper.appendChild(this.range.extractContents());
+					this.range.insertNode(wrapper);
+
+					return wrapper;
+				},
+				selectElement: function(node)
+				{
+					this.caret.set(node, 0, node, 1);
+				},
+				selectAll: function()
+				{
+					this.selection.get();
+					this.range.selectNodeContents(this.$editor[0]);
+					this.selection.addRange();
+				},
+				remove: function()
+				{
+					this.selection.get();
+					this.sel.removeAllRanges();
+				},
+				save: function()
+				{
+					this.selection.createMarkers();
+				},
+				createMarkers: function()
+				{
+					this.selection.get();
+
+					var node1 = this.selection.getMarker(1);
+
+					this.selection.setMarker(this.range, node1, true);
+
+					if (this.range.collapsed === false)
+					{
+						var node2 = this.selection.getMarker(2);
+						this.selection.setMarker(this.range, node2, false);
+					}
+
+					this.savedSel = this.$editor.html();
+				},
+				getMarker: function(num)
+				{
+					if (typeof num == 'undefined') num = 1;
+
+					return $('<span id="selection-marker-' + num + '" class="redactor-selection-marker"  data-verified="redactor">' + this.opts.invisibleSpace + '</span>')[0];
+				},
+				getMarkerAsHtml: function(num)
+				{
+					return this.utils.getOuterHtml(this.selection.getMarker(num));
+				},
+				setMarker: function(range, node, type)
+				{
+					range = range.cloneRange();
+
+					try {
+						range.collapse(type);
+						range.insertNode(node);
+					}
+					catch (e)
+					{
+						this.focus.setStart();
+					}
+				},
+				restore: function()
+				{
+					var node1 = this.$editor.find('span#selection-marker-1');
+					var node2 = this.$editor.find('span#selection-marker-2');
+
+					if (node1.length !== 0 && node2.length !== 0)
+					{
+						this.caret.set(node1, 0, node2, 0);
+					}
+					else if (node1.length !== 0)
+					{
+						this.caret.set(node1, 0, node1, 0);
+					}
+					else
+					{
+						this.$editor.focus();
+					}
+
+					this.selection.removeMarkers();
+					this.savedSel = false;
+
+				},
+				removeMarkers: function()
+				{
+					this.$editor.find('span.redactor-selection-marker').remove();
+				},
+				getText: function()
+				{
+					this.selection.get();
+
+					return this.sel.toString();
+				},
+				getHtml: function()
+				{
+					var html = '';
+
+					this.selection.get();
+					if (this.sel.rangeCount)
+					{
+						var container = document.createElement('div');
+						var len = this.sel.rangeCount;
+						for (var i = 0; i < len; ++i)
+						{
+							container.appendChild(this.sel.getRangeAt(i).cloneContents());
+						}
+
+						html = container.innerHTML;
+					}
+
+					return this.clean.onSync(html);
+				}
+			};
+		},
+		shortcuts: function()
+		{
+			return {
+				init: function(e, key)
+				{
+					// disable browser's hot keys for bold and italic
+					if (!this.opts.shortcuts)
+					{
+						if ((e.ctrlKey || e.metaKey) && (key === 66 || key === 73)) e.preventDefault();
+						return false;
+					}
+
+					$.each(this.opts.shortcuts, $.proxy(function(str, command)
+					{
+						var keys = str.split(',');
+						var len = keys.length;
+						for (var i = 0; i < len; i++)
+						{
+							if (typeof keys[i] === 'string')
+							{
+								this.shortcuts.handler(e, $.trim(keys[i]), $.proxy(function()
+								{
+									var func;
+									if (command.func.search(/\./) != '-1')
+									{
+										func = command.func.split('.');
+										if (typeof this[func[0]] != 'undefined')
+										{
+											this[func[0]][func[1]].apply(this, command.params);
+										}
+									}
+									else
+									{
+										this[command.func].apply(this, command.params);
+									}
+
+								}, this));
+							}
+
+						}
+
+					}, this));
+				},
+				handler: function(e, keys, origHandler)
+				{
+					// based on https://github.com/jeresig/jquery.hotkeys
+					var hotkeysSpecialKeys =
+					{
+						8: "backspace", 9: "tab", 10: "return", 13: "return", 16: "shift", 17: "ctrl", 18: "alt", 19: "pause",
+						20: "capslock", 27: "esc", 32: "space", 33: "pageup", 34: "pagedown", 35: "end", 36: "home",
+						37: "left", 38: "up", 39: "right", 40: "down", 45: "insert", 46: "del", 59: ";", 61: "=",
+						96: "0", 97: "1", 98: "2", 99: "3", 100: "4", 101: "5", 102: "6", 103: "7",
+						104: "8", 105: "9", 106: "*", 107: "+", 109: "-", 110: ".", 111 : "/",
+						112: "f1", 113: "f2", 114: "f3", 115: "f4", 116: "f5", 117: "f6", 118: "f7", 119: "f8",
+						120: "f9", 121: "f10", 122: "f11", 123: "f12", 144: "numlock", 145: "scroll", 173: "-", 186: ";", 187: "=",
+						188: ",", 189: "-", 190: ".", 191: "/", 192: "`", 219: "[", 220: "\\", 221: "]", 222: "'"
+					};
+
+
+					var hotkeysShiftNums =
+					{
+						"`": "~", "1": "!", "2": "@", "3": "#", "4": "$", "5": "%", "6": "^", "7": "&",
+						"8": "*", "9": "(", "0": ")", "-": "_", "=": "+", ";": ": ", "'": "\"", ",": "<",
+						".": ">",  "/": "?",  "\\": "|"
+					};
+
+					keys = keys.toLowerCase().split(" ");
+					var special = hotkeysSpecialKeys[e.keyCode],
+						character = String.fromCharCode( e.which ).toLowerCase(),
+						modif = "", possible = {};
+
+					$.each([ "alt", "ctrl", "meta", "shift"], function(index, specialKey)
+					{
+						if (e[specialKey + 'Key'] && special !== specialKey)
+						{
+							modif += specialKey + '+';
+						}
+					});
+
+
+					if (special) possible[modif + special] = true;
+					if (character)
+					{
+						possible[modif + character] = true;
+						possible[modif + hotkeysShiftNums[character]] = true;
+
+						// "$" can be triggered as "Shift+4" or "Shift+$" or just "$"
+						if (modif === "shift+")
+						{
+							possible[hotkeysShiftNums[character]] = true;
+						}
+					}
+
+					for (var i = 0, len = keys.length; i < len; i++)
+					{
+						if (possible[keys[i]])
+						{
+							e.preventDefault();
+							return origHandler.apply(this, arguments);
+						}
+					}
+				}
+			};
+		},
+		tabifier: function()
+		{
+			return {
+				get: function(code)
+				{
+					if (!this.opts.tabifier) return code;
+
+					// clean setup
+					var ownLine = ['area', 'body', 'head', 'hr', 'i?frame', 'link', 'meta', 'noscript', 'style', 'script', 'table', 'tbody', 'thead', 'tfoot'];
+					var contOwnLine = ['li', 'dt', 'dt', 'h[1-6]', 'option', 'script'];
+					var newLevel = ['blockquote', 'div', 'dl', 'fieldset', 'form', 'frameset', 'map', 'ol', 'p', 'pre', 'select', 'td', 'th', 'tr', 'ul'];
+
+					this.tabifier.lineBefore = new RegExp('^<(/?' + ownLine.join('|/?' ) + '|' + contOwnLine.join('|') + ')[ >]');
+					this.tabifier.lineAfter = new RegExp('^<(br|/?' + ownLine.join('|/?' ) + '|/' + contOwnLine.join('|/') + ')[ >]');
+					this.tabifier.newLevel = new RegExp('^</?(' + newLevel.join('|' ) + ')[ >]');
+
+					var i = 0,
+					codeLength = code.length,
+					point = 0,
+					start = null,
+					end = null,
+					tag = '',
+					out = '',
+					cont = '';
+
+					this.tabifier.cleanlevel = 0;
+
+					for (; i < codeLength; i++)
+					{
+						point = i;
+
+						// if no more tags, copy and exit
+						if (-1 == code.substr(i).indexOf( '<' ))
+						{
+							out += code.substr(i);
+
+							return this.tabifier.finish(out);
+						}
+
+						// copy verbatim until a tag
+						while (point < codeLength && code.charAt(point) != '<')
+						{
+							point++;
+						}
+
+						if (i != point)
+						{
+							cont = code.substr(i, point - i);
+							if (!cont.match(/^\s{2,}$/g))
+							{
+								if ('\n' == out.charAt(out.length - 1)) out += this.tabifier.getTabs();
+								else if ('\n' == cont.charAt(0))
+								{
+									out += '\n' + this.tabifier.getTabs();
+									cont = cont.replace(/^\s+/, '');
+								}
+
+								out += cont;
+							}
+
+							if (cont.match(/\n/)) out += '\n' + this.tabifier.getTabs();
+						}
+
+						start = point;
+
+						// find the end of the tag
+						while (point < codeLength && '>' != code.charAt(point))
+						{
+							point++;
+						}
+
+						tag = code.substr(start, point - start);
+						i = point;
+
+						var t;
+
+						if ('!--' == tag.substr(1, 3))
+						{
+							if (!tag.match(/--$/))
+							{
+								while ('-->' != code.substr(point, 3))
+								{
+									point++;
+								}
+								point += 2;
+								tag = code.substr(start, point - start);
+								i = point;
+							}
+
+							if ('\n' != out.charAt(out.length - 1)) out += '\n';
+
+							out += this.tabifier.getTabs();
+							out += tag + '>\n';
+						}
+						else if ('!' == tag[1])
+						{
+							out = this.tabifier.placeTag(tag + '>', out);
+						}
+						else if ('?' == tag[1])
+						{
+							out += tag + '>\n';
+						}
+						else if (t = tag.match(/^<(script|style|pre)/i))
+						{
+							t[1] = t[1].toLowerCase();
+							tag = this.tabifier.cleanTag(tag);
+							out = this.tabifier.placeTag(tag, out);
+							end = String(code.substr(i + 1)).toLowerCase().indexOf('</' + t[1]);
+
+							if (end)
+							{
+								cont = code.substr(i + 1, end);
+								i += end;
+								out += cont;
+							}
+						}
+						else
+						{
+							tag = this.tabifier.cleanTag(tag);
+							out = this.tabifier.placeTag(tag, out);
+						}
+					}
+
+					return this.tabifier.finish(out);
+				},
+				getTabs: function()
+				{
+					var s = '';
+					for ( var j = 0; j < this.tabifier.cleanlevel; j++ )
+					{
+						s += '\t';
+					}
+
+					return s;
+				},
+				finish: function(code)
+				{
+					code = code.replace(/\n\s*\n/g, '\n');
+					code = code.replace(/^[\s\n]*/, '');
+					code = code.replace(/[\s\n]*$/, '');
+					code = code.replace(/<script(.*?)>\n<\/script>/gi, '<script$1></script>');
+
+					this.tabifier.cleanlevel = 0;
+
+					return code;
+				},
+				cleanTag: function (tag)
+				{
+					var tagout = '';
+					tag = tag.replace(/\n/g, ' ');
+					tag = tag.replace(/\s{2,}/g, ' ');
+					tag = tag.replace(/^\s+|\s+$/g, ' ');
+
+					var suffix = '';
+					if (tag.match(/\/$/))
+					{
+						suffix = '/';
+						tag = tag.replace(/\/+$/, '');
+					}
+
+					var m;
+					while (m = /\s*([^= ]+)(?:=((['"']).*?\3|[^ ]+))?/.exec(tag))
+					{
+						if (m[2]) tagout += m[1].toLowerCase() + '=' + m[2];
+						else if (m[1]) tagout += m[1].toLowerCase();
+
+						tagout += ' ';
+						tag = tag.substr(m[0].length);
+					}
+
+					return tagout.replace(/\s*$/, '') + suffix + '>';
+				},
+				placeTag: function (tag, out)
+				{
+					var nl = tag.match(this.tabifier.newLevel);
+					if (tag.match(this.tabifier.lineBefore) || nl)
+					{
+						out = out.replace(/\s*$/, '');
+						out += '\n';
+					}
+
+					if (nl && '/' == tag.charAt(1)) this.tabifier.cleanlevel--;
+					if ('\n' == out.charAt(out.length - 1)) out += this.tabifier.getTabs();
+					if (nl && '/' != tag.charAt(1)) this.tabifier.cleanlevel++;
+
+					out += tag;
+
+					if (tag.match(this.tabifier.lineAfter) || tag.match(this.tabifier.newLevel))
+					{
+						out = out.replace(/ *$/, '');
+						out += '\n';
+					}
+
+					return out;
+				}
+			};
+		},
+		tidy: function()
+		{
+			return {
+				setupAllowed: function()
+				{
+					if (this.opts.allowedTags) this.opts.deniedTags = false;
+					if (this.opts.allowedAttr) this.opts.removeAttr = false;
+
+					if (this.opts.linebreaks) return;
+
+					var tags = ['p', 'section'];
+					if (this.opts.allowedTags) this.tidy.addToAllowed(tags);
+					if (this.opts.deniedTags) this.tidy.removeFromDenied(tags);
+
+				},
+				addToAllowed: function(tags)
+				{
+					var len = tags.length;
+					for (var i = 0; i < len; i++)
+					{
+						if ($.inArray(tags[i], this.opts.allowedTags) == -1)
+						{
+							this.opts.allowedTags.push(tags[i]);
+						}
+					}
+				},
+				removeFromDenied: function(tags)
+				{
+					var len = tags.length;
+					for (var i = 0; i < len; i++)
+					{
+						var pos = $.inArray(tags[i], this.opts.deniedTags);
+						if (pos != -1)
+						{
+							this.opts.deniedTags.splice(pos, 1);
+						}
+					}
+				},
+				load: function(html, options)
+				{
+					this.tidy.settings = {
+						deniedTags: this.opts.deniedTags,
+						allowedTags: this.opts.allowedTags,
+						removeComments: this.opts.removeComments,
+						replaceTags: this.opts.replaceTags,
+						replaceStyles: this.opts.replaceStyles,
+						removeDataAttr: this.opts.removeDataAttr,
+						removeAttr: this.opts.removeAttr,
+						allowedAttr: this.opts.allowedAttr,
+						removeWithoutAttr: this.opts.removeWithoutAttr,
+						removeEmpty: this.opts.removeEmpty
+					};
+
+					$.extend(this.tidy.settings, options);
+
+					html = this.tidy.removeComments(html);
+
+					// create container
+					this.tidy.$div = $('<div />').append(html);
+
+					// clean
+					this.tidy.replaceTags();
+					this.tidy.replaceStyles();
+					this.tidy.removeTags();
+
+					this.tidy.removeAttr();
+					this.tidy.removeEmpty();
+					this.tidy.removeParagraphsInLists();
+					this.tidy.removeDataAttr();
+					this.tidy.removeWithoutAttr();
+
+					html = this.tidy.$div.html();
+					this.tidy.$div.remove();
+
+					return html;
+				},
+				removeComments: function(html)
+				{
+					if (!this.tidy.settings.removeComments) return html;
+
+					return html.replace(/<!--[\s\S]*?-->/gi, '');
+				},
+				replaceTags: function(html)
+				{
+					if (!this.tidy.settings.replaceTags) return html;
+
+					var len = this.tidy.settings.replaceTags.length;
+					var replacement = [], rTags = [];
+					for (var i = 0; i < len; i++)
+					{
+						rTags.push(this.tidy.settings.replaceTags[i][1]);
+						replacement.push(this.tidy.settings.replaceTags[i][0]);
+					}
+
+					this.tidy.$div.find(replacement.join(',')).each($.proxy(function(n,s)
+					{
+						var tag = rTags[n];
+						$(s).replaceWith(function()
+						{
+							var replaced = $('<' + tag + ' />').append($(this).contents());
+
+							for (var i = 0; i < this.attributes.length; i++)
+							{
+								replaced.attr(this.attributes[i].name, this.attributes[i].value);
+							}
+
+							return replaced;
+						});
+
+					}, this));
+
+					return html;
+				},
+				replaceStyles: function()
+				{
+					if (!this.tidy.settings.replaceStyles) return;
+
+					var len = this.tidy.settings.replaceStyles.length;
+					this.tidy.$div.find('span').each($.proxy(function(n,s)
+					{
+						var $el = $(s);
+						var style = $el.attr('style');
+						for (var i = 0; i < len; i++)
+						{
+							if (style && style.match(new RegExp('^' + this.tidy.settings.replaceStyles[i][0], 'i')))
+							{
+								var tagName = this.tidy.settings.replaceStyles[i][1];
+								$el.replaceWith(function()
+								{
+									var tag = document.createElement(tagName);
+									return $(tag).append($(this).contents());
+								});
+							}
+						}
+
+					}, this));
+
+				},
+				removeTags: function()
+				{
+					if (!this.tidy.settings.deniedTags && this.tidy.settings.allowedTags)
+					{
+						this.tidy.$div.find('*').not(this.tidy.settings.allowedTags.join(',')).each(function(i, s)
+						{
+							if (s.innerHTML === '') $(s).remove();
+							else $(s).contents().unwrap();
+						});
+					}
+
+					if (this.tidy.settings.deniedTags)
+					{
+						this.tidy.$div.find(this.tidy.settings.deniedTags.join(',')).each(function(i, s)
+						{
+							if (s.innerHTML === '') $(s).remove();
+							else $(s).contents().unwrap();
+						});
+					}
+				},
+				removeAttr: function()
+				{
+					var len;
+					if (!this.tidy.settings.removeAttr && this.tidy.settings.allowedAttr)
+					{
+
+						var allowedAttrTags = [], allowedAttrData = [];
+						len = this.tidy.settings.allowedAttr.length;
+						for (var i = 0; i < len; i++)
+						{
+							allowedAttrTags.push(this.tidy.settings.allowedAttr[i][0]);
+							allowedAttrData.push(this.tidy.settings.allowedAttr[i][1]);
+						}
+
+
+						this.tidy.$div.find('*').each($.proxy(function(n,s)
+						{
+							var $el = $(s);
+							var pos = $.inArray($el[0].tagName.toLowerCase(), allowedAttrTags);
+							var attributesRemove = this.tidy.removeAttrGetRemoves(pos, allowedAttrData, $el);
+
+							if (attributesRemove)
+							{
+								$.each(attributesRemove, function(z,f) {
+									$el.removeAttr(f);
+								});
+							}
+						}, this));
+					}
+
+					if (this.tidy.settings.removeAttr)
+					{
+						len = this.tidy.settings.removeAttr.length;
+						for (var i = 0; i < len; i++)
+						{
+							var attrs = this.tidy.settings.removeAttr[i][1];
+							if ($.isArray(attrs)) attrs = attrs.join(' ');
+
+							this.tidy.$div.find(this.tidy.settings.removeAttr[i][0]).removeAttr(attrs);
+						}
+					}
+
+				},
+				removeAttrGetRemoves: function(pos, allowed, $el)
+				{
+					var attributesRemove = [];
+
+					// remove all attrs
+					if (pos == -1)
+					{
+						$.each($el[0].attributes, function(i, item)
+						{
+							attributesRemove.push(item.name);
+						});
+
+					}
+					// allow all attrs
+					else if (allowed[pos] == '*')
+					{
+						attributesRemove = [];
+					}
+					// allow specific attrs
+					else
+					{
+						$.each($el[0].attributes, function(i, item)
+						{
+							if ($.isArray(allowed[pos]))
+							{
+								if ($.inArray(item.name, allowed[pos]) == -1)
+								{
+									attributesRemove.push(item.name);
+								}
+							}
+							else if (allowed[pos] != item.name)
+							{
+								attributesRemove.push(item.name);
+							}
+
+						});
+					}
+
+					return attributesRemove;
+				},
+				removeAttrs: function (el, regex)
+				{
+					regex = new RegExp(regex, "g");
+					return el.each(function()
+					{
+						var self = $(this);
+						var len = this.attributes.length - 1;
+						for (var i = len; i >= 0; i--)
+						{
+							var item = this.attributes[i];
+							if (item && item.specified && item.name.search(regex)>=0)
+							{
+								self.removeAttr(item.name);
+							}
+						}
+					});
+				},
+				removeEmpty: function()
+				{
+					if (!this.tidy.settings.removeEmpty) return;
+
+					this.tidy.$div.find(this.tidy.settings.removeEmpty.join(',')).each(function()
+					{
+						var $el = $(this);
+						var text = $el.text();
+						text = text.replace(/[\u200B-\u200D\uFEFF]/g, '');
+						text = text.replace(/&nbsp;/gi, '');
+						text = text.replace(/\s/g, '');
+
+		    	    	if (text === '' && $el.children().length === 0)
+		    	    	{
+			    	    	$el.remove();
+		    	    	}
+					});
+				},
+				removeParagraphsInLists: function()
+				{
+					this.tidy.$div.find('li p').contents().unwrap();
+				},
+				removeDataAttr: function()
+				{
+					if (!this.tidy.settings.removeDataAttr) return;
+
+					var tags = this.tidy.settings.removeDataAttr;
+					if ($.isArray(this.tidy.settings.removeDataAttr)) tags = this.tidy.settings.removeDataAttr.join(',');
+
+					this.tidy.removeAttrs(this.tidy.$div.find(tags), '^(data-)');
+
+				},
+				removeWithoutAttr: function()
+				{
+					if (!this.tidy.settings.removeWithoutAttr) return;
+
+					this.tidy.$div.find(this.tidy.settings.removeWithoutAttr.join(',')).each(function()
+					{
+						if (this.attributes.length === 0)
+						{
+							$(this).contents().unwrap();
+						}
+					});
+				}
+			};
+		},
+		toolbar: function()
+		{
+			return {
+				init: function()
+				{
+					return {
+						html:
+						{
+							title: this.lang.get('html'),
+							func: 'code.toggle'
+						},
+						formatting:
+						{
+							title: this.lang.get('formatting'),
+							dropdown:
+							{
+								p:
+								{
+									title: this.lang.get('paragraph'),
+									func: 'block.format'
+								},
+								blockquote:
+								{
+									title: this.lang.get('quote'),
+									func: 'block.format'
+								},
+								pre:
+								{
+									title: this.lang.get('code'),
+									func: 'block.format'
+								},
+								h1:
+								{
+									title: this.lang.get('header1'),
+									func: 'block.format'
+								},
+								h2:
+								{
+									title: this.lang.get('header2'),
+									func: 'block.format'
+								},
+								h3:
+								{
+									title: this.lang.get('header3'),
+									func: 'block.format'
+								},
+								h4:
+								{
+									title: this.lang.get('header4'),
+									func: 'block.format'
+								},
+								h5:
+								{
+									title: this.lang.get('header5'),
+									func: 'block.format'
+								}
+							}
+						},
+						bold:
+						{
+							title: this.lang.get('bold'),
+							func: 'inline.format'
+						},
+						italic:
+						{
+							title: this.lang.get('italic'),
+							func: 'inline.format'
+						},
+						deleted:
+						{
+							title: this.lang.get('deleted'),
+							func: 'inline.format'
+						},
+						underline:
+						{
+							title: this.lang.get('underline'),
+							func: 'inline.format'
+						},
+						unorderedlist:
+						{
+							title: '&bull; ' + this.lang.get('unorderedlist'),
+							func: 'list.toggle'
+						},
+						orderedlist:
+						{
+							title: '1. ' + this.lang.get('orderedlist'),
+							func: 'list.toggle'
+						},
+						outdent:
+						{
+							title: '< ' + this.lang.get('outdent'),
+							func: 'indent.decrease'
+						},
+						indent:
+						{
+							title: '> ' + this.lang.get('indent'),
+							func: 'indent.increase'
+						},
+						image:
+						{
+							title: this.lang.get('image'),
+							func: 'image.show'
+						},
+						file:
+						{
+							title: this.lang.get('file'),
+							func: 'file.show'
+						},
+						link:
+						{
+							title: this.lang.get('link'),
+							dropdown:
+							{
+								link:
+								{
+									title: this.lang.get('link_insert'),
+									func: 'link.show'
+								},
+								unlink:
+								{
+									title: this.lang.get('unlink'),
+									func: 'link.unlink'
+								}
+							}
+						},
+						alignment:
+						{
+							title: this.lang.get('alignment'),
+							dropdown:
+							{
+								left:
+								{
+									title: this.lang.get('align_left'),
+									func: 'alignment.left'
+								},
+								center:
+								{
+									title: this.lang.get('align_center'),
+									func: 'alignment.center'
+								},
+								right:
+								{
+									title: this.lang.get('align_right'),
+									func: 'alignment.right'
+								},
+								justify:
+								{
+									title: this.lang.get('align_justify'),
+									func: 'alignment.justify'
+								}
+							}
+						},
+						horizontalrule:
+						{
+							title: this.lang.get('horizontalrule'),
+							func: 'line.insert'
+						}
+					};
+				},
+				build: function()
+				{
+					this.toolbar.hideButtons();
+					this.toolbar.hideButtonsOnMobile();
+					this.toolbar.isButtonSourceNeeded();
+
+					if (this.opts.buttons.length === 0) return;
+
+					this.$toolbar = this.toolbar.createContainer();
+
+					this.toolbar.setOverflow();
+					this.toolbar.append();
+					this.toolbar.setFormattingTags();
+					this.toolbar.loadButtons();
+					this.toolbar.setFixed();
+
+					// buttons response
+					if (this.opts.activeButtons)
+					{
+						this.$editor.on('mouseup.redactor keyup.redactor focus.redactor', $.proxy(this.observe.buttons, this));
+					}
+
+				},
+				createContainer: function()
+				{
+					return $('<ul>').addClass('redactor-toolbar').attr('id', 'redactor-toolbar-' + this.uuid);
+				},
+				setFormattingTags: function()
+				{
+					$.each(this.opts.toolbar.formatting.dropdown, $.proxy(function (i, s)
+					{
+						if ($.inArray(i, this.opts.formatting) == -1) delete this.opts.toolbar.formatting.dropdown[i];
+					}, this));
+
+				},
+				loadButtons: function()
+				{
+					$.each(this.opts.buttons, $.proxy(function(i, btnName)
+					{
+						if (!this.opts.toolbar[btnName]) return;
+
+						if (this.opts.fileUpload === false && btnName === 'file') return true;
+						if ((this.opts.imageUpload === false && this.opts.s3 === false) && btnName === 'image') return true;
+
+						var btnObject = this.opts.toolbar[btnName];
+						this.$toolbar.append($('<li>').append(this.button.build(btnName, btnObject)));
+
+					}, this));
+				},
+				append: function()
+				{
+					if (this.opts.toolbarExternal)
+					{
+						this.$toolbar.addClass('redactor-toolbar-external');
+						$(this.opts.toolbarExternal).html(this.$toolbar);
+					}
+					else
+					{
+						this.$box.prepend(this.$toolbar);
+					}
+				},
+				setFixed: function()
+				{
+					if (this.utils.isMobile()) return;
+					if (this.opts.toolbarExternal) return;
+					if (!this.opts.toolbarFixed) return;
+
+					this.toolbar.observeScroll();
+					$(this.opts.toolbarFixedTarget).on('scroll.redactor', $.proxy(this.toolbar.observeScroll, this));
+
+				},
+				setOverflow: function()
+				{
+					if (this.utils.isMobile() && this.opts.toolbarOverflow)
+					{
+						this.$toolbar.addClass('redactor-toolbar-overflow');
+					}
+				},
+				isButtonSourceNeeded: function()
+				{
+					if (this.opts.buttonSource) return;
+
+					var index = this.opts.buttons.indexOf('html');
+					if (index !== -1)
+					{
+						this.opts.buttons.splice(index, 1);
+					}
+				},
+				hideButtons: function()
+				{
+					if (this.opts.buttonsHide.length === 0) return;
+
+					$.each(this.opts.buttonsHide, $.proxy(function(i, s)
+					{
+						var index = this.opts.buttons.indexOf(s);
+						this.opts.buttons.splice(index, 1);
+
+					}, this));
+				},
+				hideButtonsOnMobile: function()
+				{
+					if (!this.utils.isMobile() || this.opts.buttonsHideOnMobile.length === 0) return;
+
+					$.each(this.opts.buttonsHideOnMobile, $.proxy(function(i, s)
+					{
+						var index = this.opts.buttons.indexOf(s);
+						this.opts.buttons.splice(index, 1);
+
+					}, this));
+				},
+				observeScroll: function()
+				{
+					var scrollTop = $(this.opts.toolbarFixedTarget).scrollTop();
+					var boxTop = 1;
+
+					if (this.opts.toolbarFixedTarget === document)
+					{
+						boxTop = this.$box.offset().top;
+					}
+
+					if (scrollTop > boxTop)
+					{
+						this.toolbar.observeScrollEnable(scrollTop, boxTop);
+					}
+					else
+					{
+						this.toolbar.observeScrollDisable();
+					}
+				},
+				observeScrollEnable: function(scrollTop, boxTop)
+				{
+					var top = this.opts.toolbarFixedTopOffset + scrollTop - boxTop;
+					var left = 0;
+					var end = boxTop + this.$box.height() + 30;
+					var width = this.$box.innerWidth();
+
+					this.$toolbar.addClass('toolbar-fixed-box');
+					this.$toolbar.css({
+						position: 'absolute',
+						width: width,
+						top: top + 'px',
+						left: left
+					});
+
+					this.toolbar.setDropdownsFixed();
+					this.$toolbar.css('visibility', (scrollTop < end) ? 'visible' : 'hidden');
+				},
+				observeScrollDisable: function()
+				{
+					this.$toolbar.css({
+						position: 'relative',
+						width: 'auto',
+						top: 0,
+						left: 0,
+						visibility: 'visible'
+					});
+
+					this.toolbar.unsetDropdownsFixed();
+					this.$toolbar.removeClass('toolbar-fixed-box');
+
+				},
+				setDropdownsFixed: function()
+				{
+					var top = this.$toolbar.innerHeight() + this.opts.toolbarFixedTopOffset;
+					var position = 'fixed';
+					if (this.opts.toolbarFixedTarget !== document)
+					{
+						top = (this.$toolbar.innerHeight() + this.$toolbar.offset().top) + this.opts.toolbarFixedTopOffset;
+						position = 'absolute';
+					}
+
+					$('.redactor-dropdown').each(function()
+					{
+						$(this).css({ position: position, top: top + 'px' });
+					});
+				},
+				unsetDropdownsFixed: function()
+				{
+					var top = (this.$toolbar.innerHeight() + this.$toolbar.offset().top);
+					$('.redactor-dropdown').each(function()
+					{
+						$(this).css({ position: 'absolute', top: top + 'px' });
+					});
+				}
+			};
+		},
+		upload: function()
+		{
+			return {
+				init: function(id, url, callback)
+				{
+					this.upload.direct = false;
+					this.upload.callback = callback;
+					this.upload.url = url;
+					this.upload.$el = $(id);
+					this.upload.$droparea = $('<div id="redactor-droparea" />');
+
+					this.upload.$placeholdler = $('<div id="redactor-droparea-placeholder" />').text('Drop file here or ');
+					this.upload.$input = $('<input type="file" name="file" />');
+
+					this.upload.$placeholdler.append(this.upload.$input);
+					this.upload.$droparea.append(this.upload.$placeholdler);
+					this.upload.$el.append(this.upload.$droparea);
+
+					this.upload.$droparea.off('redactor.upload');
+					this.upload.$input.off('redactor.upload');
+
+					this.upload.$droparea.on('dragover.redactor.upload', $.proxy(this.upload.onDrag, this));
+					this.upload.$droparea.on('dragleave.redactor.upload', $.proxy(this.upload.onDragLeave, this));
+
+					// change
+					this.upload.$input.on('change.redactor.upload', $.proxy(function(e)
+					{
+						e = e.originalEvent || e;
+						this.upload.traverseFile(this.upload.$input[0].files[0], e);
+					}, this));
+
+					// drop
+					this.upload.$droparea.on('drop.redactor.upload', $.proxy(function(e)
+					{
+						e.preventDefault();
+
+						this.upload.$droparea.removeClass('drag-hover').addClass('drag-drop');
+						this.upload.onDrop(e);
+
+					}, this));
+				},
+				directUpload: function(file, e)
+				{
+					this.upload.direct = true;
+					this.upload.traverseFile(file, e);
+				},
+				onDrop: function(e)
+				{
+					e = e.originalEvent || e;
+					var files = e.dataTransfer.files;
+
+					this.upload.traverseFile(files[0], e);
+				},
+				traverseFile: function(file, e)
+				{
+					if (this.opts.s3)
+					{
+						this.upload.setConfig(file);
+						this.upload.s3uploadFile(file);
+						return;
+					}
+
+					var formData = !!window.FormData ? new FormData() : null;
+					if (window.FormData)
+					{
+						this.upload.setConfig(file);
+
+						var name = (this.upload.type == 'image') ? this.opts.imageUploadParam : this.opts.fileUploadParam;
+						formData.append(name, file);
+					}
+
+					this.progress.show();
+					this.upload.sendData(formData, e);
+				},
+				setConfig: function(file)
+				{
+					this.upload.getType(file);
+
+					if (this.upload.direct)
+					{
+						this.upload.url = (this.upload.type == 'image') ? this.opts.imageUpload : this.opts.fileUpload;
+						this.upload.callback = (this.upload.type == 'image') ? this.image.insert : this.file.insert;
+					}
+				},
+				getType: function(file)
+				{
+					this.upload.type = 'image';
+					if (this.opts.imageTypes.indexOf(file.type) == -1)
+					{
+						this.upload.type = 'file';
+					}
+				},
+				getHiddenFields: function(obj, fd)
+				{
+					if (obj === false || typeof obj !== 'object') return fd;
+
+					$.each(obj, $.proxy(function(k, v)
+					{
+						if (v !== null && v.toString().indexOf('#') === 0) v = $(v).val();
+						fd.append(k, v);
+
+					}, this));
+
+					return fd;
+
+				},
+				sendData: function(formData, e)
+				{
+					// append hidden fields
+					if (this.upload.type == 'image')
+					{
+						formData = this.upload.getHiddenFields(this.opts.uploadImageFields, formData);
+						formData = this.upload.getHiddenFields(this.upload.imageFields, formData);
+					}
+					else
+					{
+						formData = this.upload.getHiddenFields(this.opts.uploadFileFields, formData);
+						formData = this.upload.getHiddenFields(this.upload.fileFields, formData);
+					}
+
+					var xhr = new XMLHttpRequest();
+					xhr.open('POST', this.upload.url);
+
+					// complete
+					xhr.onreadystatechange = $.proxy(function()
+					{
+					    if (xhr.readyState == 4)
+					    {
+					        var data = xhr.responseText;
+
+							data = data.replace(/^\[/, '');
+							data = data.replace(/\]$/, '');
+
+							var json;
+							try
+							{
+								json = (typeof data === 'string' ? $.parseJSON(data) : data);
+							}
+							catch(err)
+							{
+								json = {
+									error: true
+								};
+							}
+
+
+							this.progress.hide();
+
+							if (!this.upload.direct)
+							{
+								this.upload.$droparea.removeClass('drag-drop');
+							}
+
+							this.upload.callback(json, this.upload.direct, e);
+					    }
+					}, this);
+
+
+					/*
+					xhr.upload.onprogress = $.proxy(function(e)
+					{
+						if (e.lengthComputable)
+						{
+							var complete = (e.loaded / e.total * 100 | 0);
+							//progress.value = progress.innerHTML = complete;
+						}
+
+					}, this);
+					*/
+
+
+					xhr.send(formData);
+				},
+				onDrag: function(e)
+				{
+					e.preventDefault();
+					this.upload.$droparea.addClass('drag-hover');
+				},
+				onDragLeave: function(e)
+				{
+					e.preventDefault();
+					this.upload.$droparea.removeClass('drag-hover');
+				},
+				clearImageFields: function()
+				{
+					this.upload.imageFields = {};
+				},
+				addImageFields: function(name, value)
+				{
+					this.upload.imageFields[name] = value;
+				},
+				removeImageFields: function(name)
+				{
+					delete this.upload.imageFields[name];
+				},
+				clearFileFields: function()
+				{
+					this.upload.fileFields = {};
+				},
+				addFileFields: function(name, value)
+				{
+					this.upload.fileFields[name] = value;
+				},
+				removeFileFields: function(name)
+				{
+					delete this.upload.fileFields[name];
+				},
+
+
+				// S3
+				s3uploadFile: function(file)
+				{
+					this.upload.s3executeOnSignedUrl(file, $.proxy(function(signedURL)
+					{
+						this.upload.s3uploadToS3(file, signedURL);
+					}, this));
+				},
+				s3executeOnSignedUrl: function(file, callback)
+				{
+					var xhr = new XMLHttpRequest();
+
+					var mark = '?';
+					if (this.opts.s3.search(/\?/) != '-1') mark = '&';
+
+					xhr.open('GET', this.opts.s3 + mark + 'name=' + file.name + '&type=' + file.type, true);
+
+					// Hack to pass bytes through unprocessed.
+					if (xhr.overrideMimeType) xhr.overrideMimeType('text/plain; charset=x-user-defined');
+
+					var that = this;
+					xhr.onreadystatechange = function(e)
+					{
+						if (this.readyState == 4 && this.status == 200)
+						{
+							that.progress.show();
+							callback(decodeURIComponent(this.responseText));
+						}
+						else if (this.readyState == 4 && this.status != 200)
+						{
+							//setProgress(0, 'Could not contact signing script. Status = ' + this.status);
+						}
+					};
+
+					xhr.send();
+				},
+				s3createCORSRequest: function(method, url)
+				{
+					var xhr = new XMLHttpRequest();
+					if ("withCredentials" in xhr)
+					{
+						xhr.open(method, url, true);
+					}
+					else if (typeof XDomainRequest != "undefined")
+					{
+						xhr = new XDomainRequest();
+						xhr.open(method, url);
+					}
+					else
+					{
+						xhr = null;
+					}
+
+					return xhr;
+				},
+				s3uploadToS3: function(file, url)
+				{
+					var xhr = this.upload.s3createCORSRequest('PUT', url);
+					if (!xhr)
+					{
+						//setProgress(0, 'CORS not supported');
+					}
+					else
+					{
+						xhr.onload = $.proxy(function()
+						{
+							if (xhr.status == 200)
+							{
+								//setProgress(100, 'Upload completed.');
+
+								this.progress.hide();
+
+								var s3file = url.split('?');
+
+								if (!s3file[0])
+								{
+									 // url parsing is fail
+									 return false;
+								}
+
+
+								if (!this.upload.direct)
+								{
+									this.upload.$droparea.removeClass('drag-drop');
+								}
+
+								var json = { filelink: s3file[0] };
+								if (this.upload.type == 'file')
+								{
+									var arr = s3file[0].split('/');
+									json.filename = arr[arr.length-1];
+								}
+
+								this.upload.callback(json, this.upload.direct, false);
+
+
+							}
+							else
+							{
+								//setProgress(0, 'Upload error: ' + xhr.status);
+							}
+						}, this);
+
+						xhr.onerror = function()
+						{
+							//setProgress(0, 'XHR error.');
+						};
+
+						xhr.upload.onprogress = function(e)
+						{
+							/*
+							if (e.lengthComputable)
+							{
+								var percentLoaded = Math.round((e.loaded / e.total) * 100);
+								setProgress(percentLoaded, percentLoaded == 100 ? 'Finalizing.' : 'Uploading.');
+							}
+							*/
+						};
+
+						xhr.setRequestHeader('Content-Type', file.type);
+						xhr.setRequestHeader('x-amz-acl', 'public-read');
+
+						xhr.send(file);
+					}
+				}
+			};
+		},
+		utils: function()
+		{
+			return {
+				isMobile: function()
+				{
+					return /(iPhone|iPod|BlackBerry|Android)/.test(navigator.userAgent);
+				},
+				isDesktop: function()
+				{
+					return !/(iPhone|iPod|iPad|BlackBerry|Android)/.test(navigator.userAgent);
+				},
+				isString: function(obj)
+				{
+					return Object.prototype.toString.call(obj) == '[object String]';
+				},
+				isEmpty: function(html, removeEmptyTags)
+				{
+					html = html.replace(/[\u200B-\u200D\uFEFF]/g, '');
+					html = html.replace(/&nbsp;/gi, '');
+					html = html.replace(/<\/?br\s?\/?>/g, '');
+					html = html.replace(/\s/g, '');
+					html = html.replace(/^<p>[^\W\w\D\d]*?<\/p>$/i, '');
+
+					// remove empty tags
+					if (removeEmptyTags !== false)
+					{
+						html = html.replace(/<[^\/>][^>]*><\/[^>]+>/gi, '');
+						html = html.replace(/<[^\/>][^>]*><\/[^>]+>/gi, '');
+					}
+
+					html = $.trim(html);
+
+					return html === '';
+				},
+				normalize: function(str)
+				{
+					if (typeof(str) === 'undefined') return 0;
+					return parseInt(str.replace('px',''), 10);
+				},
+				hexToRgb: function(hex)
+				{
+					if (typeof hex == 'undefined') return;
+					if (hex.search(/^#/) == -1) return hex;
+
+					var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+					hex = hex.replace(shorthandRegex, function(m, r, g, b)
+					{
+						return r + r + g + g + b + b;
+					});
+
+					var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+					return 'rgb(' + parseInt(result[1], 16) + ', ' + parseInt(result[2], 16) + ', ' + parseInt(result[3], 16) + ')';
+				},
+				getOuterHtml: function(el)
+				{
+					return $('<div>').append($(el).eq(0).clone()).html();
+				},
+				getAlignmentElement: function(el)
+				{
+					if ($.inArray(el.tagName, this.opts.alignmentTags) !== -1)
+					{
+						return $(el);
+					}
+					else
+					{
+						return $(el).closest(this.opts.alignmentTags.toString().toLowerCase(), this.$editor[0]);
+					}
+				},
+				removeEmptyAttr: function(el, attr)
+				{
+					var $el = $(el);
+					if (typeof $el.attr(attr) == 'undefined')
+					{
+						return true;
+					}
+
+					if ($el.attr(attr) === '')
+					{
+						$el.removeAttr(attr);
+						return true;
+					}
+
+					return false;
+				},
+				removeEmpty: function(i, s)
+				{
+					var $s = $(s);
+
+					$s.find('.redactor-invisible-space').replaceWith(function()
+					{
+						return $(this).contents();
+					});
+
+					if ($s.find('hr, br, img, iframe').length !== 0) return;
+					var text = $.trim($s.text());
+					if (this.utils.isEmpty(text, false))
+					{
+						$s.remove();
+					}
+				},
+
+				// save and restore scroll
+				saveScroll: function()
+				{
+					if (this.utils.isSelectAll()) return;
+
+					this.saveEditorScroll = this.$editor.scrollTop();
+					this.saveBodyScroll = $(window).scrollTop();
+
+					if (this.opts.scrollTarget) this.saveTargetScroll = $(this.opts.scrollTarget).scrollTop();
+				},
+				restoreScroll: function()
+				{
+					if (typeof this.saveScroll === 'undefined' && typeof this.saveBodyScroll === 'undefined') return;
+
+					$(window).scrollTop(this.saveBodyScroll);
+					this.$editor.scrollTop(this.saveEditorScroll);
+
+					if (this.opts.scrollTarget) $(this.opts.scrollTarget).scrollTop(this.saveTargetScroll);
+				},
+
+				// get invisible space element
+				createSpaceElement: function()
+				{
+					var space = document.createElement('span');
+					space.className = 'redactor-invisible-space';
+					space.innerHTML = this.opts.invisibleSpace;
+
+					return space;
+				},
+
+				// replace
+				removeInlineTags: function(node)
+				{
+					var tags = this.opts.inlineTags;
+					tags.push('span');
+
+					if (node.tagName == 'PRE') tags.push('a');
+
+					$(node).find(tags.join(',')).not('span.redactor-selection-marker').contents().unwrap();
+				},
+				replaceWithContents: function(node, removeInlineTags)
+				{
+					var self = this;
+					$(node).replaceWith(function()
+					{
+						if (removeInlineTags === true) self.utils.removeInlineTags(this);
+
+						return $(this).contents();
+					});
+				},
+				replaceToTag: function(node, tag, removeInlineTags)
+				{
+					var replacement;
+					var self = this;
+					$(node).replaceWith(function()
+					{
+						replacement = $('<' + tag + ' />').append($(this).contents());
+
+						for (var i = 0; i < this.attributes.length; i++)
+						{
+							replacement.attr(this.attributes[i].name, this.attributes[i].value);
+						}
+
+						if (removeInlineTags === true) self.utils.removeInlineTags(replacement);
+
+						return replacement;
+					});
+
+					return replacement;
+				},
+
+				// start and end of element
+				isStartOfElement: function()
+				{
+					var block = this.selection.getBlock();
+					if (!block) return false;
+
+					var offset = this.caret.getOffsetOfElement(block);
+
+					return (offset === 0) ? true : false;
+				},
+				isEndOfElement: function()
+				{
+					var block = this.selection.getBlock();
+					if (!block) return false;
+
+					var offset = this.caret.getOffsetOfElement(block);
+					var text = $.trim($(block).text()).replace(/\n\r\n/g, '');
+
+					return (offset == text.length) ? true : false;
+				},
+
+				// test blocks
+				isBlock: function(block)
+				{
+					block = block[0] || block;
+
+					return block && this.utils.isBlockTag(block.tagName);
+				},
+				isBlockTag: function(tag)
+				{
+					if (typeof tag == 'undefined') return false;
+
+					return this.reIsBlock.test(tag);
+				},
+
+				// tag detection
+				isTag: function(current, tag)
+				{
+					var element = $(current).closest(tag);
+					if (element.size() == 1)
+					{
+						return element[0];
+					}
+
+					return false;
+				},
+
+				// select all
+				isSelectAll: function()
+				{
+					return this.selectAll;
+				},
+				enableSelectAll: function()
+				{
+					this.selectAll = true;
+				},
+				disableSelectAll: function()
+				{
+					this.selectAll = false;
+				},
+
+				// parents detection
+				isRedactorParent: function(el)
+				{
+					if (!el)
+					{
+						return false;
+					}
+
+					if ($(el).parents('.redactor-editor').length === 0 || $(el).hasClass('redactor-editor'))
+					{
+						return false;
+					}
+
+					return el;
+				},
+				isCurrentOrParent: function(tagName)
+				{
+					var parent = this.selection.getParent();
+					var current = this.selection.getCurrent();
+
+					if ($.isArray(tagName))
+					{
+						var matched = 0;
+						$.each(tagName, $.proxy(function(i, s)
+						{
+							if (this.utils.isCurrentOrParentOne(current, parent, s))
+							{
+								matched++;
+							}
+						}, this));
+
+						return (matched === 0) ? false : true;
+					}
+					else
+					{
+						return this.utils.isCurrentOrParentOne(current, parent, tagName);
+					}
+				},
+				isCurrentOrParentOne: function(current, parent, tagName)
+				{
+					return parent && parent.tagName === tagName ? parent : current && current.tagName === tagName ? current : false;
+				},
+
+
+				// browsers detection
+				isOldIe: function()
+				{
+					return (this.utils.browser('msie') && parseInt(this.utils.browser('version'), 10) < 9) ? true : false;
+				},
+				isLessIe10: function()
+				{
+					return (this.utils.browser('msie') && parseInt(this.utils.browser('version'), 10) < 10) ? true : false;
+				},
+				isIe11: function()
+				{
+					return !!navigator.userAgent.match(/Trident\/7\./);
+				},
+				browser: function(browser)
+				{
+					var ua = navigator.userAgent.toLowerCase();
+					var match = /(opr)[\/]([\w.]+)/.exec( ua ) ||
+		            /(chrome)[ \/]([\w.]+)/.exec( ua ) ||
+		            /(webkit)[ \/]([\w.]+).*(safari)[ \/]([\w.]+)/.exec(ua) ||
+		            /(webkit)[ \/]([\w.]+)/.exec( ua ) ||
+		            /(opera)(?:.*version|)[ \/]([\w.]+)/.exec( ua ) ||
+		            /(msie) ([\w.]+)/.exec( ua ) ||
+		            ua.indexOf("trident") >= 0 && /(rv)(?::| )([\w.]+)/.exec( ua ) ||
+		            ua.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec( ua ) ||
+		            [];
+
+					if (browser == 'version') return match[2];
+					if (browser == 'webkit') return (match[1] == 'chrome' || match[1] == 'webkit');
+					if (match[1] == 'rv') return browser == 'msie';
+					if (match[1] == 'opr') return browser == 'webkit';
+
+					return browser == match[1];
+				}
+			};
+		}
+	};
+
+	// constructor
+	Redactor.prototype.init.prototype = Redactor.prototype;
+
+	// LINKIFY
+	$.Redactor.fn.formatLinkify = function(protocol, convertLinks, convertUrlLinks, convertImageLinks, convertVideoLinks, linkSize)
+	{
+		var urlCheck = '((?:http[s]?:\\/\\/(?:www\\.)?|www\\.){1}(?:[0-9A-Za-z\\-%_]+\\.)+[a-zA-Z]{2,}(?::[0-9]+)?(?:(?:/[0-9A-Za-z\\-\\.%\+_]*)+)?(?:\\?(?:[0-9A-Za-z\\-\\.%_]+(?:=[0-9A-Za-z\\-\\.%_\\+]*)?)?(?:&(?:[0-9A-Za-z\\-\\.%_]+(?:=[0-9A-Za-z\\-\\.%_\\+]*)?)?)*)?(?:#[0-9A-Za-z\\-\\.%_\\+=\\?&;]*)?)';
+		var regex = new RegExp(urlCheck, 'gi');
+		var rProtocol = /(https?|ftp):\/\//i;
+		var urlImage = /(https?:\/\/.*\.(?:png|jpg|jpeg|gif))/gi;
+
+		var childNodes = (this.$editor ? this.$editor[0] : this).childNodes, i = childNodes.length;
+		while (i--)
+		{
+			var n = childNodes[i];
+			if (n.nodeType === 3)
+			{
+				var html = n.nodeValue;
+
+				// youtube & vimeo
+				if (convertVideoLinks && html)
+				{
+					var iframeStart = '<iframe width="500" height="281" src="',
+						iframeEnd = '" frameborder="0" allowfullscreen></iframe>';
+
+					if (html.match(reUrlYoutube))
+					{
+						html = html.replace(reUrlYoutube, iframeStart + '//www.youtube.com/embed/$1' + iframeEnd);
+						$(n).after(html).remove();
+					}
+					else if (html.match(reUrlVimeo))
+					{
+						html = html.replace(reUrlVimeo, iframeStart + '//player.vimeo.com/video/$2' + iframeEnd);
+						$(n).after(html).remove();
+					}
+				}
+
+				// image
+				if (convertImageLinks && html && html.match(urlImage))
+				{
+					html = html.replace(urlImage, '<img src="$1" />');
+
+					$(n).after(html).remove();
+					return;
+				}
+
+				// link
+				if (html.search(/\$/g) != -1) html = html.replace(/\$/g, '&#36;');
+
+				var matches = html.match(regex);
+				if (convertUrlLinks && html && matches)
+				{
+
+					var len = matches.length;
+					for (var z = 0; z < len; z++)
+					{
+						// remove dot in the end
+						if (matches[z].match(/\.$/) !== null) matches[z] = matches[z].replace(/\.$/, '');
+
+						var href = matches[z];
+						var text = href;
+
+						var space = '';
+						if (href.match(/\s$/) !== null) space = ' ';
+
+						var addProtocol = protocol + '://';
+						if (href.match(rProtocol) !== null) addProtocol = '';
+
+						if (text.length > linkSize) text = text.substring(0, linkSize) + '...';
+						text = text.replace(/&#36;/g, '$').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+						html = html.replace(href, '<a href=\"' + addProtocol + $.trim(href) + '\">' + $.trim(text) + '</a>' + space);
+					}
+
+					$(n).after(html).remove();
+				}
+			}
+			else if (n.nodeType === 1 && !/^(a|button|textarea)$/i.test(n.tagName))
+			{
+				$.Redactor.fn.formatLinkify.call(n, protocol, convertLinks, convertUrlLinks, convertImageLinks, convertVideoLinks, linkSize);
+			}
+		}
+	};
+
+})(jQuery);
+window.init_redactor = function(){
+  var csrf_token = $('meta[name=csrf-token]').attr('content');
+  var csrf_param = $('meta[name=csrf-param]').attr('content');
+  var params;
+  if (csrf_param !== undefined && csrf_token !== undefined) {
+    params = csrf_param + "=" + encodeURIComponent(csrf_token);
+  }
+  $('.redactor').redactor(
+    { "imageUpload":"/redactor_rails/pictures?" + params,
+      "imageGetJson":"/redactor_rails/pictures",
+      "path":"/assets/redactor-rails",
+      "css":"style.css"}
+  );
+}
+
+$(document).on( 'ready page:load', window.init_redactor );
+
+
 $(document).ready(function() {
 });
 (function() {
@@ -32166,580 +40604,6 @@ $(document).ready(function() {
 
 
 }).call(this);
-(function() {
-
-
-}).call(this);
-(function() {
-
-
-}).call(this);
-(function() {
-
-
-}).call(this);
-(function() {
-
-
-}).call(this);
-//---new
-
-function beacon_get(position_id){
-    //var position_id = $('#position_id').text();
-    var request = "/maps/google_map_beacon_get?position_id=" + position_id;
-    //var locate_id = $('#locate_id').text();
-    var aj = $.ajax({
-      // async: false,
-      url: request,
-      type: 'get',
-      beacons: $(this).serialize(),
-      dataType: 'json'
-    }).success(function (beacons) {
-      beacon_insert(beacons);
-    }).fail(function (beacons) {
-         console.log('AJAX request has FAILED');
-    });
-  };
-  function beacon_insert(beacons){
-    markers.length = 0;
-    // alert(beacons.length);
-    for(var i=0;i<beacons.length;i++){
-      var marker = new google.maps.Marker({
-        position: beacons[i],
-        map: map
-      });
-      uuid = '<div id="infowindow">'+ beacons[i].uuid + '</div>';
-      var infowindow = new google.maps.InfoWindow({
-          content: uuid
-        });
-      infowindow.open(map, marker);
-    };
-  };
-
-//---old
-function bearingsort(a,b) {
-      return (a.bearing - b.bearing);
-    }
-
-function location_get(){
-    var locate_id = $('#locate_id').text();
-    var request = "/locates/location_get?locate_id=" + locate_id;
-
-    var aj = $.ajax({
-      async: false,
-      url: request,
-      type: 'get',
-      locations: $(this).serialize(),
-      dataType: 'json'
-    }).success(function (locations) {
-      location_insert(locations);
-    }).fail(function (locations) {
-         console.log('AJAX request has FAILED');
-    });
-  };
-  function location_insert(locations){
-    location_point.length = 0;
-    for(var i=0;i<locations.length;i++){
-      // location_point.push(locations[i]);
-      location_point.push(new google.maps.LatLng(locations[i].lat, locations[i].lng));
-      // alert(location_point[i]);
-      // new google.maps.LatLng(location_point[i].lat, location_point[i].lng)
-    };
-  };
-
-  function Ini_location_get(){
-    var locate_id = $('#locate_id').text();
-    var request = "/locates/location_get?locate_id=" + locate_id;
-    var aj = $.ajax({
-      async: false,
-      url: request,
-      type: 'get',
-      locations: $(this).serialize(),
-      dataType: 'json'
-    }).success(function (locations) {
-      Ini_location_insert(locations);
-    }).fail(function (locations) {
-         console.log('AJAX request has FAILED');
-    });
-  };
-  function Ini_location_insert(locations){
-    for(var i=0;i<locations.length;i++){
-      Ini_addMarker(locations[i]);
-    }
-  };
-
-  function Ini_addMarker(location) {
-      var path = poly.getPath();
-      path.push(location);
-      var marker = new google.maps.Marker({
-        position: location,
-        lat: location.lat,
-        lng: location.lng,
-        title: '#' + path.getLength(),
-        map: map,
-        draggable: true
-      });
-      markers.push(marker);
-
-      google.maps.event.addListener(marker, 'click', function() {
-        marker.setMap(null);
-        for (var i = 0, I = markers.length; i < I && markers[i] != marker; ++i);
-          markers.splice(i, 1);
-          path.removeAt(i);
-        }
-      );
-
-      google.maps.event.addListener(marker, 'dragend', function() {
-        for (var i = 0, I = markers.length; i < I && markers[i] != marker; ++i);
-          path.setAt(i, marker.getPosition());
-        }
-      );
-    }
-
-
-  $(document).on('click','#locate_save', function () {
-      //alert('qq');
-      location_add();
-  });
-  function location_add(){
-    var locate_id = $('#locate_id').text();
-    var request = "/locates/location_del?locate_id=" + locate_id;
-
-    var aj = $.ajax({
-      async: false,
-      url: request,
-      type: 'get',
-      dataType: 'json'
-    }).success(function (beacondata) {
-      async: true;
-    }).fail(function (beacondata) {
-         console.log('AJAX request has FAILED');
-    });
-
-    request = "/locates/location_save";
-    for (var i = 0; i < markers.length; i++) {
-      var aj = $.ajax({
-          url: request,
-          type: 'post',
-          data:{
-             locate_id: locate_id,
-             longitude: markers[i].lng,
-             latitude: markers[i].lat
-           },
-          dataType: 'json'
-        }).success(function (beacondata) {
-        }).fail(function (beacondata) {
-             console.log('AJAX request has FAILED');
-        });
-    }
-  };
-
-    function addMarker_point(location) {
-
-      var marker = new google.maps.Marker({
-        position: location,
-        map: map
-        // draggable: true
-      });
-      // markers.push(marker);
-    }
-
-    // Adds a marker to the map and push to the array.
-    function addMarker(location) {
-      var path = poly.getPath();
-      path.push(location);
-      var marker = new google.maps.Marker({
-        position: location,
-        lat: location.lat(),
-        lng: location.lng(),
-        // title: '#' + path.getLength(),
-        map: map,
-        draggable: true
-      });
-      markers.push(marker);
-
-      var bound = new google.maps.LatLngBounds();
-        for (i = 0; i < markers.length; i++) {
-          bound.extend(markers[i]);
-        }
-        var center = bound.getCenter();
-        map.setCenter(center);
-
-      google.maps.event.addListener(marker, 'click', function() {
-        marker.setMap(null);
-        for (var i = 0, I = markers.length; i < I && markers[i] != marker; ++i);
-          markers.splice(i, 1);
-          path.removeAt(i);
-        }
-      );
-
-      google.maps.event.addListener(marker, 'dragend', function() {
-        for (var i = 0, I = markers.length; i < I && markers[i] != marker; ++i);
-          path.setAt(i, marker.getPosition());
-        }
-      );
-    }
-
-    // Sets the map on all markers in the array.
-    function setMapOnAll(map) {
-      for (var i = 0; i < markers.length; i++) {
-        markers[i].setMap(map);
-      }
-    }
-
-    // Removes the markers from the map, but keeps them in the array.
-    function clearMarkers() {
-      setMapOnAll(null);
-    }
-
-    // Shows any markers currently in the array.
-    function showMarkers() {
-      setMapOnAll(map);
-    }
-
-    // Deletes all markers in the array by removing references to them.
-    function deleteMarkers() {
-      clearMarkers();
-      markers = [];
-    }
-
-    function geocodeAddress(geocoder, resultsMap) {
-      var address = document.getElementById('address').value;
-      geocoder.geocode({'address': address}, function(results, status) {
-        if (status === google.maps.GeocoderStatus.OK) {
-          resultsMap.setCenter(results[0].geometry.location);
-
-          clearMarkers();
-          //markers = [];
-          // addMarker(results[0].geometry.location)
-          // markers.push(marker);
-        } else {
-          alert('Geocode was not successful for the following reason: ' + status);
-        }
-      });
-    }
-
-    function getAddress(geocoder,latLng) {
-      geocoder.geocode( {'latLng': latLng}, function(results, status) {
-        if(status === google.maps.GeocoderStatus.OK) {
-          if(results[0]) {
-            document.getElementById('address').value = results[0].formatted_address;
-            $('#message').text("請確認地圖上位置是否正確！");
-            $('#message').css("color", "black");
-          }
-          else {
-            document.getElementById('address').value = "No results";
-          }
-        }
-        else {
-          document.getElementById('address').value = '';//status;
-          $('#message').text("無法取得此處地址，請重新點選！");
-          $('#message').css("color", "red");
-        }
-      });
-    }
-;
-(function() {
-
-
-}).call(this);
-(function() {
-
-
-}).call(this);
-
-//---admin assign map
-$(document).on('click','#map_assign', function () {
-    // localStorage.setItem("map_show", 1);
-    // window.location.reload();
-    if ($('#admin_account_select').val() == "")
-      alert('請選擇帳號!');
-    else{
-    update_map_owner();
-    alert('指派完成!');
-    }
-});
-
-  function update_map_owner(){
-    var position_id = $('#position_select').val();
-    var account_id = $('#admin_account_select').val();
-    var request = "/maps/assign_map_to_account";
-
-      var aj = $.ajax({
-          async: false,
-          url: request,
-          type: 'post',
-          data:{
-             position_id: position_id,
-             account_id: account_id
-           },
-          dataType: 'json'
-        }).success(function (data) {
-          window.location.reload();
-        }).fail(function (data) {
-             console.log('AJAX request has FAILED');
-        });
-  };
-//---assign_onload
-
-function reload_beacons() {
-  var request = "/javascripts/refresh_beacons"; //access controller of interest
-  var d = new Date();
-  var n = d.getTime();
-  var aj = $.ajax({
-        url: request,
-        type: 'get',
-        update_time: $(this).serialize(),
-        dataType: 'json'
-    }).success(function (update_time) {
-        if (update_time == 1){
-          //window.location.href = "http://localhost:3000/beacons";
-          window.location.reload();
-          //alert(update_time);
-        }
-    }).fail(function (update_time) {
-         console.log('AJAX request has FAILED');
-    });
-};
-
-$(document).on('click','#show_uuid', function () {
-    localStorage.setItem("map_show", 1);
-    window.location.reload();
-});
-$(document).on('click','#hide_uuid', function () {
-    localStorage.setItem("map_show", 0);
-    window.location.reload();
-});
-//---選擇區域
-$(document).on('change','#area_select', function () {
-    area_to_county();
-});
-function area_to_county() { 
-    var area_id = $('#area_select').val();
-    var request = "/maps/county_get?area_id="+ area_id;
-    var aj = $.ajax({
-        url: request,
-        type: 'get',
-        data: $(this).serialize(),
-        dataType: 'json'
-    }).done(function (data) {
-         change_county_select(data);
-    }).fail(function (data) {
-         console.log('AJAX request has FAILED');
-    });
-};
-function change_county_select(data) { 
-    $("#county_select").empty();//remove all previous majors
-    if(data.length != 0){
-        for(i = 0;i<data.length;i++){ 
-            $("#county_select").append(//add in an option for each major
-                $("<option></option>").attr("value", data[i].id).text(data[i].county_name)
-        );}
-    }
-    county_to_position();
-};
-//---
-
-//---選擇縣市
-$(document).on('change','#county_select', function () {
-    county_to_position();
-});
-
-function county_to_position() { 
-    var county_id = $('#county_select').val();
-    var request = "/positions/position_get?county_id="+ county_id;
-    var aj = $.ajax({
-        url: request,
-        type: 'get',
-        data: $(this).serialize(),
-        dataType: 'json'
-    }).done(function (data) {
-         change_position_select(data);
-    }).fail(function (data) {
-         console.log('AJAX request has FAILED');
-    });
-};
-function change_position_select(data) { 
-    $("#position_select").empty();//remove all previous majors
-    if(data.length != 0){
-        for(i = 0;i<data.length;i++){ 
-          var request = "/maps/get_map_size?position_id="+ data[i].id;
-          $.get(request, function(data) {
-            $("#position_select").append(//add in an option for each major
-                $("<option></option>").attr("value", data.text_id).text(data.text_name+"  （平面圖總數:"+data.mapsize+"）")
-        );
-          });
-                    
-
-        //   var aj = $.ajax({
-        //     url: request,
-        //     type: 'get',
-        //     data2: $(this).serialize(),
-        //     dataType: 'json'
-        //   }).done(function (data2) {
-        //     console.log('123'+data2);
-        //     $("#position_select").append(//add in an option for each major
-        //         $("<option></option>").attr("value", data[i].id).text(data[i].position_name+'123')
-        // );
-        //   }).fail(function (data2) {
-        //     console.log('AJAX request has FAILED');
-        //     $("#position_select").append(//add in an option for each major
-        //         $("<option></option>").attr("value", data[i].id).text(data[i].position_name)
-        // );
-        // });
-        //     $("#position_select").append(//add in an option for each major
-        //         $("<option></option>").attr("value", data[i].id).text(data[i].position_name)
-        // );
-
-          }
-    }
-    // position_to_map();
-    // position_to_assign_map();
-};
-//---
-
-//---選擇位置
-$(document).on('change','#position_select', function () {
-    position_to_map();
-    position_to_assign_map();
-});
-
-function position_to_map() { 
-    var position_id = $('#position_select').val();
-    var request = "/maps/map_get?position_id="+ position_id;
-    var aj = $.ajax({
-        url: request,
-        type: 'get',
-        data: $(this).serialize()
-    }).success(function (data) {
-         // alert('qq');
-    }).fail(function (data) {
-         console.log('AJAX request has FAILED');
-    });
-};
-
-//---assigned maps pop out
-function position_to_assign_map() { 
-    var position_id = $('#position_select').val();
-    var request = "/maps/assigned_map_get?position_id="+ position_id;
-    var aj = $.ajax({
-        url: request,
-        type: 'get',
-        data: $(this).serialize()
-    }).success(function (data) {
-         // alert('qq');
-    }).fail(function (data) {
-         console.log('AJAX request has FAILED');
-    });
-};
-// function change_maps(data) { 
-//     $("#position_select").empty();//remove all previous majors
-//     if(data.length != 0){
-//         for(i = 0;i<data.length;i++){ 
-//             $("#position_select").append(//add in an option for each major
-//                 $("<option></option>").attr("value", data[i].id).text(data[i].position_name)
-//         );}
-//     }
-// };
-(function() {
-
-
-}).call(this);
-$(document).ready(function() {
-});
-$(".submit_btn").click(function(event) {
-  event.preventDefault();
-  $("#form_id").submit();
-});
-//---admin assign beacon
-$(document).on('click','#beacon_assign', function () {
-    // localStorage.setItem("map_show", 1);
-    // window.location.reload();
-    update_beacon_owner();
-    alert('修改完成!');
-});
-
-  function update_beacon_owner(){
-    var position_id = $('#position_select').val();
-    var major = $('#beacon_major').val();
-    var minor_s = $('#beacon_minor_s').val();
-    var minor_e = $('#beacon_minor_e').val();
-    var account_id = $('#admin_account_select').val();
-    var request = "/beacons/assign_beacon_to_account";
-
-      var aj = $.ajax({
-          url: request,
-          type: 'post',
-          data:{
-             position_id: position_id,
-             major: major,
-             minor_s: minor_s,
-             minor_e: minor_e,
-             account_id: account_id
-           },
-          dataType: 'json'
-        }).success(function (data) {
-        }).fail(function (data) {
-             console.log('AJAX request has FAILED');
-        });
-  };
-
-//--- beacon new/edit
-$(document).on('change','#brand_select', function () {
-    brand_to_major();
-});
-function brand_to_major() {
-    var brand_id = $('#brand_select').val();
-    var request = "/brands/major_get?brand_id="+ brand_id;
-    var aj = $.ajax({
-        url: request,
-        type: 'get',
-        data: $(this).serialize(),
-        dataType: 'json'
-    }).done(function (data) {
-         change_major(data);
-    }).fail(function (data) {
-         console.log('AJAX request has FAILED');
-    });
-};
-function change_major(data) {
-  // alert(data);
-    if(data.length != 0){
-        $('#beacon_major').val(data.major);
-        document.getElementById("beacon_major").readOnly = true;
-        // $('#beacon_major').readonly = false;
-    }
-    if (data == '0') {
-        document.getElementById("beacon_major").readOnly = false;
-    }
-};
-
-//--- beacon search
-$(document).on('click','#beacon_search', function () {
-    beacon_search();
-});
-
-function beacon_search(){
-	var category_id = $('#index_category_select').val();
-    var locate_id = $('#index_locate_select').val();
-    var brand_id = $('#index_brand_select').val();
-    var account_id = $('#index_account_select').val();
-    var power = $('#index_beacon_power').val();
-    var request = "/beacons/beacons_search?category_id=" + category_id +
-    '&locate_id=' + locate_id +
-    '&brand_id=' + brand_id +
-    '&account_id=' + account_id +
-    '&power=' + power;
-    var aj = $.ajax({
-        url: request,
-        type: 'get',
-        data: $(this).serialize()
-    }).success(function (data) {
-         // alert('qq');
-    }).fail(function (data) {
-         console.log('AJAX request has FAILED');
-    });
-};
 (function() {
   $(function() {
     return $('.infinite-table').infinitePages({
@@ -32751,1407 +40615,6 @@ function beacon_search(){
       }
     });
   });
-
-}).call(this);
-(function() {
-  var ready,
-    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-
-  $.rails.href = function(element) {
-    return element.attr("href") || element.data("href") || window.location.pathname;
-  };
-
-  window.SmartListing = (function() {
-    var Config;
-
-    Config = (function() {
-      function Config() {}
-
-      Config.options = {
-        "global_options": {
-          "param_names": {
-            "page": "page",
-            "per_page": "per_page",
-            "sort": "sort"
-          },
-          "array": false,
-          "max_count": null,
-          "unlimited_per_page": false,
-          "paginate": true,
-          "memorize_per_page": false,
-          "page_sizes": [10, 20, 50, 100],
-          "kaminari_options": {
-            "theme": "smart_listing"
-          },
-          "sort_dirs": [null, "asc", "desc"]
-        },
-        "constants": {
-          "classes": {
-            "main": "smart-listing",
-            "editable": "editable",
-            "content": "content",
-            "loading": "loading",
-            "status": "smart-listing-status",
-            "item_actions": "actions",
-            "new_item_placeholder": "new-item-placeholder",
-            "new_item_action": "new-item-action",
-            "new_item_button": "btn",
-            "hidden": "hidden",
-            "autoselect": "autoselect",
-            "callback": "callback",
-            "pagination_wrapper": "text-center",
-            "pagination_container": "pagination",
-            "pagination_per_page": "pagination-per-page text-center",
-            "inline_editing": "info",
-            "no_records": "no-records",
-            "limit": "smart-listing-limit",
-            "limit_alert": "smart-listing-limit-alert",
-            "controls": "smart-listing-controls",
-            "controls_reset": "reset",
-            "filtering": "filter",
-            "filtering_search": "glyphicon-search",
-            "filtering_cancel": "glyphicon-remove",
-            "filtering_disabled": "disabled",
-            "sortable": "sortable",
-            "icon_new": "glyphicon glyphicon-plus",
-            "icon_edit": "glyphicon glyphicon-pencil",
-            "icon_trash": "glyphicon glyphicon-trash",
-            "icon_inactive": "glyphicon glyphicon-remove-circle text-muted",
-            "icon_show": "glyphicon glyphicon-share-alt",
-            "icon_sort_none": "glyphicon glyphicon-resize-vertical",
-            "icon_sort_up": "glyphicon glyphicon-chevron-up",
-            "icon_sort_down": "glyphicon glyphicon-chevron-down",
-            "muted": "text-muted"
-          },
-          "data_attributes": {
-            "main": "smart-listing",
-            "controls_initialized": "smart-listing-controls-initialized",
-            "confirmation": "confirmation",
-            "id": "id",
-            "href": "href",
-            "callback_href": "callback-href",
-            "max_count": "max-count",
-            "item_count": "item-count",
-            "inline_edit_backup": "smart-listing-edit-backup",
-            "params": "params",
-            "observed": "observed",
-            "autoshow": "autoshow",
-            "popover": "slpopover"
-          },
-          "selectors": {
-            "item_action_destroy": "a.destroy",
-            "edit_cancel": "button.cancel",
-            "row": "tr",
-            "head": "thead",
-            "filtering_button": "button",
-            "filtering_icon": "button span",
-            "filtering_input": ".filter input",
-            "pagination_count": ".pagination-per-page .count"
-          }
-        }
-      };
-
-      Config.merge = function(d) {
-        return $.extend(true, this.options, d || $("body").data("smart-listing-config"));
-      };
-
-      Config["class"] = function(name) {
-        return this.options["constants"]["classes"][name];
-      };
-
-      Config.class_name = function(name) {
-        return "." + (this["class"](name));
-      };
-
-      Config.data_attribute = function(name) {
-        return this.options["constants"]["data_attributes"][name];
-      };
-
-      Config.selector = function(name) {
-        return this.options["constants"]["selectors"][name];
-      };
-
-      Config.element_template = function(name) {
-        return this.options["constants"]["element_templates"][name];
-      };
-
-      return Config;
-
-    })();
-
-    SmartListing.config = Config;
-
-    function SmartListing(e) {
-      this.update_list = bind(this.update_list, this);
-      this.remove = bind(this.remove, this);
-      this.destroy = bind(this.destroy, this);
-      this.update = bind(this.update, this);
-      this.edit = bind(this.edit, this);
-      this.create = bind(this.create, this);
-      this.new_item = bind(this.new_item, this);
-      this.editable = bind(this.editable, this);
-      this.registerPopover = bind(this.registerPopover, this);
-      this.params = bind(this.params, this);
-      this.reload = bind(this.reload, this);
-      this.refresh = bind(this.refresh, this);
-      this.cancelEdit = bind(this.cancelEdit, this);
-      this.changeItemCount = bind(this.changeItemCount, this);
-      this.setAutoshow = bind(this.setAutoshow, this);
-      this.maxCount = bind(this.maxCount, this);
-      this.itemCount = bind(this.itemCount, this);
-      this.fadeLoaded = bind(this.fadeLoaded, this);
-      this.fadeLoading = bind(this.fadeLoading, this);
-      this.container = e;
-      this.name = this.container.attr("id");
-      this.loading = this.container.find(SmartListing.config.class_name("loading"));
-      this.content = this.container.find(SmartListing.config.class_name("content"));
-      this.status = $((SmartListing.config.class_name("status")) + " [data-" + (SmartListing.config.data_attribute("main")) + "='" + this.name + "']");
-      this.confirmed = null;
-      this.popovers = {};
-      this.container.on("ajax:before", (SmartListing.config.class_name("item_actions")) + ", " + (SmartListing.config.class_name("pagination_container")), (function(_this) {
-        return function(e) {
-          return _this.fadeLoading();
-        };
-      })(this));
-      this.container.on("ajax:success", (function(_this) {
-        return function(e) {
-          var editable;
-          if ($(e.target).is((SmartListing.config.class_name("item_actions")) + " " + (SmartListing.config.selector("item_action_destroy")))) {
-            editable = $(e.target).closest(SmartListing.config.class_name("editable"));
-            if (_this.container.find(SmartListing.config.class_name("editable")).length === 1) {
-              _this.reload();
-              return false;
-            } else {
-              editable.remove();
-              _this.container.trigger("smart_listing:destroy", editable);
-            }
-            _this.changeItemCount(-1);
-            _this.refresh();
-            _this.fadeLoaded();
-            return false;
-          }
-        };
-      })(this));
-      this.container.on("click", SmartListing.config.selector("edit_cancel"), (function(_this) {
-        return function(event) {
-          var editable;
-          editable = $(event.currentTarget).closest(SmartListing.config.class_name("editable"));
-          if (editable.length > 0) {
-            _this.cancelEdit(editable);
-          } else {
-            _this.container.find(SmartListing.config.class_name("new_item_placeholder")).addClass(SmartListing.config["class"]("hidden"));
-            _this.container.find(SmartListing.config.class_name("new_item_action")).removeClass(SmartListing.config["class"]("hidden"));
-          }
-          _this.setAutoshow(false);
-          return false;
-        };
-      })(this));
-      this.container.on("click", (SmartListing.config.class_name("item_actions")) + " a[data-" + (SmartListing.config.data_attribute("confirmation")) + "]", (function(_this) {
-        return function(event) {
-          return $.fn.smart_listing.confirm($(event.currentTarget), $(event.currentTarget).data(SmartListing.config.data_attribute("confirmation")));
-        };
-      })(this));
-      this.container.on("click", (SmartListing.config.class_name("item_actions")) + " a[data-" + (SmartListing.config.data_attribute("popover")) + "]", (function(_this) {
-        return function(event) {
-          var name;
-          name = $(event.currentTarget).data(SmartListing.config.data_attribute("popover"));
-          if (jQuery.isFunction(_this.popovers[name])) {
-            _this.popovers[name]($(event.currentTarget));
-            return false;
-          }
-        };
-      })(this));
-      this.container.on("click", "input[type=text]" + (SmartListing.config.class_name("autoselect")), function(event) {
-        return $(this).select();
-      });
-      this.container.on("change", SmartListing.config.class_name("callback"), (function(_this) {
-        return function(event) {
-          var checkbox, data, id;
-          checkbox = $(event.currentTarget);
-          id = checkbox.closest(SmartListing.config.selector("row")).data(SmartListing.config.data_attribute("id"));
-          data = {};
-          data[checkbox.val()] = checkbox.is(":checked");
-          return $.ajax({
-            beforeSend: function(xhr, settings) {
-              return xhr.setRequestHeader("accept", "*/*;q=0.5, " + settings.accepts.script);
-            },
-            url: _this.container.data(SmartListing.config.data_attribute("callback_href")),
-            type: "POST",
-            data: data
-          });
-        };
-      })(this));
-    }
-
-    SmartListing.prototype.fadeLoading = function() {
-      return $.fn.smart_listing.onLoading(this.content, this.loading);
-    };
-
-    SmartListing.prototype.fadeLoaded = function() {
-      return $.fn.smart_listing.onLoaded(this.content, this.loading);
-    };
-
-    SmartListing.prototype.itemCount = function() {
-      return parseInt(this.container.data(SmartListing.config.data_attribute("item_count")));
-    };
-
-    SmartListing.prototype.maxCount = function() {
-      return parseInt(this.container.data(SmartListing.config.data_attribute("max_count")));
-    };
-
-    SmartListing.prototype.setAutoshow = function(v) {
-      return this.container.data(SmartListing.config.data_attribute("autoshow"), v);
-    };
-
-    SmartListing.prototype.changeItemCount = function(value) {
-      var count;
-      count = this.container.data(SmartListing.config.data_attribute("item_count")) + value;
-      this.container.data(SmartListing.config.data_attribute("item_count"), count);
-      return this.container.find(SmartListing.config.selector("pagination_count")).html(count);
-    };
-
-    SmartListing.prototype.cancelEdit = function(editable) {
-      if (editable.data(SmartListing.config.data_attribute("inline_edit_backup"))) {
-        editable.html(editable.data(SmartListing.config.data_attribute("inline_edit_backup")));
-        editable.removeClass(SmartListing.config["class"]("inline_editing"));
-        return editable.removeData(SmartListing.config.data_attribute("inline_edit_backup"));
-      }
-    };
-
-    SmartListing.prototype.refresh = function() {
-      var footer, header, no_records;
-      header = this.content.find(SmartListing.config.selector("head"));
-      footer = this.content.find(SmartListing.config.class_name("pagination_per_page"));
-      no_records = this.content.find(SmartListing.config.class_name("no_records"));
-      if (this.itemCount() === 0) {
-        header.hide();
-        footer.hide();
-        no_records.show();
-      } else {
-        header.show();
-        footer.show();
-        no_records.hide();
-      }
-      if (this.maxCount()) {
-        if (this.itemCount() >= this.maxCount()) {
-          this.container.find(SmartListing.config.class_name("new_item_placeholder")).addClass(SmartListing.config["class"]("hidden"));
-          this.container.find(SmartListing.config.class_name("new_item_action")).addClass(SmartListing.config["class"]("hidden"));
-        } else {
-          if (this.container.data(SmartListing.config.data_attribute("autoshow"))) {
-            this.container.find(SmartListing.config.class_name("new_item_placeholder")).removeClass(SmartListing.config["class"]("hidden"));
-            this.container.find(SmartListing.config.class_name("new_item_action")).addClass(SmartListing.config["class"]("hidden"));
-          } else {
-            this.container.find(SmartListing.config.class_name("new_item_placeholder")).addClass(SmartListing.config["class"]("hidden"));
-            this.container.find(SmartListing.config.class_name("new_item_action")).removeClass(SmartListing.config["class"]("hidden"));
-          }
-        }
-      }
-      return this.status.each((function(_this) {
-        return function(index, status) {
-          $(status).find(SmartListing.config.class_name("limit")).html(_this.maxCount() - _this.itemCount());
-          if (_this.maxCount() - _this.itemCount() === 0) {
-            return $(status).find(SmartListing.config.class_name("limit_alert")).show();
-          } else {
-            return $(status).find(SmartListing.config.class_name("limit_alert")).hide();
-          }
-        };
-      })(this));
-    };
-
-    SmartListing.prototype.reload = function() {
-      return $.rails.handleRemote(this.container);
-    };
-
-    SmartListing.prototype.params = function(value) {
-      if (value) {
-        return this.container.data(SmartListing.config.data_attribute("params"), value);
-      } else {
-        return this.container.data(SmartListing.config.data_attribute("params"));
-      }
-    };
-
-    SmartListing.prototype.registerPopover = function(name, callback) {
-      return this.popovers[name] = callback;
-    };
-
-    SmartListing.prototype.editable = function(id) {
-      return this.container.find((SmartListing.config.class_name("editable")) + "[data-" + (SmartListing.config.data_attribute("id")) + "=" + id + "]");
-    };
-
-    SmartListing.prototype.new_item = function(content) {
-      var new_item_action, new_item_placeholder;
-      if (!this.maxCount() || (this.itemCount() < this.maxCount())) {
-        new_item_action = this.container.find(SmartListing.config.class_name("new_item_action"));
-        new_item_placeholder = this.container.find(SmartListing.config.class_name("new_item_placeholder")).addClass(SmartListing.config["class"]("hidden"));
-        this.container.find(SmartListing.config.class_name("editable")).each((function(_this) {
-          return function(i, v) {
-            return _this.cancelEdit($(v));
-          };
-        })(this));
-        new_item_action.addClass(SmartListing.config["class"]("hidden"));
-        new_item_placeholder.removeClass(SmartListing.config["class"]("hidden"));
-        new_item_placeholder.html(content);
-        new_item_placeholder.addClass(SmartListing.config["class"]("inline_editing"));
-        this.container.trigger("smart_listing:new", new_item_placeholder);
-        return this.fadeLoaded();
-      }
-    };
-
-    SmartListing.prototype.create = function(id, success, content) {
-      var new_item, new_item_action, new_item_placeholder;
-      new_item_action = this.container.find(SmartListing.config.class_name("new_item_action"));
-      new_item_placeholder = this.container.find(SmartListing.config.class_name("new_item_placeholder"));
-      if (success) {
-        new_item_placeholder.addClass(SmartListing.config["class"]("hidden"));
-        new_item_action.removeClass(SmartListing.config["class"]("hidden"));
-        new_item = $(SmartListing.config.element_template("row")).addClass(SmartListing.config["class"]("editable"));
-        new_item.attr("data-" + (SmartListing.config.data_attribute("id")), id);
-        new_item.html(content);
-        if (new_item_placeholder.length !== 0) {
-          if (new_item_placeholder.data("insert-mode") === "after") {
-            new_item_placeholder.after(new_item);
-          } else {
-            new_item_placeholder.before(new_item);
-          }
-        } else {
-          this.content.append(new_item);
-        }
-        this.container.trigger("smart_listing:create:success", new_item);
-        this.changeItemCount(1);
-        this.refresh();
-      } else {
-        new_item_placeholder.html(content);
-        this.container.trigger("smart_listing:create:fail", new_item_placeholder);
-      }
-      return this.fadeLoaded();
-    };
-
-    SmartListing.prototype.edit = function(id, content) {
-      var editable;
-      this.container.find(SmartListing.config.class_name("editable")).each((function(_this) {
-        return function(i, v) {
-          return _this.cancelEdit($(v));
-        };
-      })(this));
-      this.container.find(SmartListing.config.class_name("new_item_placeholder")).addClass(SmartListing.config["class"]("hidden"));
-      this.container.find(SmartListing.config.class_name("new_item_action")).removeClass(SmartListing.config["class"]("hidden"));
-      editable = this.editable(id);
-      editable.data(SmartListing.config.data_attribute("inline_edit_backup"), editable.html());
-      editable.html(content);
-      editable.addClass(SmartListing.config["class"]("inline_editing"));
-      this.container.trigger("smart_listing:edit", editable);
-      return this.fadeLoaded();
-    };
-
-    SmartListing.prototype.update = function(id, success, content) {
-      var editable;
-      editable = this.editable(id);
-      if (success) {
-        editable.removeClass(SmartListing.config["class"]("inline_editing"));
-        editable.removeData(SmartListing.config.data_attribute("inline_edit_backup"));
-        editable.html(content);
-        this.container.trigger("smart_listing:update:success", editable);
-        this.refresh();
-      } else {
-        editable.html(content);
-        this.container.trigger("smart_listing:update:fail", editable);
-      }
-      return this.fadeLoaded();
-    };
-
-    SmartListing.prototype.destroy = function(id, destroyed) {};
-
-    SmartListing.prototype.remove = function(id) {
-      var editable;
-      editable = this.editable(id);
-      editable.remove();
-      return this.container.trigger("smart_listing:remove", editable);
-    };
-
-    SmartListing.prototype.update_list = function(content, data) {
-      this.container.data(SmartListing.config.data_attribute("params"), $.extend(this.container.data(SmartListing.config.data_attribute("params")), data[SmartListing.config.data_attribute("params")]));
-      this.container.data(SmartListing.config.data_attribute("max_count"), data[SmartListing.config.data_attribute("max_count")]);
-      this.container.data(SmartListing.config.data_attribute("item_count"), data[SmartListing.config.data_attribute("item_count")]);
-      this.content.html(content);
-      this.refresh();
-      this.fadeLoaded();
-      return this.container.trigger("smart_listing:update_list", this.container);
-    };
-
-    return SmartListing;
-
-  })();
-
-  $.fn.smart_listing = function() {
-    var map;
-    map = $(this).map(function() {
-      if (!$(this).data(SmartListing.config.data_attribute("main"))) {
-        $(this).data(SmartListing.config.data_attribute("main"), new SmartListing($(this)));
-      }
-      return $(this).data(SmartListing.config.data_attribute("main"));
-    });
-    if (map.length === 1) {
-      return map[0];
-    } else {
-      return map;
-    }
-  };
-
-  $.fn.smart_listing.observeField = function(field, opts) {
-    var keyChange, key_timeout, last_value, options;
-    if (opts == null) {
-      opts = {};
-    }
-    key_timeout = null;
-    last_value = null;
-    options = {
-      onFilled: function() {},
-      onEmpty: function() {},
-      onChange: function() {}
-    };
-    options = $.extend(options, opts);
-    keyChange = function() {
-      var lastValue;
-      if (field.val().length > 0) {
-        options.onFilled();
-      } else {
-        options.onEmpty();
-      }
-      if (field.val() === last_value && field.val().length !== 0) {
-        return;
-      }
-      lastValue = field.val();
-      return options.onChange();
-    };
-    field.data(SmartListing.config.data_attribute("observed"), true);
-    return field.bind("keydown", function(e) {
-      if (key_timeout) {
-        clearTimeout(key_timeout);
-      }
-      return key_timeout = setTimeout(function() {
-        return keyChange();
-      }, 400);
-    });
-  };
-
-  $.fn.smart_listing.showPopover = function(elem, body) {
-    elem.popover("destroy");
-    elem.popover({
-      content: body,
-      html: true,
-      trigger: "manual",
-      title: null
-    });
-    return elem.popover("show");
-  };
-
-  $.fn.smart_listing.showConfirmation = function(confirmation_elem, msg, confirm_callback) {
-    var buildPopover;
-    buildPopover = function(confirmation_elem, msg) {
-      var deletion_popover;
-      deletion_popover = $("<div/>").addClass("confirmation_box");
-      deletion_popover.append($("<p/>").html(msg));
-      return deletion_popover.append($("<p/>").append($("<button/>").html("Yes").addClass("btn btn-danger ").click((function(_this) {
-        return function(event) {
-          var editable;
-          editable = $(event.currentTarget).closest(SmartListing.config.class_name("editable"));
-          confirm_callback(confirmation_elem);
-          $(confirmation_elem).click();
-          return $(confirmation_elem).popover("destroy");
-        };
-      })(this))).append(" ").append($("<button/>").html("No").addClass("btn btn-small").click((function(_this) {
-        return function(event) {
-          var editable;
-          editable = $(event.currentTarget).closest(SmartListing.config.class_name("editable"));
-          return $(confirmation_elem).popover("destroy");
-        };
-      })(this))));
-    };
-    return $.fn.smart_listing.showPopover(confirmation_elem, buildPopover(confirmation_elem, msg));
-  };
-
-  $.fn.smart_listing.confirm = function(elem, msg) {
-    if (!elem.data("confirmed")) {
-      $.fn.smart_listing.showConfirmation(elem, msg, (function(_this) {
-        return function(confirm_elem) {
-          return confirm_elem.data("confirmed", true);
-        };
-      })(this));
-      return false;
-    } else {
-      elem.data("confirmed", false);
-      return true;
-    }
-  };
-
-  $.fn.smart_listing.onLoading = function(content, loader) {
-    content.stop(true).fadeTo(500, 0.2);
-    loader.show();
-    return loader.stop(true).fadeTo(500, 1);
-  };
-
-  $.fn.smart_listing.onLoaded = function(content, loader) {
-    content.stop(true).fadeTo(500, 1);
-    return loader.stop(true).fadeTo(500, 0, (function(_this) {
-      return function() {
-        return loader.hide();
-      };
-    })(this));
-  };
-
-  $.fn.smart_listing_controls = function() {
-    var reload;
-    reload = function(controls) {
-      var container, prms, smart_listing;
-      container = $("#" + (controls.data(SmartListing.config.data_attribute("main"))));
-      smart_listing = container.smart_listing();
-      prms = {};
-      $.each(controls.serializeArray(), function(i, field) {
-        var field_name;
-        if (field.name.endsWith("[]")) {
-          field_name = field.name.slice(0, field.name.length - 2);
-          if (Array.isArray(prms[field_name])) {
-            return prms[field_name].push(field.value);
-          } else {
-            return prms[field_name] = [field.value];
-          }
-        } else {
-          return prms[field.name] = field.value;
-        }
-      });
-      prms = $.extend(smart_listing.params(), prms);
-      smart_listing.params(prms);
-      smart_listing.fadeLoading();
-      return smart_listing.reload();
-    };
-    return $(this).each(function() {
-      var controls, reset, smart_listing;
-      if ($(this).data(SmartListing.config.data_attribute("controls_initialized"))) {
-        return;
-      }
-      $(this).data(SmartListing.config.data_attribute("controls_initialized"), true);
-      controls = $(this);
-      smart_listing = $("#" + (controls.data(SmartListing.config.data_attribute("main"))));
-      reset = controls.find(SmartListing.config.class_name("controls_reset"));
-      controls.submit(function() {
-        reload(controls);
-        return false;
-      });
-      controls.find("input, select").change(function() {
-        if (!$(this).data(SmartListing.config.data_attribute("observed"))) {
-          return reload(controls);
-        }
-      });
-      return $.fn.smart_listing_controls.filter(controls.find(SmartListing.config.class_name("filtering")));
-    });
-  };
-
-  $.fn.smart_listing_controls.filter = function(filter) {
-    var button, field, form, icon;
-    form = filter.closest("form");
-    button = form.find(SmartListing.config.selector("filtering_button"));
-    icon = form.find(SmartListing.config.selector("filtering_icon"));
-    field = form.find(SmartListing.config.selector("filtering_input"));
-    $.fn.smart_listing.observeField(field, {
-      onFilled: function() {
-        icon.removeClass(SmartListing.config["class"]("filtering_search"));
-        icon.addClass(SmartListing.config["class"]("filtering_cancel"));
-        return button.removeClass(SmartListing.config["class"]("filtering_disabled"));
-      },
-      onEmpty: function() {
-        icon.addClass(SmartListing.config["class"]("filtering_search"));
-        icon.removeClass(SmartListing.config["class"]("filtering_cancel"));
-        return button.addClass(SmartListing.config["class"]("filtering_disabled"));
-      },
-      onChange: function() {
-        return form.submit();
-      }
-    });
-    return button.click(function() {
-      if (field.val().length > 0) {
-        field.val("");
-        field.trigger("keydown");
-      }
-      return false;
-    });
-  };
-
-  ready = function() {
-    $(SmartListing.config.class_name("main")).smart_listing();
-    return $(SmartListing.config.class_name("controls")).smart_listing_controls();
-  };
-
-  $(document).ready(ready);
-
-  $(document).on("page:load", ready);
-
-}).call(this);
-//---------------------------------------------------------------------------------
-/*!
- * jQuery Taggd
- * A helpful plugin that helps you adding 'tags' on images.
- *
- * License: MIT
- */
-
-var map_show = localStorage.getItem("map_show");
-$(document).on('click','#map', function () {
-    // localStorage.setItem("map_show", 1);
-    // window.location.reload();
-    // alert('修改完成!');
-    localStorage.setItem("map_show",0);
-    window.location.reload();
-    
-});
-(function($) {
-	'use strict';
-	
-	var defaults = {
-		edit: false,
-		
-		align: {
-			x: 'center',
-			y: 'center'
-		},
-
-		handlers: {},
-
-		offset: {
-			left: 0,
-			top: 0
-		},
-		
-		strings: {
-			save: '&#x2713;',
-			delete: '&#x00D7;'
-		}
-	};
-	
-	var methods = {
-		show: function() {
-			var $this = $(this),
-				$label = $this.next();
-			
-			$this.addClass('active');
-			$label.addClass('show').find('input').focus();
-		},
-		
-		hide: function() {
-			var $this = $(this);
-			
-			$this.removeClass('active');
-			$this.next().removeClass('show');
-		},
-		
-		toggle: function() {
-			var $hover = $(this).next();
-			
-			if($hover.hasClass('show')) {
-				methods.hide.call(this);
-			} else {
-				methods.show.call(this);
-			}
-		}
-	};
-	/****************************************************************
-	 * TAGGD
-	 ****************************************************************/
-	//只有程式一開始執行
-	var Taggd = function(element, options, data) {
-		var _this = this;
-		
-		/*if(options.edit) {
-			options.handlers = 
-			{
-				click: function() {
-					mapbeacon_get();
-					_this.hide(); //前一個隱藏
-					methods.show.call(this);//新增刪除視窗彈出
-				}
-			};
-		}*/
-		this.element = $(element);
-		this.options = $.extend(true, {}, defaults, options);
-		this.data = data;
-
-		this.initialized = true;
-		
-		if(!this.element.height() || !this.element.width()) {
-			this.element.on('load', _this.initialize.bind(this));
-		} 
-		else this.initialize();
-	};
-
-	function mapbeacon_get(){
-		// var request = "/javascripts/task_mapbeacon_assigned?map_id=" //access controller of interest
-		//  + $('#map_id').text() + '&task_id=' + $('#task_id').text();
-		var request = "/maps/mapbeacon_get?map_id=" //access controller of interest
-		 + $('#map_id').text();
-		var aj = $.ajax({
-				async: false,
-		        url: request,
-		        type: 'get',
-		        beacondata: $(this).serialize(),
-		        dataType: 'json'
-		    }).then(function (beacondata) {
-		         insert_beacon(beacondata);
-		         //update_assign_beacon();
-		         async: true;
-		    }).fail(function (beacondata) {
-		         console.log('AJAX request has FAILED');
-		         async: true;
-		    });
- 	};
- 	function mapbeacon_add(){
-		var request = "/maps/mapbeacon_add";
-		var aj = $.ajax({
-				async: false,
-		        url: request,
-		        type: 'get',
-		        beacondata: $(this).serialize(),
-		        dataType: 'json'
-		    }).then(function (beacondata) {
-		         async: true;
-		    }).fail(function (beacondata) {
-		         console.log('AJAX request has FAILED');
-		         async: true;
-		    });
- 	};
- 	function mapbeacon_del(uuid){
-		var request = "/maps/mapbeacon_del?uuid=" + uuid;
-		var aj = $.ajax({
-				async: false,
-		        url: request,
-		        type: 'get',
-		        beacondata: $(this).serialize(),
-		        dataType: 'json'
-		    }).then(function (beacondata) {
-		         async: true;
-		    }).fail(function (beacondata) {
-		         console.log('AJAX request has FAILED');
-		         async: true;
-		    });
- 	};
- 	function insert_beacon(beacondata){
- 		data.length = 0;
- 		for(var i=0;i<beacondata.length;i++){
-			data.push( { 
-				x: beacondata[i].beacon_x, 
-				y: beacondata[i].beacon_y, 
-				text: beacondata[i].beacon_uuid,
-				beacon_id: beacondata[i].beacon_id,
-			 	status: beacondata[i].beacon_status,
-			 	power: beacondata[i].power,
-			 	width: beacondata[i].map_width,
-			 	height: beacondata[i].map_height,
-			 	
-			 });
-		};
-	};
-	function update_assign_beacon(map_id){
- 		var request = "/tasks/refresh_beacons?map_id=" //access controller of interest
-		 + $('#map_id').text() + '&task_id=' + $('#task_id').text();
-		var aj = $.ajax({
-				async: false,
-		        url: request,
-		        type: 'get',
-		        beacondata: $(this).serialize(),
-		        dataType: 'json'
-		    }).then(function (beacondata) {
-		         insert_beacon(beacondata);
-		         update_assign_beacon($('#map_id').text());
-		         async: true;
-		    }).fail(function (beacondata) {
-		         console.log('AJAX request has FAILED');
-		         async: true;
-		    });
-	};
-
-	function radio_check(){
-
-		var rates = document.getElementsByName('[beacon_uuid]');
-		var checked = false;
-		//alert(rates[0].checked);
-		for(var i = 0; i < rates.length; i++){
-		    if(rates[i].checked){
-		        checked = rates[i].checked;
-		        break;
-		        //alert(checked);
-		    }
-		}
-	};
-
-	Taggd.prototype.hide_uuid = function() {
-		var _this = this;
-		hide();
-	};
-
-	/****************************************************************
-	 * INITIALISATION
-	 ****************************************************************/
-	
-	Taggd.prototype.initialize = function() {
-		var _this = this;
-		
-		this.initialized = true;
-		
-		this.initWrapper();
-
-		mapbeacon_get();
-
-		this.addDOM();
-		
-		if(this.options.edit) {
-			this.element.on('click', function(e) {
-				// alert(event.type);
-			var poffset = $(this).parent().offset(),
-
-				x = (e.pageX - poffset.left),// / _this.element.width(),
-				y = (e.pageY - poffset.top);// / _this.element.height();
-
-				$('#beacon_x').val(e.pageX - poffset.left),
-				$('#beacon_y').val(e.pageY - poffset.top);
-				//mapbeacon_get();
-
-				var rates = document.getElementsByName('[beacon_uuid]');
-				var checked = false;
-				//alert(rates[0].checked);
-				for(var i = 0; i < rates.length; i++){
-				    if(rates[i].checked){
-				        checked = rates[i].checked;
-				        $('#radio_check').text(rates[i].value);
-				        break;
-				        //alert(checked);
-				    }
-				}
-				//if ($("#task_beacon_uuid_dropdown").text() != '')
-				// if (checked == true)
-				// {
-					//平面圖佈點
-					// _this.addData({
-					// 	x: x,
-					// 	y: y,
-					// 	text: '',
-					// 	status: 'qq',
-					// 	width: $('#map').width(),
-					// 	height: $('#map').height()
-					// });
-					// _this.show(_this.data.length - 1);
-				// }
-			});
-		}
-		if (map_show == 1) {
-			this.show();//讓全部uuid秀出來
-		}
-		
-		$(window).resize(function() {
-			_this.updateDOM();
-		});
-	};
-	
-	Taggd.prototype.initWrapper = function() {
-		var wrapper = $('<div class="taggd-wrapper" />');
-		this.element.wrap(wrapper);
-		
-		this.wrapper = this.element.parent('.taggd-wrapper');
-	};
-	
-	//---edit 功能區
-	Taggd.prototype.alterDOM = function() {
-		var _this = this;
-		
-		this.wrapper.find('.taggd-item-hover').each(function() {
-			var $e = $(this),
-			// $linkstart = $('<a id="pointbutton" href="'+$rootdomain+'/notifications/uuidedit.'+$e.text()+'" >'+$e.text()+'</a>'),
-			
-			$id = $e.attr('beacon_id'),
-			$linkstart = $('<a id="pointbutton" href="/notifications/uuidedit.'+$e.text()+'" >'+$id+'</a>'),
-			$uuid = $e.text(),
-			// $uuid = $('<span />')
-			// 	.html($e.text()),
-			$power = $('<div> <span class="glyphicon glyphicon-flash" aria-hidden="true" style="font-size:13px;color:yellow;font-weight:bold"></span>'+$e.attr('power')+'%</div>')
-				.html(),
-			$br = $("<br></br>"),
-			$pushlink = $("<div> "+$e.attr('pushlink')+'</div>')
-				.html(),
-			$nopower = $('<div> <span class="glyphicon glyphicon-flash" aria-hidden="true" style="font-size:13px;color:yellow;font-weight:bold"></span>--%</div>')
-				.html(),
-			//$input = $('<input type="text" size="16" />')
-			//	.val($e.text()),
-			$button_ok = $('<button />')
-				.html(_this.options.strings.save),
-			$button_delete = $('<button />')
-				.html(_this.options.strings.delete);
-			
-			$button_ok.on('click', function() {
-				_this.addDOM();
-				_this.element.triggerHandler('change');
-
-				mapbeacon_add();
-			    window.location.reload();
-			});
-			
-			$button_delete.on('click', function() {
-				var x = $e.attr('data-x'),
-					y = $e.attr('data-y');
-				
-					_this.data = $.grep(_this.data, function(v) {
-						return v.x != x || v.y != y;
-					});
-
-						mapbeacon_del($uuid.text());
-						window.location.reload();
-					
-					_this.addDOM();
-					_this.element.triggerHandler('change');
-			});
-			
-			/*
-			$input.on('change', function() {
-				var x = $e.attr('data-x'),
-					y = $e.attr('data-y'),
-					item = $.grep(_this.data, function(v) {
-						return v.x == x && v.y == y;
-					}).pop();
-				
-				if(item) item.text = $input.val();
-				
-				_this.addDOM();
-				_this.element.triggerHandler('change');	
-			});
-	*/
-			//$e.empty().append($input, $button_ok, $button_delete);
-
-
-			//判斷若點在點上 不能儲存
-			if ($e.text() == ''){
-				//$uuid = $('<span />').html($('#task_beacon_uuid_dropdown').val());
-				$uuid = $('#radio_check').text();
-				$e.empty().append($id,$button_ok,$button_delete);
-			}else{
-				if ($e.attr('power') > -1){
-					if ($e.attr('power') == 0){
-						$e.empty().append($id, $nopower);
-					} else {
-						$e.empty().append($linkstart, $power);
-						// alert($linkstart+$uuid);
-					}
-				} else {
-					$e.empty().append($id);
-				}
-			}
-		});
-		_this.updateDOM();
-	};
-	/****************************************************************
-	 * DATA MANAGEMENT
-	 ****************************************************************/
-	
-	Taggd.prototype.addData = function(data) {
-		if($.isArray(data)) {
-			this.data = $.merge(this.data, data);
-		} else {
-			if (this.data.length > 0){
-				if (this.data[this.data.length-1].status == 'qq'){
-					this.data.pop();
-				}
-			}
-			this.data.push(data);
-		}
-		
-		if(this.initialized) {
-			this.addDOM();
-			this.element.triggerHandler('change');
-		}
-	};
-	
-/*	Taggd.prototype.setData = function(data) {
-		this.data = data;
-		
-		if(this.initialized) {
-			this.addDOM();
-		}
-	};*/
-	
-	Taggd.prototype.clear = function() {
-		if(!this.initialized) return;
-		this.wrapper.find('.taggd-item, .taggd-item-hover').remove();
-	};
-	
-	
-	/****************************************************************
-	 * EVENTS
-	 ****************************************************************/
-	
-	Taggd.prototype.on = function(event, handler) {
-		if(
-			typeof event !== 'string' ||
-			typeof handler !== 'function'
-		) return;
-		
-		this.element.on(event, handler);
-	};
-	
-	
-	/****************************************************************
-	 * TAGS MANAGEMENT
-	 ****************************************************************/
-	
-	Taggd.prototype.iterateTags = function(a, yep) {
-		var func;
-		
-		if($.isNumeric(a)) {
-			func = function(i, e) { return a === i; };
-		} else if(typeof a === 'string') {
-			func = function(i, e) { return $(e).is(a); }
-		} else if($.isArray(a)) {
-			func = function(i, e) {
-				var $e = $(e);
-				var result = false;
-				
-				$.each(a, function(ai, ae) {
-					if(
-						i === ai ||
-						e === ae ||
-						$e.is(ae)
-					) {
-						result = true;
-						return false;
-					}
-				});
-				
-				return result;
-			}
-		} else if(typeof a === 'object') {
-			func = function(i, e) {
-				var $e = $(e);
-				return $e.is(a);
-			};
-		} else if($.isFunction(a)) {
-			func = a;
-		} else if(!a) {
-			func = function() { return true; }
-		} else return this;
-		
-		this.wrapper.find('.taggd-item').each(function(i, e) {
-			if(typeof yep === 'function' && func.call(this, i, e)) {
-				yep.call(this, i, e);
-			}
-		});
-		
-		return this;
-	};
-	
-	Taggd.prototype.show = function(a) {
-		return this.iterateTags(a, methods.show);
-	};
-	
-	Taggd.prototype.hide = function(a) {
-		return this.iterateTags(a, methods.hide);
-	};
-	
-	Taggd.prototype.toggle = function(a) {
-		return this.iterateTags(a, methods.toggle);
-	};
-	
-	/****************************************************************
-	 * CLEANING UP
-	 ****************************************************************/
-	
-	Taggd.prototype.dispose = function() {
-		this.clear();
-		this.element.unwrap(this.wrapper);
-	};
-	
-	
-	/****************************************************************
-	 * SEMI-PRIVATE
-	 ****************************************************************/
-	
-	Taggd.prototype.addDOM = function() {
-		var _this = this;
-		
-		this.clear();
-		//this.element.css({ height: 'auto', width: 'auto' });
-		this.element.css({ height: $('#map').height(), width: $('#map').width() });
-
-		//var height = this.element.height();//圖的高
-		//var width = this.element.width();
-
-		var height = $('#map').height();
-		var width = $('#map').width();
-		
-		$.each(this.data, function(i, v) {
-			var $item = $('<span />');
-			var $hover;
-			
-			var x = 0, y = 0;
-			/*if(
-				v.x > 1 && v.x % 1 === 0 &&
-				v.y > 1 && v.y % 1 === 0
-			) {
-				v.x = v.x / width;
-				v.y = v.y / height;
-			}*/
-			
-			if(typeof v.attributes === 'object') {
-				$item.attr(v.attributes);
-			}
-			x = v.x * ( width / v.width ),
-			y = v.y * ( height / v.height )
-			
-			//---點的格式
-
-			$item.attr({
-				'data-x': x,
-				'data-y': y
-			});
-			
-			$item.css('position', 'absolute');
-			$item.addClass('taggd-item');
-			//---
-
-			if (v.status == '4'){
-				$item.css('background-color', '#0F0');
-			}
-			
-			_this.wrapper.append($item);//秀點
-			
-			//點擊時的視窗
-			if(typeof v.text === 'string' && (v.text.length > 0 || _this.options.edit)) {
-
-				$hover = $('<span class="taggd-item-hover" style="position: absolute;" />').html(v.text);
-				
-				//$hover_power = v.power;
-
-				$hover.attr({
-					'data-x': x,
-					'data-y': y,
-					'power': v.power,
-					'pushlink': v.pushlink,
-					'beacon_id' :v.beacon_id
-				});
-				
-				_this.wrapper.append($hover); //點擊新增時的對話視窗
-			}
-			
-			if(typeof _this.options.handlers === 'object') {
-				$.each(_this.options.handlers, function(event, func) {
-					var handler;
-					
-					if(typeof func === 'string' && methods[func]) {
-						handler = methods[func];
-					} else if(typeof func === 'function') {
-						handler = func;
-					}
-					
-					$item.on(event, function(e) {
-						if(!handler) return;
-						handler.call($item, e, _this.data[i]);
-					});
-				});
-			}
-		});
-		
-		this.element.removeAttr('style');
-		
-		if(this.options.edit) {
-			this.alterDOM();
-		}
-		this.updateDOM();
-	};
-	
-	Taggd.prototype.updateDOM = function() {
-		var _this = this;
-		
-		this.wrapper.removeAttr('style').css({
-			//height: this.element.height(),
-			//width: this.element.width()
-			height: $('#map').height(),
-			width: $('#map').width()
-		});
-
-		var height = parseInt($('#map').height());// * $('#map').width();
-		var width = parseInt($('#map').width());// * $('#map').height();
-		
-		this.wrapper.find('span').each(function(i, e) {
-			var $el = $(e);
-			
-			//var left = $el.attr('data-x') * _this.element.width();
-			//var top = $el.attr('data-y') * _this.element.height();
-
-			var left = parseInt($el.attr('data-x'));// * $('#map').width();
-			var top = parseInt($el.attr('data-y'));// * $('#map').height();
-			//alert(top);
-			
-			//點位置
-			if($el.hasClass('taggd-item')) {
-				$el.css({
-					left: left - $el.outerWidth(true) / 2,
-					top: top - $el.outerHeight(true) / 2
-				});
-			} 
-			else if($el.hasClass('taggd-item-hover')) {
-				/*if(_this.options.align.x === 'center') {
-					left -= $el.outerWidth(true) / 2;
-				} else if(_this.options.align.x === 'right') {
-					left -= $el.outerWidth(true);
-				}
-				
-				if(_this.options.align.y === 'center') {
-					top -= $el.outerHeight(true) / 2;
-				} else if(_this.options.align.y === 'bottom') {
-					top -= $el.outerHeight(true);
-				}
-				
-				$el.attr('data-align', $el.outerWidth(true));
-				
-				$el.css({
-					left: left + _this.options.offset.left,
-					top: top + _this.options.offset.top
-				});*/
-				//資訊位置
-				//left -= 100;
-				var widthgap = $el.outerWidth(true) / 2 - (width - left) +2
-				if (width - left <= $el.outerWidth(true)/2){
-					left -= widthgap;
-				}
-				if (left <= $el.outerWidth(true)/2){
-					left += $el.outerWidth(true) / 2 -left;
-				}
-				if (height - top <= $el.outerHeight(true)*2.8){
-					top -= $el.outerHeight(true)*3.5;
-				}
-				$el.css({
-					left: left - $el.outerWidth(true) / 2,
-					top: top + $el.outerHeight(true) / 1.5
-				});
-			}
-		});
-	};
-	
-	
-	/****************************************************************
-	 * JQUERY LINK
-	 ****************************************************************/
-	//初始時呼叫Taggd
-	$.fn.taggd = function(options, data) {
-		return new Taggd(this, options, data);
-	};
-})(jQuery);
-//---task - locate_id dropdown select
-
-/*$(document).on('change','#task_locate_id_dropdown', function () {//change majors when user changes school
-   var request = "/javascripts/task_id_to_maps?task_id=" //access controller of interest
-        + $('#task_id').text();
-    var aj = $.ajax({
-        url: request,
-        type: 'get',
-        data: $(this).serialize()
-    }).success(function (data) {
-         task_change_maps(data);//modify the majors' dropdown
-    }).fail(function (data) {
-         console.log('AJAX request has FAILED');
-    });
-    
-});
-function task_change_maps(data) { 
-    $("#task_map_id_dropdown").empty();//remove all previous majors
-    if(data.length > 0){
-	    for(i = 0; i<data.length; i++){ 
-	        $("#task_map_id_dropdown").append(//add in an option for each major
-	            $("<option></option>").attr("id", data[i].id).text(data[i].title)
-	        );
-	    }
-	}
-};*/
-
-
-$(document).on('change','#task_locate_id_dropdown', function () {
-    task_locate_id_to_beacons();
-});
-function task_locate_id_to_beacons() { 
-    var task_id = $('#task_locate_id_dropdown').val();
-    var request = "/javascripts/locate_id_to_beacons?locate_id="+ task_id;
-    var aj = $.ajax({
-        url: request,
-        type: 'get',
-        data: $(this).serialize()
-    }).done(function (data) {
-         task_change_beacons(data);//modify the majors' dropdown
-         //refresh_assigned_beacons(task_id);
-    }).fail(function (data) {
-         console.log('AJAX request has FAILED');
-    });
-};
-function task_change_beacons(data) { 
-    $("#task_beacon_uuid_dropdown").empty();//remove all previous majors
-    if(data.length != 0){
-        for(i = 0;i<data.length;i++){ 
-            $("#task_beacon_uuid_dropdown").append(//add in an option for each major
-                $("<option></option>").attr("value", data[i].beacon_uuid).text(data[i].brand_name+' - '+data[i].beacon_uuid)
-            );
-        }
-        $("#task_beacons").show();
-    }
-    else{
-        $("#task_beacons").hide();
-    }
-};
-function task_locate_id_to_assigned_beacons(task_id) {
-   var request = "/javascripts/refresh_assigned_maps?task_id=" + task_id;
-
-    var aj = $.ajax({
-        async: false,
-        url: request,
-        type: 'get',
-        data: $(this).serialize(),
-        dataType: 'json'
-    }).success(function (data) {
-        $("#items_grid").html("<%= escape_javascript(render partial: 'tasks/partial/partial_assigned_maps', locals: { :taskmaps: @taskmaps } ) %>");
-        //refresh_assigned_beacons(task_id)
-    }).fail(function (data) {
-         console.log('AJAX request has FAILED');
-    });
-    
-};
-function refresh_assigned_beacons(task_id) {
-   var request = "/javascripts/refresh_assigned_beacons?task_id=" + task_id;
-
-    var aj = $.ajax({
-        async: false,
-        url: request,
-        type: 'get',
-        data: $(this).serialize(),
-        dataType: 'json'
-    }).success(function (data) {
-        $("#partial_assigned_beacons").html("<%= escape_javascript(render partial: 'tasks/partial/refresh_assigned_beacons', locals: { :taskmaps: @taskmaps } ) %>");
-        //refresh_assigned_beacons(task_id)
-    }).fail(function (data) {
-         console.log('AJAX request has FAILED');
-    });
-    
-};
-
-
-//---task - brand_id dropdown select
-
-$(document).on('change','#task_brand_id_dropdown', function () {//change majors when user changes school
-   var request = "/javascripts/brand_id_to_beacons?brand_id=" //access controller of interest
-        + $('#task_brand_id_dropdown').val() + '&locate_id=' + $('#task_locate_id_dropdown').val();
-
-    var aj = $.ajax({
-        url: request,
-        type: 'get',
-        data: $(this).serialize()
-    }).done(function (data) {
-         task_change_beacons(data);//modify the majors' dropdown
-    }).fail(function (data) {
-         console.log('AJAX request has FAILED');
-    });
-});
-(function() {
-
 
 }).call(this);
 
@@ -37554,8 +44017,618 @@ window.locale = {
 
 
 
+(function() {
+  var ready,
+    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  $.rails.href = function(element) {
+    return element.attr("href") || element.data("href") || window.location.pathname;
+  };
+
+  window.SmartListing = (function() {
+    var Config;
+
+    Config = (function() {
+      function Config() {}
+
+      Config.options = {
+        "global_options": {
+          "param_names": {
+            "page": "page",
+            "per_page": "per_page",
+            "sort": "sort"
+          },
+          "array": false,
+          "max_count": null,
+          "unlimited_per_page": false,
+          "paginate": true,
+          "memorize_per_page": false,
+          "page_sizes": [10, 20, 50, 100],
+          "kaminari_options": {
+            "theme": "smart_listing"
+          },
+          "sort_dirs": [null, "asc", "desc"]
+        },
+        "constants": {
+          "classes": {
+            "main": "smart-listing",
+            "editable": "editable",
+            "content": "content",
+            "loading": "loading",
+            "status": "smart-listing-status",
+            "item_actions": "actions",
+            "new_item_placeholder": "new-item-placeholder",
+            "new_item_action": "new-item-action",
+            "new_item_button": "btn",
+            "hidden": "hidden",
+            "autoselect": "autoselect",
+            "callback": "callback",
+            "pagination_wrapper": "text-center",
+            "pagination_container": "pagination",
+            "pagination_per_page": "pagination-per-page text-center",
+            "inline_editing": "info",
+            "no_records": "no-records",
+            "limit": "smart-listing-limit",
+            "limit_alert": "smart-listing-limit-alert",
+            "controls": "smart-listing-controls",
+            "controls_reset": "reset",
+            "filtering": "filter",
+            "filtering_search": "glyphicon-search",
+            "filtering_cancel": "glyphicon-remove",
+            "filtering_disabled": "disabled",
+            "sortable": "sortable",
+            "icon_new": "glyphicon glyphicon-plus",
+            "icon_edit": "glyphicon glyphicon-pencil",
+            "icon_trash": "glyphicon glyphicon-trash",
+            "icon_inactive": "glyphicon glyphicon-remove-circle text-muted",
+            "icon_show": "glyphicon glyphicon-share-alt",
+            "icon_sort_none": "glyphicon glyphicon-resize-vertical",
+            "icon_sort_up": "glyphicon glyphicon-chevron-up",
+            "icon_sort_down": "glyphicon glyphicon-chevron-down",
+            "muted": "text-muted"
+          },
+          "data_attributes": {
+            "main": "smart-listing",
+            "controls_initialized": "smart-listing-controls-initialized",
+            "confirmation": "confirmation",
+            "id": "id",
+            "href": "href",
+            "callback_href": "callback-href",
+            "max_count": "max-count",
+            "item_count": "item-count",
+            "inline_edit_backup": "smart-listing-edit-backup",
+            "params": "params",
+            "observed": "observed",
+            "autoshow": "autoshow",
+            "popover": "slpopover"
+          },
+          "selectors": {
+            "item_action_destroy": "a.destroy",
+            "edit_cancel": "button.cancel",
+            "row": "tr",
+            "head": "thead",
+            "filtering_button": "button",
+            "filtering_icon": "button span",
+            "filtering_input": ".filter input",
+            "pagination_count": ".pagination-per-page .count"
+          }
+        }
+      };
+
+      Config.merge = function(d) {
+        return $.extend(true, this.options, d || $("body").data("smart-listing-config"));
+      };
+
+      Config["class"] = function(name) {
+        return this.options["constants"]["classes"][name];
+      };
+
+      Config.class_name = function(name) {
+        return "." + (this["class"](name));
+      };
+
+      Config.data_attribute = function(name) {
+        return this.options["constants"]["data_attributes"][name];
+      };
+
+      Config.selector = function(name) {
+        return this.options["constants"]["selectors"][name];
+      };
+
+      return Config;
+
+    })();
+
+    SmartListing.config = Config;
+
+    function SmartListing(e) {
+      this.update_list = bind(this.update_list, this);
+      this.remove = bind(this.remove, this);
+      this.destroy = bind(this.destroy, this);
+      this.update = bind(this.update, this);
+      this.edit = bind(this.edit, this);
+      this.create = bind(this.create, this);
+      this.new_item = bind(this.new_item, this);
+      this.editable = bind(this.editable, this);
+      this.registerPopover = bind(this.registerPopover, this);
+      this.params = bind(this.params, this);
+      this.reload = bind(this.reload, this);
+      this.refresh = bind(this.refresh, this);
+      this.cancelEdit = bind(this.cancelEdit, this);
+      this.changeItemCount = bind(this.changeItemCount, this);
+      this.setAutoshow = bind(this.setAutoshow, this);
+      this.maxCount = bind(this.maxCount, this);
+      this.itemCount = bind(this.itemCount, this);
+      this.fadeLoaded = bind(this.fadeLoaded, this);
+      this.fadeLoading = bind(this.fadeLoading, this);
+      this.container = e;
+      this.name = this.container.attr("id");
+      this.loading = this.container.find(SmartListing.config.class_name("loading"));
+      this.content = this.container.find(SmartListing.config.class_name("content"));
+      this.status = $((SmartListing.config.class_name("status")) + " [data-" + (SmartListing.config.data_attribute("main")) + "='" + this.name + "']");
+      this.confirmed = null;
+      this.popovers = {};
+      this.container.on("ajax:before", (SmartListing.config.class_name("item_actions")) + ", " + (SmartListing.config.class_name("pagination_container")), (function(_this) {
+        return function(e) {
+          return _this.fadeLoading();
+        };
+      })(this));
+      this.container.on("ajax:success", (function(_this) {
+        return function(e) {
+          var editable;
+          if ($(e.target).is((SmartListing.config.class_name("item_actions")) + " " + (SmartListing.config.selector("item_action_destroy")))) {
+            editable = $(e.target).closest(SmartListing.config.class_name("editable"));
+            if (_this.container.find(SmartListing.config.class_name("editable")).length === 1) {
+              _this.reload();
+              return false;
+            } else {
+              editable.remove();
+              _this.container.trigger("smart_listing:destroy", editable);
+            }
+            _this.changeItemCount(-1);
+            _this.refresh();
+            _this.fadeLoaded();
+            return false;
+          }
+        };
+      })(this));
+      this.container.on("click", SmartListing.config.selector("edit_cancel"), (function(_this) {
+        return function(event) {
+          var editable;
+          editable = $(event.currentTarget).closest(SmartListing.config.class_name("editable"));
+          if (editable.length > 0) {
+            _this.cancelEdit(editable);
+          } else {
+            _this.container.find(SmartListing.config.class_name("new_item_placeholder")).addClass(SmartListing.config["class"]("hidden"));
+            _this.container.find(SmartListing.config.class_name("new_item_action")).removeClass(SmartListing.config["class"]("hidden"));
+          }
+          _this.setAutoshow(false);
+          return false;
+        };
+      })(this));
+      this.container.on("click", (SmartListing.config.class_name("item_actions")) + " a[data-" + (SmartListing.config.data_attribute("confirmation")) + "]", (function(_this) {
+        return function(event) {
+          return $.fn.smart_listing.confirm($(event.currentTarget), $(event.currentTarget).data(SmartListing.config.data_attribute("confirmation")));
+        };
+      })(this));
+      this.container.on("click", (SmartListing.config.class_name("item_actions")) + " a[data-" + (SmartListing.config.data_attribute("popover")) + "]", (function(_this) {
+        return function(event) {
+          var name;
+          name = $(event.currentTarget).data(SmartListing.config.data_attribute("popover"));
+          if (jQuery.isFunction(_this.popovers[name])) {
+            _this.popovers[name]($(event.currentTarget));
+            return false;
+          }
+        };
+      })(this));
+      this.container.on("click", "input[type=text]" + (SmartListing.config.class_name("autoselect")), function(event) {
+        return $(this).select();
+      });
+      this.container.on("change", SmartListing.config.class_name("callback"), (function(_this) {
+        return function(event) {
+          var checkbox, data, id;
+          checkbox = $(event.currentTarget);
+          id = checkbox.closest(SmartListing.config.selector("row")).data(SmartListing.config.data_attribute("id"));
+          data = {};
+          data[checkbox.val()] = checkbox.is(":checked");
+          return $.ajax({
+            beforeSend: function(xhr, settings) {
+              return xhr.setRequestHeader("accept", "*/*;q=0.5, " + settings.accepts.script);
+            },
+            url: _this.container.data(SmartListing.config.data_attribute("callback_href")),
+            type: "POST",
+            data: data
+          });
+        };
+      })(this));
+    }
+
+    SmartListing.prototype.fadeLoading = function() {
+      return $.fn.smart_listing.onLoading(this.content, this.loading);
+    };
+
+    SmartListing.prototype.fadeLoaded = function() {
+      return $.fn.smart_listing.onLoaded(this.content, this.loading);
+    };
+
+    SmartListing.prototype.itemCount = function() {
+      return parseInt(this.container.data(SmartListing.config.data_attribute("item_count")));
+    };
+
+    SmartListing.prototype.maxCount = function() {
+      return parseInt(this.container.data(SmartListing.config.data_attribute("max_count")));
+    };
+
+    SmartListing.prototype.setAutoshow = function(v) {
+      return this.container.data(SmartListing.config.data_attribute("autoshow"), v);
+    };
+
+    SmartListing.prototype.changeItemCount = function(value) {
+      var count;
+      count = this.container.data(SmartListing.config.data_attribute("item_count")) + value;
+      this.container.data(SmartListing.config.data_attribute("item_count"), count);
+      return this.container.find(SmartListing.config.selector("pagination_count")).html(count);
+    };
+
+    SmartListing.prototype.cancelEdit = function(editable) {
+      if (editable.data(SmartListing.config.data_attribute("inline_edit_backup"))) {
+        editable.html(editable.data(SmartListing.config.data_attribute("inline_edit_backup")));
+        editable.removeClass(SmartListing.config["class"]("inline_editing"));
+        return editable.removeData(SmartListing.config.data_attribute("inline_edit_backup"));
+      }
+    };
+
+    SmartListing.prototype.refresh = function() {
+      var footer, header, no_records;
+      header = this.content.find(SmartListing.config.selector("head"));
+      footer = this.content.find(SmartListing.config.class_name("pagination_per_page"));
+      no_records = this.content.find(SmartListing.config.class_name("no_records"));
+      if (this.itemCount() === 0) {
+        header.hide();
+        footer.hide();
+        no_records.show();
+      } else {
+        header.show();
+        footer.show();
+        no_records.hide();
+      }
+      if (this.maxCount()) {
+        if (this.itemCount() >= this.maxCount()) {
+          this.container.find(SmartListing.config.class_name("new_item_placeholder")).addClass(SmartListing.config["class"]("hidden"));
+          this.container.find(SmartListing.config.class_name("new_item_action")).addClass(SmartListing.config["class"]("hidden"));
+        } else {
+          if (this.container.data(SmartListing.config.data_attribute("autoshow"))) {
+            this.container.find(SmartListing.config.class_name("new_item_placeholder")).removeClass(SmartListing.config["class"]("hidden"));
+            this.container.find(SmartListing.config.class_name("new_item_action")).addClass(SmartListing.config["class"]("hidden"));
+          } else {
+            this.container.find(SmartListing.config.class_name("new_item_placeholder")).addClass(SmartListing.config["class"]("hidden"));
+            this.container.find(SmartListing.config.class_name("new_item_action")).removeClass(SmartListing.config["class"]("hidden"));
+          }
+        }
+      }
+      return this.status.each((function(_this) {
+        return function(index, status) {
+          $(status).find(SmartListing.config.class_name("limit")).html(_this.maxCount() - _this.itemCount());
+          if (_this.maxCount() - _this.itemCount() === 0) {
+            return $(status).find(SmartListing.config.class_name("limit_alert")).show();
+          } else {
+            return $(status).find(SmartListing.config.class_name("limit_alert")).hide();
+          }
+        };
+      })(this));
+    };
+
+    SmartListing.prototype.reload = function() {
+      return $.rails.handleRemote(this.container);
+    };
+
+    SmartListing.prototype.params = function(value) {
+      if (value) {
+        return this.container.data(SmartListing.config.data_attribute("params"), value);
+      } else {
+        return this.container.data(SmartListing.config.data_attribute("params"));
+      }
+    };
+
+    SmartListing.prototype.registerPopover = function(name, callback) {
+      return this.popovers[name] = callback;
+    };
+
+    SmartListing.prototype.editable = function(id) {
+      return this.container.find((SmartListing.config.class_name("editable")) + "[data-" + (SmartListing.config.data_attribute("id")) + "=" + id + "]");
+    };
+
+    SmartListing.prototype.new_item = function(content) {
+      var new_item_action, new_item_placeholder;
+      if (!this.maxCount() || (this.itemCount() < this.maxCount())) {
+        new_item_action = this.container.find(SmartListing.config.class_name("new_item_action"));
+        new_item_placeholder = this.container.find(SmartListing.config.class_name("new_item_placeholder")).addClass(SmartListing.config["class"]("hidden"));
+        this.container.find(SmartListing.config.class_name("editable")).each((function(_this) {
+          return function(i, v) {
+            return _this.cancelEdit($(v));
+          };
+        })(this));
+        new_item_action.addClass(SmartListing.config["class"]("hidden"));
+        new_item_placeholder.removeClass(SmartListing.config["class"]("hidden"));
+        new_item_placeholder.html(content);
+        new_item_placeholder.addClass(SmartListing.config["class"]("inline_editing"));
+        return this.fadeLoaded();
+      }
+    };
+
+    SmartListing.prototype.create = function(id, success, content) {
+      var new_item, new_item_action, new_item_placeholder;
+      new_item_action = this.container.find(SmartListing.config.class_name("new_item_action"));
+      new_item_placeholder = this.container.find(SmartListing.config.class_name("new_item_placeholder"));
+      if (success) {
+        new_item_placeholder.addClass(SmartListing.config["class"]("hidden"));
+        new_item_action.removeClass(SmartListing.config["class"]("hidden"));
+        new_item = $("<tr />").addClass(SmartListing.config["class"]("editable"));
+        new_item.attr("data-" + (SmartListing.config.data_attribute("id")), id);
+        new_item.html(content);
+        new_item_placeholder.before(new_item);
+        this.container.trigger("smart_listing:create:success", new_item);
+        this.changeItemCount(1);
+        this.refresh();
+      } else {
+        new_item_placeholder.html(content);
+        this.container.trigger("smart_listing:create:fail", new_item_placeholder);
+      }
+      return this.fadeLoaded();
+    };
+
+    SmartListing.prototype.edit = function(id, content) {
+      var editable;
+      this.container.find(SmartListing.config.class_name("editable")).each((function(_this) {
+        return function(i, v) {
+          return _this.cancelEdit($(v));
+        };
+      })(this));
+      this.container.find(SmartListing.config.class_name("new_item_placeholder")).addClass(SmartListing.config["class"]("hidden"));
+      this.container.find(SmartListing.config.class_name("new_item_action")).removeClass(SmartListing.config["class"]("hidden"));
+      editable = this.editable(id);
+      editable.data(SmartListing.config.data_attribute("inline_edit_backup"), editable.html());
+      editable.html(content);
+      editable.addClass(SmartListing.config["class"]("inline_editing"));
+      this.container.trigger("smart_listing:edit", editable);
+      return this.fadeLoaded();
+    };
+
+    SmartListing.prototype.update = function(id, success, content) {
+      var editable;
+      editable = this.editable(id);
+      if (success) {
+        editable.removeClass(SmartListing.config["class"]("inline_editing"));
+        editable.removeData(SmartListing.config.data_attribute("inline_edit_backup"));
+        editable.html(content);
+        this.container.trigger("smart_listing:update:success", editable);
+        this.refresh();
+      } else {
+        editable.html(content);
+        this.container.trigger("smart_listing:update:fail", editable);
+      }
+      return this.fadeLoaded();
+    };
+
+    SmartListing.prototype.destroy = function(id, destroyed) {};
+
+    SmartListing.prototype.remove = function(id) {
+      var editable;
+      editable = this.editable(id);
+      editable.remove();
+      return this.container.trigger("smart_listing:remove", editable);
+    };
+
+    SmartListing.prototype.update_list = function(content, data) {
+      this.container.data(SmartListing.config.data_attribute("params"), $.extend(this.container.data(SmartListing.config.data_attribute("params")), data[SmartListing.config.data_attribute("params")]));
+      this.container.data(SmartListing.config.data_attribute("max_count"), data[SmartListing.config.data_attribute("max_count")]);
+      this.container.data(SmartListing.config.data_attribute("item_count"), data[SmartListing.config.data_attribute("item_count")]);
+      this.content.html(content);
+      this.refresh();
+      this.fadeLoaded();
+      return this.container.trigger("smart_listing:update_list", this.container);
+    };
+
+    return SmartListing;
+
+  })();
+
+  $.fn.smart_listing = function() {
+    var map;
+    map = $(this).map(function() {
+      if (!$(this).data(SmartListing.config.data_attribute("main"))) {
+        $(this).data(SmartListing.config.data_attribute("main"), new SmartListing($(this)));
+      }
+      return $(this).data(SmartListing.config.data_attribute("main"));
+    });
+    if (map.length === 1) {
+      return map[0];
+    } else {
+      return map;
+    }
+  };
+
+  $.fn.smart_listing.observeField = function(field, opts) {
+    var keyChange, key_timeout, last_value, options;
+    if (opts == null) {
+      opts = {};
+    }
+    key_timeout = null;
+    last_value = null;
+    options = {
+      onFilled: function() {},
+      onEmpty: function() {},
+      onChange: function() {}
+    };
+    options = $.extend(options, opts);
+    keyChange = function() {
+      var lastValue;
+      if (field.val().length > 0) {
+        options.onFilled();
+      } else {
+        options.onEmpty();
+      }
+      if (field.val() === last_value && field.val().length !== 0) {
+        return;
+      }
+      lastValue = field.val();
+      return options.onChange();
+    };
+    field.data(SmartListing.config.data_attribute("observed"), true);
+    return field.bind("keydown", function(e) {
+      if (key_timeout) {
+        clearTimeout(key_timeout);
+      }
+      return key_timeout = setTimeout(function() {
+        return keyChange();
+      }, 400);
+    });
+  };
+
+  $.fn.smart_listing.showPopover = function(elem, body) {
+    elem.popover("destroy");
+    elem.popover({
+      content: body,
+      html: true,
+      trigger: "manual",
+      title: null
+    });
+    return elem.popover("show");
+  };
+
+  $.fn.smart_listing.showConfirmation = function(confirmation_elem, msg, confirm_callback) {
+    var buildPopover;
+    buildPopover = function(confirmation_elem, msg) {
+      var deletion_popover;
+      deletion_popover = $("<div/>").addClass("confirmation_box");
+      deletion_popover.append($("<p/>").html(msg));
+      return deletion_popover.append($("<p/>").append($("<button/>").html("Yes").addClass("btn btn-danger ").click((function(_this) {
+        return function(event) {
+          var editable;
+          editable = $(event.currentTarget).closest(SmartListing.config.class_name("editable"));
+          confirm_callback(confirmation_elem);
+          $(confirmation_elem).click();
+          return $(confirmation_elem).popover("destroy");
+        };
+      })(this))).append(" ").append($("<button/>").html("No").addClass("btn btn-small").click((function(_this) {
+        return function(event) {
+          var editable;
+          editable = $(event.currentTarget).closest(SmartListing.config.class_name("editable"));
+          return $(confirmation_elem).popover("destroy");
+        };
+      })(this))));
+    };
+    return $.fn.smart_listing.showPopover(confirmation_elem, buildPopover(confirmation_elem, msg));
+  };
+
+  $.fn.smart_listing.confirm = function(elem, msg) {
+    if (!elem.data("confirmed")) {
+      $.fn.smart_listing.showConfirmation(elem, msg, (function(_this) {
+        return function(confirm_elem) {
+          return confirm_elem.data("confirmed", true);
+        };
+      })(this));
+      return false;
+    } else {
+      elem.data("confirmed", false);
+      return true;
+    }
+  };
+
+  $.fn.smart_listing.onLoading = function(content, loader) {
+    content.stop(true).fadeTo(500, 0.2);
+    loader.show();
+    return loader.stop(true).fadeTo(500, 1);
+  };
+
+  $.fn.smart_listing.onLoaded = function(content, loader) {
+    content.stop(true).fadeTo(500, 1);
+    return loader.stop(true).fadeTo(500, 0, (function(_this) {
+      return function() {
+        return loader.hide();
+      };
+    })(this));
+  };
+
+  $.fn.smart_listing_controls = function() {
+    var reload;
+    reload = function(controls) {
+      var container, prms, smart_listing;
+      container = $("#" + (controls.data(SmartListing.config.data_attribute("main"))));
+      smart_listing = container.smart_listing();
+      prms = {};
+      $.each(controls.serializeArray(), function(i, field) {
+        return prms[field.name] = field.value;
+      });
+      prms = $.extend(smart_listing.params(), prms);
+      smart_listing.params(prms);
+      container.trigger("ajax:before");
+      return smart_listing.reload();
+    };
+    return $(this).each(function() {
+      var controls, reset, smart_listing;
+      if ($(this).data(SmartListing.config.data_attribute("controls_initialized"))) {
+        return;
+      }
+      $(this).data(SmartListing.config.data_attribute("controls_initialized"), true);
+      controls = $(this);
+      smart_listing = $("#" + (controls.data(SmartListing.config.data_attribute("main"))));
+      reset = controls.find(SmartListing.config.class_name("controls_reset"));
+      controls.submit(function() {
+        reload(controls);
+        return false;
+      });
+      controls.find("input, select").change(function() {
+        if (!$(this).data(SmartListing.config.data_attribute("observed"))) {
+          return reload(controls);
+        }
+      });
+      return $.fn.smart_listing_controls.filter(controls.find(SmartListing.config.class_name("filtering")));
+    });
+  };
+
+  $.fn.smart_listing_controls.filter = function(filter) {
+    var button, field, form, icon;
+    form = filter.closest("form");
+    button = form.find(SmartListing.config.selector("filtering_button"));
+    icon = form.find(SmartListing.config.selector("filtering_icon"));
+    field = form.find(SmartListing.config.selector("filtering_input"));
+    $.fn.smart_listing.observeField(field, {
+      onFilled: function() {
+        icon.removeClass(SmartListing.config["class"]("filtering_search"));
+        icon.addClass(SmartListing.config["class"]("filtering_cancel"));
+        return button.removeClass(SmartListing.config["class"]("filtering_disabled"));
+      },
+      onEmpty: function() {
+        icon.addClass(SmartListing.config["class"]("filtering_search"));
+        icon.removeClass(SmartListing.config["class"]("filtering_cancel"));
+        return button.addClass(SmartListing.config["class"]("filtering_disabled"));
+      },
+      onChange: function() {
+        return form.submit();
+      }
+    });
+    return button.click(function() {
+      if (field.val().length > 0) {
+        field.val("");
+        field.trigger("keydown");
+      }
+      return false;
+    });
+  };
+
+  ready = function() {
+    $(SmartListing.config.class_name("main")).smart_listing();
+    return $(SmartListing.config.class_name("controls")).smart_listing_controls();
+  };
+
+  $(document).ready(ready);
+
+  $(document).on("page:load", ready);
+
+}).call(this);
 /*!
- * JavaScript Cookie v2.1.2
+ * JavaScript Cookie v2.1.3
  * https://github.com/js-cookie/js-cookie
  *
  * Copyright 2006, 2015 Klaus Hartl & Fagner Brack
@@ -37563,11 +44636,16 @@ window.locale = {
  */
 
 ;(function (factory) {
+	var registeredInModuleLoader = false;
 	if (typeof define === 'function' && define.amd) {
 		define(factory);
-	} else if (typeof exports === 'object') {
+		registeredInModuleLoader = true;
+	}
+	if (typeof exports === 'object') {
 		module.exports = factory();
-	} else {
+		registeredInModuleLoader = true;
+	}
+	if (!registeredInModuleLoader) {
 		var OldCookies = window.Cookies;
 		var api = window.Cookies = factory();
 		api.noConflict = function () {
@@ -37629,9 +44707,9 @@ window.locale = {
 				return (document.cookie = [
 					key, '=', value,
 					attributes.expires ? '; expires=' + attributes.expires.toUTCString() : '', // use expires attribute, max-age is not supported by IE
-					attributes.path    ? '; path=' + attributes.path : '',
-					attributes.domain  ? '; domain=' + attributes.domain : '',
-					attributes.secure  ? '; secure' : ''
+					attributes.path ? '; path=' + attributes.path : '',
+					attributes.domain ? '; domain=' + attributes.domain : '',
+					attributes.secure ? '; secure' : ''
 				].join(''));
 			}
 
@@ -37684,7 +44762,7 @@ window.locale = {
 
 		api.set = api;
 		api.get = function (key) {
-			return api(key);
+			return api.call(api, key);
 		};
 		api.getJSON = function () {
 			return api.apply({
@@ -59173,26 +66251,44 @@ $.fn.visibility.settings = {
 
 })( jQuery, window, document );
 /*!
- * clipboard.js v1.5.10
+ * clipboard.js v1.5.15
  * https://zenorocha.github.io/clipboard.js
  *
  * Licensed MIT © Zeno Rocha
  */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.Clipboard = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var matches = require('matches-selector')
+/**
+ * A polyfill for Element.matches()
+ */
+if (Element && !Element.prototype.matches) {
+    var proto = Element.prototype;
 
-module.exports = function (element, selector, checkYoSelf) {
-  var parent = checkYoSelf ? element : element.parentNode
-
-  while (parent && parent !== document) {
-    if (matches(parent, selector)) return parent;
-    parent = parent.parentNode
-  }
+    proto.matches = proto.matchesSelector ||
+                    proto.mozMatchesSelector ||
+                    proto.msMatchesSelector ||
+                    proto.oMatchesSelector ||
+                    proto.webkitMatchesSelector;
 }
 
-},{"matches-selector":5}],2:[function(require,module,exports){
-var closest = require('closest');
+/**
+ * Finds the closest parent that matches a selector.
+ *
+ * @param {Element} element
+ * @param {String} selector
+ * @return {Function}
+ */
+function closest (element, selector) {
+    while (element && element !== document) {
+        if (element.matches(selector)) return element;
+        element = element.parentNode;
+    }
+}
+
+module.exports = closest;
+
+},{}],2:[function(require,module,exports){
+var closest = require('./closest');
 
 /**
  * Delegates event to a selector.
@@ -59227,7 +66323,7 @@ function delegate(element, selector, type, callback, useCapture) {
  */
 function listener(element, selector, type, callback) {
     return function(e) {
-        e.delegateTarget = closest(e.target, selector, true);
+        e.delegateTarget = closest(e.target, selector);
 
         if (e.delegateTarget) {
             callback.call(element, e);
@@ -59237,7 +66333,7 @@ function listener(element, selector, type, callback) {
 
 module.exports = delegate;
 
-},{"closest":1}],3:[function(require,module,exports){
+},{"./closest":1}],3:[function(require,module,exports){
 /**
  * Check if argument is a HTML element.
  *
@@ -59386,51 +66482,15 @@ function listenSelector(selector, type, callback) {
 module.exports = listen;
 
 },{"./is":3,"delegate":2}],5:[function(require,module,exports){
-
-/**
- * Element prototype.
- */
-
-var proto = Element.prototype;
-
-/**
- * Vendor function.
- */
-
-var vendor = proto.matchesSelector
-  || proto.webkitMatchesSelector
-  || proto.mozMatchesSelector
-  || proto.msMatchesSelector
-  || proto.oMatchesSelector;
-
-/**
- * Expose `match()`.
- */
-
-module.exports = match;
-
-/**
- * Match `el` to `selector`.
- *
- * @param {Element} el
- * @param {String} selector
- * @return {Boolean}
- * @api public
- */
-
-function match(el, selector) {
-  if (vendor) return vendor.call(el, selector);
-  var nodes = el.parentNode.querySelectorAll(selector);
-  for (var i = 0; i < nodes.length; ++i) {
-    if (nodes[i] == el) return true;
-  }
-  return false;
-}
-},{}],6:[function(require,module,exports){
 function select(element) {
     var selectedText;
 
-    if (element.nodeName === 'INPUT' || element.nodeName === 'TEXTAREA') {
+    if (element.nodeName === 'SELECT') {
+        element.focus();
+
+        selectedText = element.value;
+    }
+    else if (element.nodeName === 'INPUT' || element.nodeName === 'TEXTAREA') {
         element.focus();
         element.setSelectionRange(0, element.value.length);
 
@@ -59456,14 +66516,14 @@ function select(element) {
 
 module.exports = select;
 
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 function E () {
-	// Keep this empty so it's easier to inherit from
+  // Keep this empty so it's easier to inherit from
   // (via https://github.com/lipsmack from https://github.com/scottcorgan/tiny-emitter/issues/3)
 }
 
 E.prototype = {
-	on: function (name, callback, ctx) {
+  on: function (name, callback, ctx) {
     var e = this.e || (this.e = {});
 
     (e[name] || (e[name] = [])).push({
@@ -59524,7 +66584,7 @@ E.prototype = {
 
 module.exports = E;
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 (function (global, factory) {
     if (typeof define === "function" && define.amd) {
         define(['module', 'select'], factory);
@@ -59551,7 +66611,7 @@ module.exports = E;
     var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
         return typeof obj;
     } : function (obj) {
-        return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
     };
 
     function _classCallCheck(instance, Constructor) {
@@ -59582,7 +66642,6 @@ module.exports = E;
         /**
          * @param {Object} options
          */
-
         function ClipboardAction(options) {
             _classCallCheck(this, ClipboardAction);
 
@@ -59596,120 +66655,126 @@ module.exports = E;
          */
 
 
-        ClipboardAction.prototype.resolveOptions = function resolveOptions() {
-            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+        _createClass(ClipboardAction, [{
+            key: 'resolveOptions',
+            value: function resolveOptions() {
+                var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-            this.action = options.action;
-            this.emitter = options.emitter;
-            this.target = options.target;
-            this.text = options.text;
-            this.trigger = options.trigger;
+                this.action = options.action;
+                this.emitter = options.emitter;
+                this.target = options.target;
+                this.text = options.text;
+                this.trigger = options.trigger;
 
-            this.selectedText = '';
-        };
-
-        ClipboardAction.prototype.initSelection = function initSelection() {
-            if (this.text) {
-                this.selectFake();
-            } else if (this.target) {
-                this.selectTarget();
+                this.selectedText = '';
             }
-        };
-
-        ClipboardAction.prototype.selectFake = function selectFake() {
-            var _this = this;
-
-            var isRTL = document.documentElement.getAttribute('dir') == 'rtl';
-
-            this.removeFake();
-
-            this.fakeHandler = document.body.addEventListener('click', function () {
-                return _this.removeFake();
-            });
-
-            this.fakeElem = document.createElement('textarea');
-            // Prevent zooming on iOS
-            this.fakeElem.style.fontSize = '12pt';
-            // Reset box model
-            this.fakeElem.style.border = '0';
-            this.fakeElem.style.padding = '0';
-            this.fakeElem.style.margin = '0';
-            // Move element out of screen horizontally
-            this.fakeElem.style.position = 'fixed';
-            this.fakeElem.style[isRTL ? 'right' : 'left'] = '-9999px';
-            // Move element to the same position vertically
-            this.fakeElem.style.top = (window.pageYOffset || document.documentElement.scrollTop) + 'px';
-            this.fakeElem.setAttribute('readonly', '');
-            this.fakeElem.value = this.text;
-
-            document.body.appendChild(this.fakeElem);
-
-            this.selectedText = (0, _select2.default)(this.fakeElem);
-            this.copyText();
-        };
-
-        ClipboardAction.prototype.removeFake = function removeFake() {
-            if (this.fakeHandler) {
-                document.body.removeEventListener('click');
-                this.fakeHandler = null;
+        }, {
+            key: 'initSelection',
+            value: function initSelection() {
+                if (this.text) {
+                    this.selectFake();
+                } else if (this.target) {
+                    this.selectTarget();
+                }
             }
+        }, {
+            key: 'selectFake',
+            value: function selectFake() {
+                var _this = this;
 
-            if (this.fakeElem) {
-                document.body.removeChild(this.fakeElem);
-                this.fakeElem = null;
+                var isRTL = document.documentElement.getAttribute('dir') == 'rtl';
+
+                this.removeFake();
+
+                this.fakeHandlerCallback = function () {
+                    return _this.removeFake();
+                };
+                this.fakeHandler = document.body.addEventListener('click', this.fakeHandlerCallback) || true;
+
+                this.fakeElem = document.createElement('textarea');
+                // Prevent zooming on iOS
+                this.fakeElem.style.fontSize = '12pt';
+                // Reset box model
+                this.fakeElem.style.border = '0';
+                this.fakeElem.style.padding = '0';
+                this.fakeElem.style.margin = '0';
+                // Move element out of screen horizontally
+                this.fakeElem.style.position = 'absolute';
+                this.fakeElem.style[isRTL ? 'right' : 'left'] = '-9999px';
+                // Move element to the same position vertically
+                var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+                this.fakeElem.addEventListener('focus', window.scrollTo(0, yPosition));
+                this.fakeElem.style.top = yPosition + 'px';
+
+                this.fakeElem.setAttribute('readonly', '');
+                this.fakeElem.value = this.text;
+
+                document.body.appendChild(this.fakeElem);
+
+                this.selectedText = (0, _select2.default)(this.fakeElem);
+                this.copyText();
             }
-        };
+        }, {
+            key: 'removeFake',
+            value: function removeFake() {
+                if (this.fakeHandler) {
+                    document.body.removeEventListener('click', this.fakeHandlerCallback);
+                    this.fakeHandler = null;
+                    this.fakeHandlerCallback = null;
+                }
 
-        ClipboardAction.prototype.selectTarget = function selectTarget() {
-            this.selectedText = (0, _select2.default)(this.target);
-            this.copyText();
-        };
-
-        ClipboardAction.prototype.copyText = function copyText() {
-            var succeeded = undefined;
-
-            try {
-                succeeded = document.execCommand(this.action);
-            } catch (err) {
-                succeeded = false;
+                if (this.fakeElem) {
+                    document.body.removeChild(this.fakeElem);
+                    this.fakeElem = null;
+                }
             }
+        }, {
+            key: 'selectTarget',
+            value: function selectTarget() {
+                this.selectedText = (0, _select2.default)(this.target);
+                this.copyText();
+            }
+        }, {
+            key: 'copyText',
+            value: function copyText() {
+                var succeeded = void 0;
 
-            this.handleResult(succeeded);
-        };
+                try {
+                    succeeded = document.execCommand(this.action);
+                } catch (err) {
+                    succeeded = false;
+                }
 
-        ClipboardAction.prototype.handleResult = function handleResult(succeeded) {
-            if (succeeded) {
-                this.emitter.emit('success', {
+                this.handleResult(succeeded);
+            }
+        }, {
+            key: 'handleResult',
+            value: function handleResult(succeeded) {
+                this.emitter.emit(succeeded ? 'success' : 'error', {
                     action: this.action,
                     text: this.selectedText,
                     trigger: this.trigger,
                     clearSelection: this.clearSelection.bind(this)
                 });
-            } else {
-                this.emitter.emit('error', {
-                    action: this.action,
-                    trigger: this.trigger,
-                    clearSelection: this.clearSelection.bind(this)
-                });
             }
-        };
+        }, {
+            key: 'clearSelection',
+            value: function clearSelection() {
+                if (this.target) {
+                    this.target.blur();
+                }
 
-        ClipboardAction.prototype.clearSelection = function clearSelection() {
-            if (this.target) {
-                this.target.blur();
+                window.getSelection().removeAllRanges();
             }
-
-            window.getSelection().removeAllRanges();
-        };
-
-        ClipboardAction.prototype.destroy = function destroy() {
-            this.removeFake();
-        };
-
-        _createClass(ClipboardAction, [{
+        }, {
+            key: 'destroy',
+            value: function destroy() {
+                this.removeFake();
+            }
+        }, {
             key: 'action',
             set: function set() {
-                var action = arguments.length <= 0 || arguments[0] === undefined ? 'copy' : arguments[0];
+                var action = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'copy';
 
                 this._action = action;
 
@@ -59750,7 +66815,7 @@ module.exports = E;
     module.exports = ClipboardAction;
 });
 
-},{"select":6}],9:[function(require,module,exports){
+},{"select":5}],8:[function(require,module,exports){
 (function (global, factory) {
     if (typeof define === "function" && define.amd) {
         define(['module', './clipboard-action', 'tiny-emitter', 'good-listener'], factory);
@@ -59784,6 +66849,24 @@ module.exports = E;
         }
     }
 
+    var _createClass = function () {
+        function defineProperties(target, props) {
+            for (var i = 0; i < props.length; i++) {
+                var descriptor = props[i];
+                descriptor.enumerable = descriptor.enumerable || false;
+                descriptor.configurable = true;
+                if ("value" in descriptor) descriptor.writable = true;
+                Object.defineProperty(target, descriptor.key, descriptor);
+            }
+        }
+
+        return function (Constructor, protoProps, staticProps) {
+            if (protoProps) defineProperties(Constructor.prototype, protoProps);
+            if (staticProps) defineProperties(Constructor, staticProps);
+            return Constructor;
+        };
+    }();
+
     function _possibleConstructorReturn(self, call) {
         if (!self) {
             throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -59815,11 +66898,10 @@ module.exports = E;
          * @param {String|HTMLElement|HTMLCollection|NodeList} trigger
          * @param {Object} options
          */
-
         function Clipboard(trigger, options) {
             _classCallCheck(this, Clipboard);
 
-            var _this = _possibleConstructorReturn(this, _Emitter.call(this));
+            var _this = _possibleConstructorReturn(this, (Clipboard.__proto__ || Object.getPrototypeOf(Clipboard)).call(this));
 
             _this.resolveOptions(options);
             _this.listenClick(trigger);
@@ -59833,62 +66915,71 @@ module.exports = E;
          */
 
 
-        Clipboard.prototype.resolveOptions = function resolveOptions() {
-            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+        _createClass(Clipboard, [{
+            key: 'resolveOptions',
+            value: function resolveOptions() {
+                var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-            this.action = typeof options.action === 'function' ? options.action : this.defaultAction;
-            this.target = typeof options.target === 'function' ? options.target : this.defaultTarget;
-            this.text = typeof options.text === 'function' ? options.text : this.defaultText;
-        };
-
-        Clipboard.prototype.listenClick = function listenClick(trigger) {
-            var _this2 = this;
-
-            this.listener = (0, _goodListener2.default)(trigger, 'click', function (e) {
-                return _this2.onClick(e);
-            });
-        };
-
-        Clipboard.prototype.onClick = function onClick(e) {
-            var trigger = e.delegateTarget || e.currentTarget;
-
-            if (this.clipboardAction) {
-                this.clipboardAction = null;
+                this.action = typeof options.action === 'function' ? options.action : this.defaultAction;
+                this.target = typeof options.target === 'function' ? options.target : this.defaultTarget;
+                this.text = typeof options.text === 'function' ? options.text : this.defaultText;
             }
+        }, {
+            key: 'listenClick',
+            value: function listenClick(trigger) {
+                var _this2 = this;
 
-            this.clipboardAction = new _clipboardAction2.default({
-                action: this.action(trigger),
-                target: this.target(trigger),
-                text: this.text(trigger),
-                trigger: trigger,
-                emitter: this
-            });
-        };
-
-        Clipboard.prototype.defaultAction = function defaultAction(trigger) {
-            return getAttributeValue('action', trigger);
-        };
-
-        Clipboard.prototype.defaultTarget = function defaultTarget(trigger) {
-            var selector = getAttributeValue('target', trigger);
-
-            if (selector) {
-                return document.querySelector(selector);
+                this.listener = (0, _goodListener2.default)(trigger, 'click', function (e) {
+                    return _this2.onClick(e);
+                });
             }
-        };
+        }, {
+            key: 'onClick',
+            value: function onClick(e) {
+                var trigger = e.delegateTarget || e.currentTarget;
 
-        Clipboard.prototype.defaultText = function defaultText(trigger) {
-            return getAttributeValue('text', trigger);
-        };
+                if (this.clipboardAction) {
+                    this.clipboardAction = null;
+                }
 
-        Clipboard.prototype.destroy = function destroy() {
-            this.listener.destroy();
-
-            if (this.clipboardAction) {
-                this.clipboardAction.destroy();
-                this.clipboardAction = null;
+                this.clipboardAction = new _clipboardAction2.default({
+                    action: this.action(trigger),
+                    target: this.target(trigger),
+                    text: this.text(trigger),
+                    trigger: trigger,
+                    emitter: this
+                });
             }
-        };
+        }, {
+            key: 'defaultAction',
+            value: function defaultAction(trigger) {
+                return getAttributeValue('action', trigger);
+            }
+        }, {
+            key: 'defaultTarget',
+            value: function defaultTarget(trigger) {
+                var selector = getAttributeValue('target', trigger);
+
+                if (selector) {
+                    return document.querySelector(selector);
+                }
+            }
+        }, {
+            key: 'defaultText',
+            value: function defaultText(trigger) {
+                return getAttributeValue('text', trigger);
+            }
+        }, {
+            key: 'destroy',
+            value: function destroy() {
+                this.listener.destroy();
+
+                if (this.clipboardAction) {
+                    this.clipboardAction.destroy();
+                    this.clipboardAction = null;
+                }
+            }
+        }]);
 
         return Clipboard;
     }(_tinyEmitter2.default);
@@ -59911,7 +67002,7 @@ module.exports = E;
     module.exports = Clipboard;
 });
 
-},{"./clipboard-action":8,"good-listener":4,"tiny-emitter":7}]},{},[9])(9)
+},{"./clipboard-action":7,"good-listener":4,"tiny-emitter":6}]},{},[8])(8)
 });
 // This is a manifest file that'll be compiled into application.js, which will include all the files
 // listed below.
@@ -59940,12 +67031,29 @@ module.exports = E;
 
 
 
+
+
 $(document).ready(function() {
-	$('#beacon_function').dropdown();
+
 	$('#user_profile').popup({
 		inline   : true,
 		position : 'bottom right',
 		on: 'click'
+  });
+  $('#type_and_brand').popup({
+    inline   : true,
+    position : 'bottom right',
+    on: 'click'
+  });
+  $('#pay_and_delivery').popup({
+    inline   : true,
+    position : 'bottom right',
+    on: 'click'
+  });
+  $('#user_manage').popup({
+    inline   : true,
+    position : 'bottom right',
+    on: 'click'
   });
   $('.simple_time')
     .popup({
@@ -59955,37 +67063,27 @@ $(document).ready(function() {
     })
   ;
 });
+  $('body').on('click','#edit-admin',function(){
+    $('.ui.dimmer.site').dimmer('show');
 
-$(function() {
-	$("#map").click
-	(function(e) {
+    var row_id = $(this).data("value");
+    $.get( "/accounts/"+row_id+"/edit", function(html) {
+      $("#admin_from").empty();
+      $("#admin_from").append(html);
+      $('.ui.dimmer.site').dimmer('hide');
 
-	  var offset = $(this).offset();
+      $('.ui.small.modal.admin').modal({
+        observeChanges: true
+      }).modal('setting', 'closable', false)
+      .modal('refresh').modal('show');
 
-	  var relativeX = (e.pageX - offset.left);
-	  var relativeY = (e.pageY - offset.top);
-	  var imagemap_width = $('#map').width();
-	  var imagemap_height = $('#map').height();
-	  /*alert(relativeX+':'+relativeY);*/
-	  $(".position").val("afaf");
+    }).fail(function() {
+      $('.ui.dimmer.site').dimmer('hide');
+      alert( "error" );
+    });
+  });
+  
 
-		$('#x_point').text("x = " + relativeX);
-		$('#y_point').text("y = " + relativeY);
-		$('#image_width').text("width = " + imagemap_width);
-		$('#image_hight').text("hight = " + imagemap_height);
-
-		$('#beacon_x').val(relativeX);
-		$('#beacon_y').val(relativeY);
-		$('#map_width').val(imagemap_width);
-		$('#map_hight').val(imagemap_height);
-		$('#offsetleft').val(offset.left);
-		$('#offsettop').val(offset.top);
-
-		$("#add_beacon").show();
-
-		});
-	$("#add_beacon").hide();
-});
 
 $(function()
 {
@@ -59997,22 +67095,7 @@ $(function()
 	);
 });
 /*
-$(function()
-{
-	$("#beacon").click
-	(function(e)
-		{
-			if($('#sidebar-wrapper').css('display') == 'none'){
-				$("#sidebar-wrapper").show();
-			}
-			else{
-				$("#sidebar-wrapper").hide();
-			}
-		}
-	);
-});*/
 
-//------------------------------------Progress Bar
 
 //--- 新增畫面選擇brand_id
 

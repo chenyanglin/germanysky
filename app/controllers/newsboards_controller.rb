@@ -4,7 +4,7 @@ before_action :set_newsboard, only: [:edit, :update, :destroy]
 	def index
 		    @newsboards = Newsboard.all
         @newsboards = @newsboards.like(params[:filter]) if params[:filter]
-        @newsboards = @newsboards.order(updated_at: :desc) if params[:recent]
+        @newsboards = @newsboards.order(updated_at: :desc)
         @newsboards_size = @newsboards.size
         @newsboards = @newsboards.page(params[:page]).per(15)
         @newsboard_info = false

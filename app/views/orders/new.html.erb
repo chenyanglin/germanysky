@@ -23,8 +23,8 @@
             </thead>
             <tbody>
             <% @shoppingcarts.each do |shoppingcart| %>
-            <input type="hidden" id="surplus<%= shoppingcart.id%>" value="<%=shoppingcart.product.product_options.find_by_option1(shoppingcart.option_id).surplus %>">
-            <% price = shoppingcart.product.product_options.find_by_option1(shoppingcart.option_id).price%>
+            <input type="hidden" id="surplus<%= shoppingcart.id%>" value="<%=shoppingcart.product.product_options.find(shoppingcart.option_id).surplus %>">
+            <% price = shoppingcart.product.product_options.find(shoppingcart.option_id).price%>
 <tr>
   <td><%= shoppingcart.product.name %></td>
   <td><%= shoppingcart.option_id %></td>

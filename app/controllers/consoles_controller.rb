@@ -6,10 +6,22 @@ class ConsolesController < ApplicationController
     @product = @product.order("created_at desc")
     @newsboards = Newsboard.limit(5).order('id desc')
 	end
-
+  def fblogin
+    @account = Account.find_by_account_name(params[:uid])
+    if @account != nil
+      session[:user_id] = @account.id
+      session[:profile_photo] = params[:profile_photo]
+      render :text => "login"
+    else
+      render :text => "register"
+    end
+  end
 	def login
     if session[:user_id] != nil
          @account = Account.find_by(id: session[:user_id])
+        end
+        if session[:profile_photo].present?
+          session[:profile_photo] = nil
         end
   render :layout => "empty"
 	end
@@ -39,12 +51,29 @@ class ConsolesController < ApplicationController
        if session[:user_id].present?
         session[:user_id] = nil
         end
+        if session[:profile_photo].present?
+          session[:profile_photo] = nil
+        end
     # cookies.delete(:auth_token)
     redirect_to consoles_path
   end
   def aboutus
   end
-
+  def subscription
+    @newsletteremail = NewsletterEmail.new
+    @newsletteremail.email = params[:email]
+    if @current_user != nil
+      @newsletteremail.account_id = @current_user.id
+      @newsletteremail.name = @current_user.name
+      @newsletteremail.account_name = @current_user.account_name
+    end
+  if @newsletteremail.save
+    render :text => "success"
+  else
+    render :text => "error"
+  end
+    
+  end
 	  def test
     @account = ManagerAccount.new
 

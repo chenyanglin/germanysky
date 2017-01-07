@@ -15,12 +15,14 @@
 
 <% @orders.each do |order| %>
 <tr>
+<% if @current_user.role == 1 %>
   <td class="center aligned collapsing order-setting">
     <div class="ui child checkbox">
       <input type="checkbox" name="<%= order.id %>" value="<%= order.id %>">
       <label></label>
     </div>
   </td>
+  <%end%>
   <td class="center aligned collapsing order-setting"><%= order.ordernumber %></td>
   <td><%= order.total_price%></td>
   <!-- 付款tag -->
@@ -104,15 +106,20 @@
  <%= order.created_at.strftime("%Y-%m-%d") %>
  </td>
   <td class="collapsing">
-	
+	 <% if order.delivery_status == 5 && order.pay_status == 6 %>
+    <% else %>
     <button class="ui blue basic button order_edit" data-value="<%= order.id %>">修改</button></br>
+    <%end%>
      <% if @current_user.role ==1 %>
      <%= link_to order, class: 'ui orange basic button order_del', method: :delete, data:{id: order.id} do %>
       刪除
     <% end %>
     
     </br>
+    <% if order.delivery_status == 5 && order.pay_status == 6 %>
+    <% else %>
     <button class="ui violet basic button orderdone" data-value="<%= order.id %>">完成</button>
+    <%end%>
     <% end %>
   </td>
 </tr>

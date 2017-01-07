@@ -29,10 +29,10 @@
 
 $(document).ready(function() {
 
-	$('#user_profile').popup({
-		inline   : true,
-		position : 'bottom right',
-		on: 'click'
+  $('#user_profile').popup({
+    inline   : true,
+    position : 'bottom right',
+    on: 'click'
   });
   $('#type_and_brand').popup({
     inline   : true,
@@ -78,59 +78,59 @@ $(document).ready(function() {
   });
   
 $(function() {
-	$("#map").click
-	(function(e) {
+  $("#map").click
+  (function(e) {
 
-	  var offset = $(this).offset();
+    var offset = $(this).offset();
 
-	  var relativeX = (e.pageX - offset.left);
-	  var relativeY = (e.pageY - offset.top);
-	  var imagemap_width = $('#map').width();
-	  var imagemap_height = $('#map').height();
-	  /*alert(relativeX+':'+relativeY);*/
-	  $(".position").val("afaf");
+    var relativeX = (e.pageX - offset.left);
+    var relativeY = (e.pageY - offset.top);
+    var imagemap_width = $('#map').width();
+    var imagemap_height = $('#map').height();
+    /*alert(relativeX+':'+relativeY);*/
+    $(".position").val("afaf");
 
-		$('#x_point').text("x = " + relativeX);
-		$('#y_point').text("y = " + relativeY);
-		$('#image_width').text("width = " + imagemap_width);
-		$('#image_hight').text("hight = " + imagemap_height);
+    $('#x_point').text("x = " + relativeX);
+    $('#y_point').text("y = " + relativeY);
+    $('#image_width').text("width = " + imagemap_width);
+    $('#image_hight').text("hight = " + imagemap_height);
 
-		$('#beacon_x').val(relativeX);
-		$('#beacon_y').val(relativeY);
-		$('#map_width').val(imagemap_width);
-		$('#map_hight').val(imagemap_height);
-		$('#offsetleft').val(offset.left);
-		$('#offsettop').val(offset.top);
+    $('#beacon_x').val(relativeX);
+    $('#beacon_y').val(relativeY);
+    $('#map_width').val(imagemap_width);
+    $('#map_hight').val(imagemap_height);
+    $('#offsetleft').val(offset.left);
+    $('#offsettop').val(offset.top);
 
-		$("#add_beacon").show();
+    $("#add_beacon").show();
 
-		});
-	$("#add_beacon").hide();
+    });
+  $("#add_beacon").hide();
 });
 
 $(function()
 {
-	$("#other").click
-	(function(e)
-		{
-//		  $("#add_beacon").hide();
-		}
-	);
+  $("#other").click
+  (function(e)
+    {
+//      $("#add_beacon").hide();
+    }
+  );
 });
 /*
 $(function()
 {
-	$("#beacon").click
-	(function(e)
-		{
-			if($('#sidebar-wrapper').css('display') == 'none'){
-				$("#sidebar-wrapper").show();
-			}
-			else{
-				$("#sidebar-wrapper").hide();
-			}
-		}
-	);
+  $("#beacon").click
+  (function(e)
+    {
+      if($('#sidebar-wrapper').css('display') == 'none'){
+        $("#sidebar-wrapper").show();
+      }
+      else{
+        $("#sidebar-wrapper").hide();
+      }
+    }
+  );
 });*/
 
 //------------------------------------Progress Bar
@@ -139,15 +139,15 @@ $(function()
 
 $(document).on('change','#new_brand_id', function () {//change majors when user changes school
 
-	var e = document.getElementById("new_brand_id");
-	var brand = e.options[e.selectedIndex].value;
+  var e = document.getElementById("new_brand_id");
+  var brand = e.options[e.selectedIndex].value;
 
-	if ( brand == 1 ){
-		document.getElementById("new_power").checked = true;
-	}
-	else{
-		document.getElementById("new_power").checked = false;
-	}
+  if ( brand == 1 ){
+    document.getElementById("new_power").checked = true;
+  }
+  else{
+    document.getElementById("new_power").checked = false;
+  }
 });
 
 //---beacon_uuid dropdown select
@@ -171,17 +171,17 @@ $(document).on('change','#new_brand_id', function () {//change majors when user 
 //     $("#beacon_uuid_dropdown").empty();//remove all previous majors
 //     var option;
 //     if(data.length != 0){
-// 	    for(i = 0;i<data.length;i++){
-// 	        $("#beacon_uuid_dropdown").append(//add in an option for each major
-// 	            option = $("<option></option>").attr("value", data[i].beacon_uuid).text(data[i].beacon_uuid),
-// 	            option.attr('selected', true)
-// 	        );
-// 	    }
-//     	$("#beacon_description").show();
-// 	}
-// 	else{
-// 		$("#beacon_description").hide();
-// 	}
+//      for(i = 0;i<data.length;i++){
+//          $("#beacon_uuid_dropdown").append(//add in an option for each major
+//              option = $("<option></option>").attr("value", data[i].beacon_uuid).text(data[i].beacon_uuid),
+//              option.attr('selected', true)
+//          );
+//      }
+//      $("#beacon_description").show();
+//  }
+//  else{
+//    $("#beacon_description").hide();
+//  }
 // };
 
 

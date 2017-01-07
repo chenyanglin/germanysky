@@ -62,7 +62,9 @@
       <% end %>
         </div>
         </div>
-
+<%= link_to newsletters_path, class: "item" do %>
+      <i class="in cart icon"></i>發送電子報
+    <% end %>
       
     
 
@@ -107,8 +109,30 @@
     <% if @current_user.present? %>
     <a class="inline item" href="/products/shoppingcart" data-html="<%if @barcarts.size>0 %>
     您的購物車商品列表<br>
+    <div class='divider'></div>
+    <table class='striped table'>
+    <%@cartprice=0%>
     <%@barcarts.each do |b| %>
-    <%=b.product.name%>&nbsp;x&nbsp;<%=b.sum %><br><%end%><%else%>購物車是空的<%end%>">
+    <tr>
+    <tr>
+    <td class='graybg'>
+    <img class='ui centered mini image' src='<%= asset_path '100px.png' %>' style='height: 40px; width: 40px; object-fit: contain'>
+    </td>
+    </tr>
+    <td>
+    <tr class='graybg'>
+    <%=b.product.name%>
+    </tr>
+    <tr class='graybg'>數量：<%=b.sum %></tr>
+    <tr class='graybg'>價格：<%=b.product.product_options.find(b.option_id).price*b.sum%>
+    <%@cartprice += b.product.product_options.find(b.option_id).price*b.sum%>
+    </tr>
+    </td></tr><br>
+    <%end%>
+    </table>
+    <div class='divider'></div>
+    總價：<%=@cartprice%>
+    <%else%>購物車是空的<%end%>">
         <i class="shipping icon"></i>購物車
       </a>  
    <%end%>
@@ -122,10 +146,14 @@
     <div class="right menu">
 
       <div id="user_profile" class="ui icon dropdown blue item" style="color:#1678c2;">
+      <% if session[:profile_photo] != nil %>
+      <img class='ui centered mini image' src='<%= session[:profile_photo] %>' style='height: 40px; width: 40px; object-fit: contain'>
+      <%else%>
         <i class="user icon"></i>
+        <%end%>
         <% if @current_user != nil %>
 
-        <%= @current_user.account_name %>
+        <%= @current_user.name %>
         </div>
         <div id="profile_menu" class="ui popup transition hidden">
         <div class="ui secondary vertical icon menu">
@@ -172,9 +200,6 @@
     inline: true
   })
 ;
-function shop() {
-  
-}
 
 $(function(){
 

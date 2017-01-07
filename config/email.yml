@@ -1,0 +1,16 @@
+development:
+  address: "smtp.gmail.com"
+  port: 587
+  domain: "gmail.com"
+  authentication: "plain"
+  user_name: "chenyang1205@gmail.com"
+  password: "chenyanglin"
+  enable_starttls_auto: true
+production:
+  address: "smtp.gmail.com"
+  port: 587
+  domain: "gmail.com"
+  authentication: "plain"
+  user_name: "chenyang1205@gmail.com"
+  password: "chenyanglin"
+  enable_starttls_auto: true
