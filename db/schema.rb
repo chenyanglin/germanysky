@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170104141813) do
+ActiveRecord::Schema.define(version: 20170113120522) do
 
   create_table "account_levels", force: :cascade do |t|
     t.string   "level_name",  limit: 255
@@ -42,6 +42,7 @@ ActiveRecord::Schema.define(version: 20170104141813) do
     t.datetime "updated_at",                               null: false
     t.string   "provider",         limit: 255
     t.string   "uid",              limit: 255
+    t.string   "googleid",         limit: 255
   end
 
   create_table "brandimages", force: :cascade do |t|
@@ -102,14 +103,16 @@ ActiveRecord::Schema.define(version: 20170104141813) do
   end
 
   create_table "newsletter_emails", force: :cascade do |t|
-    t.string   "email",        limit: 255, unique: true
+    t.string   "email",        limit: 255
     t.string   "account_id",   limit: 255
     t.string   "account_name", limit: 255
     t.string   "name",         limit: 255
-    t.integer  "status",       limit: 4, default: 1
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.integer  "status",       limit: 4,   default: 1, null: false
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
   end
+
+  add_index "newsletter_emails", ["email"], name: "email_UNIQUE", unique: true, using: :btree
 
   create_table "newsletters", force: :cascade do |t|
     t.string   "subject",    limit: 255
@@ -120,11 +123,14 @@ ActiveRecord::Schema.define(version: 20170104141813) do
   end
 
   create_table "order_messages", force: :cascade do |t|
-    t.string   "order_id",   limit: 255
-    t.string   "account_id", limit: 255
-    t.string   "content",    limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.string   "order_id",     limit: 255
+    t.string   "account_id",   limit: 255
+    t.string   "content",      limit: 255
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+    t.string   "reply",        limit: 255
+    t.integer  "status",       limit: 4
+    t.string   "account_name", limit: 255
   end
 
   create_table "order_products", force: :cascade do |t|
@@ -165,6 +171,7 @@ ActiveRecord::Schema.define(version: 20170104141813) do
     t.date     "change_date"
     t.datetime "created_at",                               null: false
     t.datetime "updated_at",                               null: false
+    t.integer  "get_point",        limit: 4
   end
 
   add_index "orders", ["ordernumber"], name: "ordernumber_UNIQUE", unique: true, using: :btree
@@ -225,6 +232,28 @@ ActiveRecord::Schema.define(version: 20170104141813) do
   end
 
   add_index "product_paymentships", ["product_id", "payment_id"], name: "index_product_paymentships_on_product_id_and_payment_id", unique: true, using: :btree
+
+  create_table "product_registers", force: :cascade do |t|
+    t.string   "email",             limit: 255
+    t.string   "account_id",        limit: 255
+    t.string   "account_name",      limit: 255
+    t.string   "product_id",        limit: 255
+    t.string   "product_option_id", limit: 255
+    t.integer  "quantity",          limit: 4
+    t.integer  "sendemail",         limit: 4
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+  end
+
+  create_table "product_specialofferships", force: :cascade do |t|
+    t.integer  "product_id",        limit: 4
+    t.integer  "product_option_id", limit: 4
+    t.integer  "specialoffer_id",   limit: 4
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
+  add_index "product_specialofferships", ["product_id", "product_option_id", "specialoffer_id"], name: "offer_index", unique: true, using: :btree
 
   create_table "product_typeships", force: :cascade do |t|
     t.integer  "product_id",  limit: 4
@@ -307,13 +336,14 @@ ActiveRecord::Schema.define(version: 20170104141813) do
     t.integer  "sellprice",     limit: 4
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
+    t.integer  "get_point",     limit: 4
   end
 
   add_index "shoppingcarts", ["account_id", "product_id", "option_id"], name: "index_account_product", unique: true, using: :btree
 
   create_table "specialoffers", force: :cascade do |t|
     t.string   "name",         limit: 255
-    t.string   "type",         limit: 255
+    t.string   "offertype",         limit: 255
     t.integer  "productcount", limit: 4
     t.integer  "saleprice",    limit: 4
     t.integer  "discount",     limit: 4

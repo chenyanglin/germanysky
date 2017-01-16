@@ -13,12 +13,13 @@
           <table id="order_table" class="ui celled table" style="table-layout:fixed">
             <thead>
               <tr>
-                <th style="background-color:#2894FF"><label>商品名稱</label></th>
-                <th style="background-color:#2894FF"><label>規格</label></th>
-                <th style="background-color:#2894FF"><label>圖片</label></th>
-                <th style="background-color:#2894FF"><label>單價</label></th>
-                <th style="background-color:#2894FF"><label>數量</label></th>
-                <th style="background-color:#2894FF"><label>總價</label></th>
+                <th ><label>商品名稱</label></th>
+                <th ><label>規格</label></th>
+                <th ><label>圖片</label></th>
+                <th ><label>單價</label></th>
+                <th ><label>數量</label></th>
+                <th ><label>紅利</label></th>
+                <th ><label>總價</label></th>
               </tr>
             </thead>
             <tbody>
@@ -35,6 +36,7 @@
   <td><div  id="selectsum">
       <%= shoppingcart.sum %>
       </div></td>
+  <td><%= @get_point %>點</td>
   <td>$<%= price*shoppingcart.sum %></td>
   
 </tr>
@@ -42,7 +44,7 @@
 <% end %>
 <tr>
 
-<td align="center" colspan="6" style="background-color:teal" ><label>商品小計：</label><b id='product_price'><%= @product_price%></b></td>
+<td align="center" colspan="7" style="background-color:#C4E1E1" align="right"><label>商品小計：</label><b id='product_price'><%= @product_price%></b></td>
 </tr>
 <tr>
 <td colspan="3">
@@ -71,18 +73,18 @@
         </td>
         </tr>
         <tr>
-        <td colspan="6" >
+        <td colspan="7" >
       <input type="hidden" id="user_point" value="<%= @current_user.point%>" />
       <label>使用紅利點數：</label><input type="text" name="order[usepoint]" id="usepoint" onkeyup="return ValidatePoint($(this),value)" value="0"/><b>您目前有<%= @current_user.point%>點(不可大於現有點數)</b>
         </td>
         </tr>
-        <td colspan="6" >
+        <td colspan="7" >
     <input type="hidden" id="total_price_hide" name="order[total_price]" value="<%= @order_price%>" />
   <label>總金額：</label><b id='total_price' >付款手續費 ＄0 + 運費 ＄0 +商品總計 ＄<%=@product_price %>  - 使用紅利 0 點 =＄<%= @product_price%></b>
         </td>
         </tr>
         <tr>
-        <th colspan="6" >
+        <th colspan="7" >
   <label>收貨資料</label>
         </th>
 
@@ -100,13 +102,13 @@
         </td>
         </tr>
         <tr>
-        <td colspan="6" >
+        <td colspan="7" >
   <label>備註：</label><textarea name="order[note]" id="content" rows="3" cols="120">
 </textarea>
         </td>
         </tr>
         <tr>
-        <td colspan="6" >
+        <td colspan="7" >
         <button id="to_order"  class="ui blue button">
         <i class="chevron circle right icon"></i>
         立即結帳

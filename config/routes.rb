@@ -17,17 +17,20 @@ Rails.application.routes.draw do
      collection do
       get :login
       post :fblogin
+      post :googlelogin
       post :signin
       get :logout
       get :aboutus
       get :test
       get :subscription
+      get :templateindex
     end
   end
   resources :accounts do
      collection do
       get :register
       get :fbregister
+      get :googleregister
       get :login
       get :console_edit
       post :signin
@@ -41,6 +44,8 @@ Rails.application.routes.draw do
   end
   resources :specialoffers do
     collection do
+      get :select_product
+      post :insertproduct
     end
   end
   resources :newsboards do
@@ -74,6 +79,8 @@ Rails.application.routes.draw do
       get :console_index
       get :list
       get :progressbar
+      get :outofstock
+      get :del_register
       get :copy
       post :confirm, :to => :confirmed
       post :add_to_shoppingcart
@@ -83,6 +90,8 @@ Rails.application.routes.draw do
       get :shoppingcart_minus
       get :newlist
       get :shopprocess
+      get :register
+      post :product_register
     end
   end
     resources :type_ones do
@@ -105,12 +114,20 @@ Rails.application.routes.draw do
   end
   resources :messages do
     collection do
+      get :product_message
+      get :order_message
       get :progressbar
       post :reply
     end
   end
   resources :product_messages do
     collection do
+      post :reply
+    end
+  end
+  resources :order_messages do
+    collection do
+      post :reply
     end
   end
   # The priority is based upon order of creation: first created -> highest priority.

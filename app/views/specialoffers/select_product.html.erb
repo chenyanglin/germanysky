@@ -1,0 +1,97 @@
+  <div class="ui stackable one column centered grid">
+  <div class="fourteen wide column">
+  <input type="hidden" id="offer_id" name="offer_id" value="<%=@offer_id%>">
+  <div class="ui six cards">
+  <% if @products.present? %>
+  <% if @products.size != 0 %>
+  <% @products.each do |product| %>
+    <% surplus = 0%>
+    <% if product.product_options.size > 1 %>
+    <% price = [] %>
+    <% product.product_options.each do |o| %>
+    <% surplus += o.surplus %>
+    <% price << o.price %>
+      <%end%>
+    <% else %>
+    <% price = product.product_options.first.price %>
+    <% surplus  = product.product_options.first.surplus %>
+    <% end %>
+
+  <div class="ui card" data-id="<%= product.id %>">
+<div class="item" href="/products/<%= product.id %>">
+<%begin%>
+    <img class="ui centered tiny image" href="/products/<%= product.id %>" src="<%= asset_path '100px.png' %>" style='height: 50px; width: 50px; object-fit: contain'>
+    <%rescue%>
+  <img class="ui centered tiny image" href="/products/<%= product.id %>" src="<%= asset_path product.productimages.first.phourl %>" style='height: 50px; width: 50px; object-fit: contain'>
+  <%end%>
+    </div>
+    <div style="margin:0 auto;">
+            <%= product.name %>
+</div>
+  <div class="center content">
+  <span class="center floated">
+  
+  <% product.product_options.each do |p| %>
+      <div class="ui child checkbox">
+      <input type="checkbox" name="<%= p.id %>" value="<%=product.id%>,<%= p.id %>">
+      <label><%= p.option1 %></label>
+    </div>
+  <%end%>
+  </br>
+      </span>
+    
+  </div>
+  </a>
+</div>
+
+  <% end %>
+  <% else %>
+  <div>沒有商品</div>
+  <% end %>
+  <% end %>
+  
+</div>
+    <br>
+    <div class="ui divider"></div>
+    <button class="ui teal basic button btn-product">
+      <i class="write icon"></i>送出
+    </button>
+
+</div>
+</div>
+<script type="text/javascript">
+   $(".btn-product").click(function(){
+        selected_data_array = [];
+    var offer_id = $("#offer_id").val();
+    var is_empty = true;
+    $( ".child.checkbox" ).find("input").each(function( index ) {
+      var checkbox_value = $(this).val();
+      var is_checked = $(this).is(":checked");
+      if (is_checked) {
+        selected_data_array.push(checkbox_value);
+        is_empty = false;
+      }
+    });
+     var request = "/specialoffers/insertproduct";
+
+      var aj = $.ajax({
+          url: request,
+          type: 'post',
+          data:{
+             selected_data_array: selected_data_array,
+             offer_id: offer_id,
+           },
+          dataType: 'text'
+        }).success(function(upload_result) {
+          if(upload_result == "success" ){
+            window.location.replace("/specialoffers");
+          }
+        }).fail(function(data) {
+       alert("error");
+        });
+
+
+
+    });
+
+</script>

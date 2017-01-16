@@ -24,6 +24,15 @@ def new
   def fbregister
     @FBaccount = Account.new
   end
+  def googleregister
+    @Googleaccount = Account.new
+    @name = session[:name]
+    session[:name] = nil
+    @email = session[:email]
+    session[:email] =nil
+    @googleid = session[:googleid]
+    session[:googleid] = nil
+  end
 
   def create
     @account = Account.new(account_params)
@@ -31,6 +40,10 @@ def new
     @account.role = "2"
     if params[:account][:uid]!= nil
       @account.uid = params[:account][:uid]
+      session[:profile_photo] = params[:account][:profile_photo]
+    end
+    if params[:account][:googleid]!= nil
+      @account.uid = params[:account][:googleid]
       session[:profile_photo] = params[:account][:profile_photo]
     end
     if @account.save

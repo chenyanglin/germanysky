@@ -41,14 +41,16 @@
                 <th>圖片</th>
                 <th>單價</th>
                 <th>數量</th>
+                <th>紅利</th>
                 <th>總價</th>
                 <th>Function</th>
               </tr>
             </thead>
             <tbody>
             <% @shoppingcarts.each do |shoppingcart| %>
-            <input type="hidden" id="surplus<%= shoppingcart.id%>" value="<%=shoppingcart.product.product_options.find(shoppingcart.option_id).surplus %>">
-            <% price = shoppingcart.product.product_options.find(shoppingcart.option_id).price%>
+  <input type="hidden" id="surplus<%= shoppingcart.id%>" value="<%=shoppingcart.product_option.surplus %>">
+  <input type="hidden" id="single_point<%= shoppingcart.id%>" value="<%=shoppingcart.product.point %>">
+<% price = shoppingcart.product.product_options.find(shoppingcart.option_id).price%>
 <tr>
   <td><%= shoppingcart.product.name %><br>規格：<%= shoppingcart.option_id %></td>
   <td>
@@ -62,6 +64,7 @@
   <td><div  id="selectsum">
        <span class="input-group-btn"><button id ="minus" type="button" class="btn btn-default btn-minus" data-id="<%= shoppingcart.id %>" data-price = "<%= price %>">－</button>  <input id = "sum<%= shoppingcart.id %>" type="text" name="lname" size="2" value ="<%= shoppingcart.sum %> ">  <span class="input-group-btn"><button id = "plus" type="button" class="btn btn-default btn-plus" data-id="<%= shoppingcart.id %>" data-price = "<%= price %>">＋</button>
       </div></td>
+      <td><div style="display: inline-block;" id ="get_point<%= shoppingcart.id %>"><%= shoppingcart.get_point%></div>點</td>
   <td><b id="option_total_price<%= shoppingcart.id %>">$<%= price*shoppingcart.sum %></b></td>
   <td>
     <button class="ui red basic button" id="cart_del" value="<%= shoppingcart.id %>">刪除</button>
@@ -71,10 +74,10 @@
 
 <% end %>
 <tr>
-<td align="center" colspan="6" ><label>商品小計：</label><b id='product_price'><%= @order_price%></b></td>
+<td align="center" colspan="7" ><label>商品小計：</label><b id='product_price'><%= @order_price%></b></td>
 </tr>
         <tr>
-        <td colspan="6" >
+        <td colspan="7" >
     
         <a id="to_order"  href="/orders/new" class="small ui bottom attached blue button">
         <i class="chevron circle right icon"></i>
@@ -160,22 +163,37 @@ $("#cart_del").click(function(){
     var cart_id = $(this).data("id");
     var price = $(this).data("price");
     var sum = Number(document.getElementById("sum"+cart_id).value);
+    if (sum <= 1 )
+      {alert("不得小於1")}
+    else{
     $.get( "/products/shoppingcart_minus?cart_id="+cart_id, function(html) {
+      document.getElementById("get_point"+cart_id).innerHTML = Number(document.getElementById("get_point"+cart_id).innerHTML)/sum*(sum-1)
       sum = sum-1;
       document.getElementById("sum"+cart_id).value = sum ;
       document.getElementById("option_total_price"+cart_id).innerHTML = "$"+sum*price;
+
       order_price = Number(document.getElementById("product_price").innerHTML);
       document.getElementById("product_price").innerHTML = order_price-price;
     }).fail(function() {
 
       alert( "error" );
     });
+      }
   });
     $('body').on('click','.btn-plus',function(){
     var cart_id = $(this).data("id");
     var price = $(this).data("price");
     var sum = Number(document.getElementById("sum"+cart_id).value);
+    if (sum == Number(document.getElementById("surplus"+cart_id).value)){
+      alert("不得大於庫存");
+    }else{
     $.get( "/products/shoppingcart_plus?cart_id="+cart_id, function(html) {
+      if (sum != 0){
+      document.getElementById("get_point"+cart_id).innerHTML = Number(document.getElementById("get_point"+cart_id).innerHTML)/sum*(sum+1);
+    }else{
+      document.getElementById("get_point"+cart_id).innerHTML = Number(document.getElementById("single_point"+cart_id).value)
+      
+    }
       sum = sum+1;
       document.getElementById("sum"+cart_id).value = sum ;
       document.getElementById("option_total_price"+cart_id).innerHTML = "$"+sum*price;
@@ -185,5 +203,6 @@ $("#cart_del").click(function(){
 
       alert( "error" );
     });
+    }
   });
 </script>

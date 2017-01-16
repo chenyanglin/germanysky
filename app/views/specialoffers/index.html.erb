@@ -4,17 +4,18 @@
       <div id="control_panel" class="ui sticky control-menu">
         <div class="ui fluid vertical large menu">
           <div class="header item">
-            <h3 class="site-font ui teal header">
+            <h3 class="site-font ui brown header">
               促銷活動
             </h3>
           </div>
         <% if @current_user.present? && @current_user.role == 1 %>
             <div class="item">
-              <button id="btn_new_newsboard" class="site-font fluid ui blue right labeled icon button">
+              <button class="site-font fluid ui blue right labeled icon button btn_new_offer">
                 <i class="add icon"></i>
-                新增文章
+                新增優惠
               </button>
             </div>
+
          <%end%>
           <div class="header item">
             搜尋
@@ -49,7 +50,7 @@
     <% if @specialoffers.present? %>
       <% if @specialoffers.size != 0 %>
         <div class="infinite-table">
-          <table id="newsboards_table" class="site-font ui sortable selectable teal table">
+          <table id="specialoffers_table" class="site-font ui sortable selectable teal table">
             <thead>
               <tr>
                 <th>名稱</th>
@@ -80,11 +81,64 @@
 
 </div>
 
-<div class="ui small modal edit-specialoffer" style="padding-top:0px;">
+
+<div class="ui modal edit-specialoffer" style="padding:10px;">
   <i class="close icon"></i>
-  <div id="edit_from" style="padding:10px;">
+
+  <div class="ui container">
+  <div id="edit_title_form" >
+    <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
+      <div class="content">
+        新增優惠
+      </div>
+    </h1>
+      <div class="ui horizontal divider">New Offer</div>
+    <div class="ui stackable one column centered grid">
+    <div class="fourteen wide column">
+    <div class="ui large form" style="text-align:left;">
+        <div class="ui attached center aligned segment" style="padding:10px;">
+        <%= select_tag :type, options_for_select([['價格優惠',1], ['折扣優惠', 2]]),:prompt => '請選擇類型',:id => 'type_select',:class => "ui fluid selection dropdown" %>
+        </div>
+    </div>
+    </div>
+    </div>
+    </div>
   </div>
+
+  <div id="edit_from" >
+  </div>
+
 </div>
+
+
+<div class="ui modal select-product-modal" style="padding:10px;">
+  <i class="close icon"></i>
+
+  <div class="ui container">
+  <div id="edit_title_form" >
+    <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
+      <div class="content">
+        選擇商品
+      </div>
+    </h1>
+      <div class="ui horizontal divider">Select Product</div>
+    <div class="ui stackable one column centered grid">
+    <div class="fourteen wide column">
+    <div class="ui large form" style="text-align:left;">
+        <div class="ui attached center aligned segment" style="padding:10px;">
+        <%= select_tag :select_product_type, options_from_collection_for_select(@product_type, "id", "name"), prompt: "全部分類", :id => 'product_type_select',:class => "ui fluid selection dropdown" %>
+        </div>
+    </div>
+    </div>
+    </div>
+    </div>
+  </div>
+
+  <div id="product_from" >
+  </div>
+
+</div>
+
 
 <div class="ui basic modal delete-check">
   <i class="close icon"></i>
@@ -115,6 +169,44 @@
 
 
 <script type="text/javascript">
+
+  function loadContentForm(){
+    var selected_type = $("#type_select").val();
+    console.log(selected_type);
+    $("#type_select").addClass("loading");
+    $.get( "/specialoffers/new?type="+selected_type, function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $("#type_select").removeClass("loading");
+    }).fail(function() {
+      console.log( "error" );
+      $("#type_select").removeClass("loading");
+    });
+  }
+
+  $("#type_select").change(function(){
+    loadContentForm();
+  });
+
+    function loadProductForm(){
+    var selected_type = $("#product_type_select").val();
+    console.log(selected_type);
+    $("#product_type_select").addClass("loading");
+    $.get( "/specialoffers/select_product?type="+selected_type, function(html) {
+      $("#product_from").empty();
+      $("#product_from").append(html);
+      $("#product_type_select").removeClass("loading");
+    }).fail(function() {
+      console.log( "error" );
+      $("#product_type_select").removeClass("loading");
+    });
+  }
+
+  $("#product_type_select").change(function(){
+    loadProductForm();
+  });
+
+
 $(function(){
   $('.ui.sticky.control-menu')
   .sticky({
@@ -150,13 +242,13 @@ $(function(){
   $( "#filter" ).focus(function() {
     search_msg.popup('hide');
   });
-  $('body').on('click','.newsboard_info',function(){
+  $('body').on('click','.specialoffer_info',function(){
     var row_id = $(this).data("value");
     show_info(row_id);
   });
-  function show_info(newsboard_id){
+  function show_info(specialoffer_id){
     
-window.location.replace("http://"+location.host+"/newsboards/"+newsboard_id);
+window.location.replace("http://"+location.host+"/specialoffers/"+newsboard_id);
   }
   function start_search(){
     var search_string = $("#filter").val();
@@ -164,10 +256,10 @@ window.location.replace("http://"+location.host+"/newsboards/"+newsboard_id);
       search_msg.popup('toggle');
     }else{
       var target_url = "";
-      if(window.location.href == "http://"+location.host+"/newsboards"){
+      if(window.location.href == "http://"+location.host+"/specialoffers"){
         target_url = window.location.href+"?filter="+search_string;
       }else if(window.location.href.indexOf('filter') > -1){
-        target_url = "http://"+location.host+"/newsboards?filter="+search_string;
+        target_url = "http://"+location.host+"/specialoffers?filter="+search_string;
       }else{
         target_url = window.location.href+"&filter="+search_string;
       }
@@ -176,18 +268,19 @@ window.location.replace("http://"+location.host+"/newsboards/"+newsboard_id);
   }
 // search functions
 
-  $('#newsboards_table').tablesort();
+  $('#specialoffers_table').tablesort();
 
-  $('body').on('click','.newsboard_edit',function(){
+  $('body').on('click','.specialoffer_edit',function(){
     $('.ui.dimmer.main').dimmer('show');
 
     var row_id = $(this).data("value");
-    $.get( "/newsboards/"+row_id+"/edit", function(html) {
+    $.get( "/specialoffers/"+row_id+"/edit", function(html) {
+      $("#edit_title_form").empty();
       $("#edit_from").empty();
       $("#edit_from").append(html);
       $('.ui.dimmer.main').dimmer('hide');
 
-      $('.ui.modal.edit-newsboard').modal({
+      $('.ui.modal.edit-specialoffer').modal({
         observeChanges: true
       }).modal('refresh').modal('show');
 
@@ -197,13 +290,32 @@ window.location.replace("http://"+location.host+"/newsboards/"+newsboard_id);
     });
   });
 
-  $('body').on('click', '.newsboard_del',function(){
+    $('body').on('click','.product_edit',function(){
+    $('.ui.dimmer.main').dimmer('show');
+
+    var row_id = $(this).data("value");
+    $.get( "/specialoffers/select_product?id="+row_id, function(html) {
+      $("#product_from").empty();
+      $("#product_from").append(html);
+      $('.ui.dimmer.main').dimmer('hide');
+
+      $('.ui.modal.select-product-modal').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $('.ui.dimmer.main').dimmer('hide');
+      alert( "error" );
+    });
+  });
+
+  $('body').on('click', '.specialoffer_del',function(){
     var href = this.href;
     var orign_link = $(this);
-    var newsboard_name = $(this).data("name");
-    console.log(newsboard_name);
+    var specialoffer_name = $(this).data("name");
+    console.log(specialoffer_name);
 
-    $(".target_newsboard").text(newsboard_name);
+    $(".target_specialoffer").text(specialoffer_name);
 
     $('.delete-check').modal({
         onApprove : function() {
@@ -220,22 +332,18 @@ window.location.replace("http://"+location.host+"/newsboards/"+newsboard_id);
     return false;
   });
 
-  $("#btn_new_newsboard").click(function(){
-    $("#btn_new_newsboard").addClass("loading");
-    $.get( "/newsboards/new", function(html) {
-      $("#edit_from").empty();
-      $("#edit_from").append(html);
-      $("#btn_new_newsboard").removeClass("loading");
-
-      $('.ui.modal.edit-newsboard').modal({
-        observeChanges: true
-      }).modal('refresh').modal('show');
-
-    }).fail(function() {
-      $("#btn_new_newsboard").removeClass("loading");
-      alert( "error" );
-    });
-
+  $(".btn_new_offer").click(function(){
+    $('#type_select')
+      .dropdown()
+    ;
+    $('.ui.modal.edit-specialoffer').modal({
+        observeChanges: true,
+        onHidden : function() {
+          $("#edit_from").empty();
+          $("#type_select").dropdown('clear');
+        }
+      }).modal('setting', 'closable', false)
+      .modal('refresh').modal('show');
   });
 
 

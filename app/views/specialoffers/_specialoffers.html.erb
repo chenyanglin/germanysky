@@ -1,0 +1,30 @@
+<% @specialoffers.each do |specialoffer| %>
+<tr>
+<td class="collapsing newsboard_info not-icon" data-value="<%= specialoffer.id %>">
+<%= specialoffer.name %>
+  </td>
+  <td><%if specialoffer.offertype == "1" %>
+      價格優惠
+      <% elsif specialoffer.offertype =="2"%>
+      折扣優惠
+      <%end%>
+  </td>
+  <td><%if specialoffer.offertype == "1" %>
+      任選<%= specialoffer.productcount %>件，一件<%=specialoffer.saleprice%>元
+      <% elsif specialoffer.offertype =="2"%>
+      任選<%= specialoffer.productcount %>件，一件打<%=specialoffer.discount%>折
+      <%end%>
+
+      </td>
+  <td><%= specialoffer.products.size %></td>
+ <% if @current_user.present? && @current_user.role == 1 %>
+  <td class="collapsing">
+  <button class="ui blue basic button product_edit" data-value="<%= specialoffer.id %>">商品</button>
+    <button class="ui blue basic button specialoffer_edit" data-value="<%= specialoffer.id %>">修改</button>
+    <%= link_to specialoffer, class: 'ui orange basic button specialoffer_del', method: :delete, data:{name: specialoffer.name} do %>
+      刪除
+    <% end %>
+  </td>
+  <% end %>
+</tr>
+<% end %>

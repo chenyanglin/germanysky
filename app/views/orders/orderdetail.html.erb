@@ -1,9 +1,10 @@
-<div class="ui container">
+  <div class="ui container">
   <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 20px 0;">
     <div class="content">
       訂單資料
     </div>
   </h1>
+  <input type="hidden" id="order_id" value="<%=@order.id%>">
   <div class="ui horizontal divider">order detail</div>
    <%case status = @order.pay_status %>
     <% when @order.pay_status = 1%>
@@ -55,8 +56,16 @@
     <% end %>
     <br></br>
     <div></div>
-  <%= form_for(@order) do |f| %>
-   <% if @order.order_products.present? %>
+
+<div class="ui top attached tabular menu">
+  <a class="item active" data-tab="first">訂單資料</a>
+  <a class="item" data-tab="second">付款資料</a>
+  <a class="item" data-tab="third">收件資料</a>
+  <a class="item" data-tab="fourth">訂單留言</a>
+  </div>
+  <div class="ui bottom attached tab segment active" data-tab="first">
+ 
+ <% if @order.order_products.present? %>
       <% if @order.order_products.size != 0 %>
         <div class="infinite-table">
           <table id="order_table" class="ui celled table" style="table-layout:fixed">
@@ -107,28 +116,18 @@
   <label>總金額：</label><b id='total_price' ><%= @order.total_price%></b>
         </td>
         </tr>
+        </tbody>
         </table>
-        <div class="ui horizontal divider">Receiver Info</div>
-<table class="ui celled table" style="table-layout:fixed">
-      <tr>
-        <td colspan="1" >
-  <label>姓名：</label><%= @order.receiver_name %>
-        </td>
-        <td colspan="1" >
-  <label>電話：</label><%= @order.receiver_phone %>
-        </td>
-        <td colspan="2" >
-  <label>收貨地址：</label><%= @order.receiver_address %>
-        </td>
-        </tr>
-        <tr>
-        <td colspan="4" >
-  <label>備註：</label><%= @order.note %>
-        </td>
-        </tr>
-            </tbody>
-          </table>
-    <div class="ui horizontal divider">Pay Info</div>
+        </div>
+                  <% else %>
+<h3 class="ui center aligned icon header">沒有訂單！</h3>
+<% end %>
+
+  </div>
+
+  <div class="ui bottom attached tab segment" data-tab="second">
+   <div class="ui horizontal divider">Pay Info</div>
+   <% if @order.order_products.present? %>
     <table class="ui celled table" style="table-layout:fixed">
     <tr>
     <td colspan="4">
@@ -153,22 +152,75 @@
     <%end%>
     </td>
     </table>
-        </div>
-
-        <div class="divider"></div>
-          
 
       <% else %>
-        <h3>購物車沒有商品。</h3>
+        <h3>沒有訂單。</h3>
       <% end %>
-    
+<% else %>
+<h3 class="ui center aligned icon header">沒有訂單！</h3>
+<% end %>
   </div>
 
-
-<% else %>
-<h3 class="ui center aligned icon header">購物車是空的，快去選購吧！</h3>
+  <div class="ui bottom attached tab segment" data-tab="third">
+     <% if @order.order_products.present? %>
+        <div class="ui horizontal divider">Receiver Info</div>
+<table class="ui celled table" style="table-layout:fixed">
+      <tr>
+        <td colspan="1" >
+  <label>姓名：</label><%= @order.receiver_name %>
+        </td>
+        <td colspan="1" >
+  <label>電話：</label><%= @order.receiver_phone %>
+        </td>
+        <td colspan="2" >
+  <label>收貨地址：</label><%= @order.receiver_address %>
+        </td>
+        </tr>
+        <tr>
+        <td colspan="4" >
+  <label>備註：</label><%= @order.note %>
+        </td>
+        </tr>
+            </tbody>
+          </table>
+          <% else %>
+<h3 class="ui center aligned icon header">沒有訂單！</h3>
 <% end %>
-<%end%>
+    
+</div>
+<div class="ui bottom attached tab segment" data-tab="fourth">
+
+  <% if @messages.size > 0 %>
+  <div class="comment">
+    <% @messages.each do |r| %>
+    <div class="ui graybg segment">
+      <a class="author"><%if r.account.role == 1 %>管理員<%= r.account_name %><%else%><%= r.account_name %><%end%></a>
+      
+        <div class="date"><%= r.created_at.strftime("%Y-%m-%d") %></div>
+      
+      <div class="text">
+        <%= r.content %>
+      </div>
+    </div>
+    <% end %>
+  </div>
+  <%else%>
+  目前沒有留言
+  <% end %>
+  <br></br>
+  <div class="divider"></div>
+<div class="form-check">
+  <%= form_for @message ,:html =>{:class => "ui reply form"}, :url => new_order_message_path, method: :post do |f| %>
+    <div class="field">
+      <textarea id="content" name = "content" rows="3"></textarea>
+    </div>
+    <div id="reply-btn" class="ui primary labeled icon button reply-btn">
+      <i class="icon edit"></i> 留言
+    </div>
+<% end %>
+</div>
+
+
 </div>
 <script type="text/javascript">
 function ValidateNumber(e, pnumber)
@@ -184,7 +236,31 @@ function ValidateNumber(e, pnumber)
 
     return false;
 }
+$('.form-check form').on('click','.reply-btn',function(){
+    var order_id = document.getElementById("order_id").value;
+    var replycontent = document.getElementById("content").value;
+    var request = "/order_messages";
 
-
-
+      var aj = $.ajax({
+          url: request,
+          type: 'post',
+          data:{
+             order_id: order_id,
+             replycontent: replycontent
+           },
+          dataType: 'json'
+        }).success(function(upload_result) {
+          if(upload_result == "success" ){
+            window.location.reload();
+          }
+        }).fail(function(data) {
+       window.location.reload();
+        });
+    return false; // prevents normal behaviour
+  });
+</script>
+  <script type="text/javascript">
+  $('.menu .item')
+  .tab()
+;
 </script>

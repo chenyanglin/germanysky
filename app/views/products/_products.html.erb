@@ -1,39 +1,45 @@
 <% @products.each do |product| %>
 <tr>
   <td class="product_info not-icon"  style= "word-break:break-all;" data-value="<%= product.id %>"><%= product.name %></td>
-  <td class="product_info not-icon" style= "word-break:break-all; " data-value="<%= product.id %>"><%= product.producttype.name %></td>
-  <td class="collapsing product_info not-icon" data-value="<%= product.id %>"><%= product.type_one.name %></td>
   <td><div class="item">
   
 <%begin%>
-     <img class="ui centered small image" src="<%= asset_path product.productimages.first.phourl %>">
+     <img class="ui centered tiny image" src="<%= asset_path product.productimages.first.phourl %>">
      <%rescue%>
      <img class="ui centered tiny image" src="<%= asset_path '100px.png' %>">
      <%end%>
     </div></td>
+  <td class="product_info not-icon" style= "word-break:break-all; " data-value="<%= product.id %>"><%= product.producttype.name %></td>
+  <td class="collapsing product_info not-icon" data-value="<%= product.id %>"><%= product.type_one.name %></td>
   <td class="product_info not-icon" style= "word-break:break-all;" data-value="<%= product.id %>"><%= product.briefdescription%></td>
    <td class="product_info not-icon" style= "word-break:break-all;" data-value="<%= product.id %>">
  <% if product.product_options.size > 1 %>
+ <table border="0" width="100%">
  <% product.product_options.each do |o| %>
- <%= o.option1 %></br>
+ <tr><td><%= o.option1 %></br></td></tr>
 <%end%>
+</table>
  </td>
  <% else %>
  <%= product.product_options.first.option1 %></td>
  <% end %>
  <td>
  <% if product.product_options.size > 1 %>
+ <table border="0" width="100%">
  <% product.product_options.each do |o| %>
- <%= o.price %></br>
+ <tr><td><%= o.price %></br></td></tr>
 <%end%>
+</table>
  </td>
  <% else %>
  <%= product.product_options.first.price %></td>
  <% end %>
  <td> <% if product.product_options.size > 1 %>
+  <table border="0" width="100%">
  <% product.product_options.each do |o| %>
- <%= o.surplus %></br>
+ <tr><td><%= o.surplus %></br></td></tr>
 <%end%>
+</table>
  </td>
  <% else %>
  <%= product.product_options.first.surplus %></td>

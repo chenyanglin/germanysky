@@ -7,10 +7,21 @@
     <%= link_to newsboards_path, class: "item" do %>
         <i class="user icon"></i>公佈欄設定
       <% end %>
-    <%= link_to console_index_products_path, class: "item" do %>
-      <i class="in cart icon"></i>商品管理
-    <% end %>
 
+      <div id="product_manage" class="ui icon dropdown item">
+        <i class="clone icon"></i>
+        商品管理
+      </div>
+      <div id="brand_menu" class="ui popup transition hidden">
+        <div class="ui secondary vertical icon menu">
+        <%= link_to console_index_products_path, class: "item" do %>
+            <i class="in cart icon"></i>商品管理
+        <% end %>
+        <%= link_to outofstock_products_path, class: "item" do %>
+            <i class="in cart icon"></i>缺貨管理
+        <% end %>
+        </div>
+        </div>
     <div id="type_and_brand" class="ui icon dropdown item">
         <i class="clone icon"></i>
         分類與品牌

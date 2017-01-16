@@ -7,19 +7,27 @@
               留言管理
             </h3>
           </div>
+           <div class="header item">
+            <h4 class="site-font ui blue horizontal fitted divider header">
+              留言分類
+            </h4>
+          </div>
+          <div class="item">
+            <h4 class="ui header">
+              <a style="color:black;" href="/messages">一般留言</a>
+            </h4>
+          </div>
+          <div class="item">
+            <h4 class="ui header">
+              <a style="color:black;" href="/messages?product=1">商品留言</a>
+            </h4>
+          </div>
+          <div class="item">
+            <h4 class="ui header">
+              <a style="color:black;" href="/messages?order=1">訂單留言</a>
+            </h4>
+          </div>
          
-          <div class="header item">
-            搜尋
-          </div>
-          <div class="ui item">
-            <div class="ui transparent icon input">
-              <input id="filter" type="text" placeholder="Search...">
-                <div id="empty_msg" class="ui popup transition hidden">
-                  <span style="color:#db2828;">請輸入條件</span>
-                </div>
-              <i id="search_go" class="search link icon"></i>
-            </div>
-          </div>
          
         </div>
       </div>
@@ -40,31 +48,17 @@
     </div>
     <% if @messages.present? %>
       <% if @messages.size != 0 %>
-        <div class="infinite-table">
-          <table id="payments_table" class="site-font ui sortable selectable teal table">
-            <thead>
-              <tr>
-                <th>編號</th>
-                <th>使用者名稱</th>
-                <th>主旨</th>
-                <th>日期</th>
-                <th>管理員是否回覆</th>
-                <th style="margin: 0 10px 0 10px;">Function</th>
-              </tr>
-            </thead>
-            <tbody>
-              <%= render :partial => 'messages', :object => @messages %>
-            </tbody>
-          </table>
-          <p class="pagination">
-            <%= link_to_next_page @messages, 'Next Page', :params => {:filter => @search_param}%>
-          </p>
-        </div>
+        <% if params[:order].present? %>
+        <%= render :partial => 'order_messages', :object => @messages %>
+        <%elsif params[:product].present? %>
+        <%= render :partial => 'product_messages', :object => @messages %>
+        <% else %>
+          <%= render :partial => 'messages', :object => @messages %>
+        <% end %>       
       <% else %>
         <h3>未建立！</h3>
       <% end %>
     <% end %>
-    
           </tbody>
         </table>
   </div>
@@ -205,7 +199,7 @@ $(function(){
   });
 
 
-    $('body').on('click','.message_content',function(){
+  $('body').on('click','.message_content',function(){
     $('.ui.dimmer.main').dimmer('show');
 
     var row_id = $(this).data("value");
@@ -223,7 +217,42 @@ $(function(){
       alert( "error" );
     });
   });
+  $('body').on('click','.order_message_content',function(){
+    $('.ui.dimmer.main').dimmer('show');
 
+    var row_id = $(this).data("value");
+    $.get( "/messages/order_message?id="+row_id, function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $('.ui.dimmer.main').dimmer('hide');
+
+      $('.ui.modal.edit-account').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $('.ui.dimmer.main').dimmer('hide');
+      alert( "error" );
+    });
+  });
+  $('body').on('click','.product_message_content',function(){
+    $('.ui.dimmer.main').dimmer('show');
+
+    var row_id = $(this).data("value");
+    $.get( "/messages/product_message?id="+row_id, function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $('.ui.dimmer.main').dimmer('hide');
+
+      $('.ui.modal.edit-account').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $('.ui.dimmer.main').dimmer('hide');
+      alert( "error" );
+    });
+  });
   //   $('body').on('click','.reply-btn',function(){
   //     alert("dd");
   //   $.ajax({
@@ -251,46 +280,6 @@ $(function(){
   //   });
   //   return false; // prevents normal behaviour
   // });
-
-$('body').on('click','#edit-admin',function(){
-    $('.ui.dimmer.site').dimmer('show');
-
-    var row_id = $(this).data("value");
-    $.get( "/accounts/"+row_id+"/edit", function(html) {
-      $("#admin_from").empty();
-      $("#admin_from").append(html);
-      $('.ui.dimmer.site').dimmer('hide');
-
-      $('.ui.small.modal.admin').modal({
-        observeChanges: true
-      }).modal('setting', 'closable', false)
-      .modal('refresh').modal('show');
-
-    }).fail(function() {
-      $('.ui.dimmer.site').dimmer('hide');
-      alert( "error" );
-    });
-  });
-
-
-  $("#btn_new_message").click(function(){
-    $("#btn_new_message").addClass("loading");
-    $.get( "/messages/new", function(html) {
-      $("#edit_from").empty();
-      $("#edit_from").append(html);
-      $("#btn_new_message").removeClass("loading");
-
-      $('.ui.modal.edit-account').modal({
-        observeChanges: true
-      }).modal('refresh').modal('show');
-
-    }).fail(function() {
-      $("#btn_new_message").removeClass("loading");
-      alert( "error" );
-    });
-
-  });
-
 
 
 });

@@ -1,3 +1,5 @@
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+<meta name="google-signin-client_id" content="103495519586-8mkenfl2qrp1t22bgb60sc1f3p33fskk.apps.googleusercontent.com">
 <body style="background-color:#5B5B5B">.
 <div class="center container">
 <div class="ui one column centered grid">
@@ -44,16 +46,25 @@
      <button class="ui facebook button" data-size="xlarge" data-auto-logout-link="false" type="button" onClick="fb_login();"><i class="facebook icon"></i>Facebook登入</button>
   </td>
   <td align='center' valign="middle">
-   <button class="ui google plus button" id="googleloginbtn" type="button">
+<!--    <button class="ui google plus button" id="googleloginbtn" type="button">
   <i class="google icon"></i>
   Google登入
-</button>
+</button> -->
+<div class="g-signin2" data-onsuccess="onSignIn">googlebtn</div>
+<!-- <button class="ui google plus button"  id = "googlebtn" onClick="onSignIn();"type="button">googlebtn</button> -->
+<!-- <div id="signinButton">
+  <span class="g-signin"
+    data-scope="https://www.googleapis.com/auth/plus.login"
+    data-clientid="103495519586-8mkenfl2qrp1t22bgb60sc1f3p33fskk.apps.googleusercontent.com"
+    data-redirecturi="postmessage"
+    data-accesstype="offline"
+    data-cookiepolicy="single_host_origin"
+    data-callback="signInCallback">
+  </span>
+</div> -->
   </td>
  </tr>
 </table>
-    
-
- 
 
 <div id="status">
 </div> 
@@ -62,7 +73,11 @@
   </div>
 </div>
 
+</body>
 <script type="text/javascript">
+  window.onbeforeunload = function(e){
+     gapi.auth2.getAuthInstance().signOut();
+  };
 var count = 0;
 var browser=navigator.appName;
 if(browser=="Netscape"){    //如果瀏覽器為Netscape或者Firefox
@@ -100,6 +115,36 @@ function fb_login()
     }, {scope: 'public_profile,email'});
 }
 
+function onSignIn(googleUser) {
+  var profile = googleUser.getBasicProfile();
+  googleid = profile.getId(); // Do not send to your backend! Use an ID token instead.
+  name = profile.getName();
+  profile_photo = profile.getImageUrl();
+  email = profile.getEmail();
+      $.ajax({
+        url: "http://"+location.host+"/consoles/googlelogin", //sumbits it to the given url of the form
+        type: 'POST',
+        data: {googleid: googleid,
+             profile_photo: profile_photo,
+             name: name,
+             email: email,
+             },
+        dataType: 'text'
+    }).success(function (upload_result){
+        if(upload_result == "login" ){
+          window.location.replace("http://"+location.host+"/consoles");
+        }else if(upload_result =="register"){
+          window.location.replace("http://"+location.host+"/accounts/googleregister");
+        }
+    }).fail(function(e) {
+        console.log(e);
+    }).done(function(){
+      
+    });
+
+
+}
+
 $(function(){
 
   $("#register").click(function(){
@@ -128,7 +173,6 @@ $(function(){
 
 });
 </script>
-</body>
 <script>
   // This is called with the results from from FB.getLoginStatus().
   function statusChangeCallback(response) {

@@ -24,9 +24,9 @@
   </td>
   <%end%>
   <td class="center aligned collapsing order-setting"><%= order.ordernumber %></td>
-  <td><%= order.total_price%></td>
+  <td class="center aligned collapsing order-setting"><%= order.total_price%></td>
   <!-- 付款tag -->
-  <td>
+  <td class="center aligned collapsing order-setting">
   <%case status = order.pay_status %>
   	<% when order.pay_status = 1%>
   		<div style="text-align: center;">

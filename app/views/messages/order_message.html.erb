@@ -1,0 +1,85 @@
+<div class="ui comments">
+  <div class="comment">
+    <a class="avatar">
+      <div class="image">
+      <i class="user icon"></i>
+    </div>
+    </a>
+    <div class="content">
+      <a class="author"><%=@message.account_name%></a>
+      <div class="metadata">
+        <div class="date"><%= @message.created_at.strftime("%Y-%m-%d") %></div>
+      </div>
+      <div class="text">
+        <%= @message.content %>
+      </div>
+    </div>
+  </div>
+  <% if @message.reply != nil %>
+  <div class="comment">
+
+    <a class="avatar">
+      <div class="image">
+      <i class="red user icon"></i>
+      </div>
+    </a>
+    <div class="content">
+      <a class="author">管理員</a>
+      <div class="metadata">
+        <div class="date"><%= @message.updated_at.strftime("%Y-%m-%d") %></div>
+      </div>
+      <div class="text">
+        <%= @message.reply %>
+      </div>
+    </div>
+  </div>
+  <% end %>
+<div class="form-check">
+  <%= form_for @message ,:html =>{:class => "ui reply form"}, :url => reply_order_messages_path, method: :post do |f| %>
+      <input type="hidden" id="message_id" name="message_id" value="<%=@message.id%>">
+    <div class="field">
+      <textarea id="replycontent" name = "replycontent" rows="3"></textarea>
+    </div>
+    <div id="reply-btn" class="ui primary labeled icon button reply-btn">
+      <i class="icon edit"></i> 回覆
+    </div>
+<% end %>
+</div>
+</div>
+<script type="text/javascript">
+  $('.form-check form').on('click','.reply-btn',function(){
+
+    var message_id = document.getElementById("message_id").value;
+    var replycontent = document.getElementById("replycontent").value;
+    var request = "/order_messages/reply";
+
+      var aj = $.ajax({
+          url: request,
+          type: 'post',
+          data:{
+             message_id: message_id,
+             replycontent: replycontent
+           },
+          dataType: 'json'
+        }).success(function(upload_result) {
+          if(upload_result == "success" ){
+            window.location.replace("/"+location.host+"/messages");
+          }
+        }).fail(function(data) {
+       $.get( "/messages/order_messages?id="+message_id, function(html) {
+          $("#edit_from").empty();
+          $("#edit_from").append(html);
+          $('.ui.dimmer.main').dimmer('hide');
+
+          $('.ui.modal.edit-order').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $('.ui.dimmer.main').dimmer('hide');
+      alert( "error" );
+    });
+        });
+    return false; // prevents normal behaviour
+  });
+  </script>

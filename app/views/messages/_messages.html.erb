@@ -1,27 +1,45 @@
-<% @messages.each do |message| %>
-<tr>
-  <td><%= message.id%></td>
-  <td><%= message.account_name %></td>
-  <td><%= message.title%></td>
-  <td><%= message.created_at.strftime("%Y-%m-%d") %></td>
-  <td>
-  <% if message.status == 1 %>
-  <a class="ui teal tag label" style="width:140px;text-align:center;">
-        已回覆
-      	</a>
-  <% else %>
-  <a class="ui red tag label" style="width:140px;text-align:center;">
-        未回覆
-        </a>
-  <% end %>
-      </td>
+<div class="infinite-table">
+  <table id="payments_table" class="site-font ui sortable selectable teal table">
+    <thead>
+      <tr>
+        <th>編號</th>
+        <th>使用者名稱</th>
+        <th>主旨</th>
+        <th>日期</th>
+        <th>管理員是否回覆</th>
+        <th style="margin: 0 10px 0 10px;">功能</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @messages.each do |message| %>
+      <tr>
+        <td><%= message.id%></td>
+        <td><%= message.account_name %></td>
+        <td><%= message.title%></td>
+        <td><%= message.created_at.strftime("%Y-%m-%d") %></td>
+        <td>
+        <% if message.status == 1 %>
+          <a class="ui teal tag label" style="width:140px;text-align:center;">
+          已回覆
+      	 </a>
+        <% else %>
+          <a class="ui red tag label" style="width:140px;text-align:center;">
+          未回覆
+          </a>
+        <% end %>
+        </td>
  
-  <td class="collapsing">
-  <button class="ui brown button message_content" data-value="<%= message.id %>">詳細資料</button>
-    <%= link_to message, class: 'ui orange basic button message_del', method: :delete, data:{id: message.id} do %>
-      刪除
-    <% end %>
-    
-  </td>
-</tr>
-<% end %>
+        <td class="collapsing">
+          <button class="ui brown basic button message_content" data-value="<%= message.id %>">回覆</button>
+          <%= link_to message, class: 'ui orange basic button message_del', method: :delete, data:{id: message.id} do %>
+            刪除
+          <% end %>
+        </td>
+      </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <p class="pagination">
+    <%= link_to_next_page @messages, 'Next Page', :params => {:filter => @search_param}%>
+  </p>
+</div>

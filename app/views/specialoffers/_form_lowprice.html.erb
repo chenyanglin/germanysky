@@ -1,0 +1,68 @@
+<%= form_for(@specialoffer) do |f| %>
+<div class="ui stackable one column centered grid">
+  <div class="fourteen wide column">
+    <div class="ui form" >
+      <div class="ui segments">
+  		<div class="ui segment">
+      		<div class="inline fields">
+        		<label >名稱：</label>
+        			<div ><%= f.text_field :name, placeholder: "請輸入優惠名稱" %></div>
+      		</div>
+      	</div>
+      	<div class="ui segment">
+      		<div class="inline fields">
+        	<label >優惠內容：</label><div class="three wide field"><label style="margin:0 auto;">此區商品任選</label></div><div class="two wide field"><%= f.text_field :productcount,onkeyup: "return ValidateNumber($(this),value)" %></div><div class="two wide field"><label style="margin:0 auto;">件，一件特價</label></div><div class="two wide field"><%= f.text_field :saleprice,onkeyup: "return ValidateNumber($(this),value)" %></div><div class="one wide field"><label>元！</label></div>
+      		</div>
+      	</div>
+
+      </div>
+	</div>
+    <input type="hidden" id="offertype" name="offertype" value="1">
+    <br>
+    <div class="ui divider"></div>
+    <button id="lowprice_form_submit" class="ui teal basic button">
+      <i class="write icon"></i>送出
+    </button>
+</div>
+</div>
+
+
+<% end %>
+<script type="text/javascript">
+$(function(){
+  $('select.dropdown')
+    .dropdown()
+  ;
+  $('form').submit(function() {
+    var valuesToSubmit = $(this).serialize();
+    $("#lowprice_form_submit").addClass("loading");
+    console.log($(this).attr('action'));
+    $.ajax({
+        url: $(this).attr('action'), //sumbits it to the given url of the form
+        type: 'POST',
+        processData: false,
+        contentType: false,
+        data: new FormData(this)
+    }).success(function(upload_result){
+        console.log(upload_result);
+        if(upload_result == "success" ){
+          window.location.replace("http://"+location.host+"/specialoffers");
+        }
+    }).fail(function(e) {
+        console.log(e);
+    }).done(function(){
+      $("#lowprice_form_submit").removeClass("loading");
+    });
+    return false; // prevents normal behaviour
+  });
+});
+
+function ValidateNumber(e, pnumber)
+{
+    if (!/^\d+$/.test(pnumber))
+    {
+        $(e).val(/^\d+/.exec($(e).val()));
+    }
+    return false;
+}
+</script>

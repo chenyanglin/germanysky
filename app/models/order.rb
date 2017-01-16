@@ -1,6 +1,7 @@
 class Order < ActiveRecord::Base
 	has_many :order_products, :dependent => :destroy
 	belongs_to :account, foreign_key: "account_id"
+	has_many :order_messages, :dependent => :destroy
 
 	#pay_status 
 	#1:未付款

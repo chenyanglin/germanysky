@@ -45,10 +45,6 @@
         <label>庫存 Surplus：</label>
         <%= f.text_field :surplus, placeholder: "請輸入庫存量(數字)" ,onkeyup: "return ValidateNumber($(this),value)"%>
       </div>
-      <div class="required field">
-        <label>紅利點數 point：</label>
-        <%= f.text_field :point, placeholder: "請輸入可得紅利點數(單筆)" ,onkeyup: "return ValidateNumber($(this),value)"%>
-      </div>
 
       </div>
 
@@ -67,7 +63,10 @@
             </div>
         </div>
   </div>
-
+      <div class="required field">
+        <label>紅利點數 point：</label>
+        <%= f.text_field :point, placeholder: "請輸入可得紅利點數(單筆)" ,onkeyup: "return ValidateNumber($(this),value)"%>
+      </div>
       <div class="required field">
         <label>簡短敘述 BriefDescription：</label>
         <%= f.text_field :briefdescription, placeholder: "請輸入簡短敘述" %>
@@ -92,14 +91,14 @@
             </div>
         </div>
   </div>
-<div class="required field">
-              <label>可用運送方式：</label>
-              <%= select_tag :delivery_id, options_for_select(Delivery.all.pluck(:name, :id), params[:delivery_id]), class: "ui fluid dropdown", id: 'delivery_select', multiple: true,:data => {validate:"delivery_id"} %>
-          </div>
-          <div class="required field">
-              <label>可用付款方式：</label>
-              <%= select_tag :payment_id, options_for_select(Payment.all.pluck(:name, :id), params[:payment_id]), class: "ui fluid dropdown", id: 'payment_select', multiple: true,:data => {validate:"payment_id"} %>
-          </div>
+      <div class="required field">
+      <label>可用運送方式：</label>
+        <%= f.select :delivery_ids, Delivery.all.collect {|x| [x.name, x.id]}, {}, :class => "ui search selection dropdown", :multiple => true %>
+      </div>
+      <div class="required field">
+      <label>可用運送方式：</label>
+        <%= f.select :payment_ids, Payment.all.collect {|x| [x.name, x.id]}, {}, :class => "ui search selection dropdown", :multiple => true ,:data => {validate:"payment_id"}%>
+      </div>
 
         <div class="field">
         <div class="ui horizontal segments">

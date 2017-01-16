@@ -2,20 +2,50 @@ class MessagesController < ApplicationController
 before_filter :current_user
 before_action :set_message, only: [:edit, :update, :destroy,:show]
   def index
-
+      if params[:order].present?
         if @current_user.role == 1
-        @messages = Message.all
-        @messages = @messages.like(params[:filter]) if params[:filter]
-        @messages = @messages.order(updated_at: :desc) if params[:recent]
-        @messages_size = @messages.size
-        @messages = @messages.page(params[:page]).per(15)
+          @messages = OrderMessage.all
+          @messages = @messages.like(params[:filter]) if params[:filter]
+          @messages = @messages.order(updated_at: :desc)
+          @messages_size = @messages.size
+          @messages = @messages.page(params[:page]).per(15)
+        else
+          @messages = @current_user.order_messages
+          @messages = @messages.like(params[:filter]) if params[:filter]
+          @messages = @messages.order(updated_at: :desc)
+          @messages_size = @messages.size
+          @messages = @messages.page(params[:page]).per(15)
+        end
+      elsif params[:product].present?
+        if @current_user.role == 1
+          @messages = ProductMessage.all
+          @messages = @messages.like(params[:filter]) if params[:filter]
+          @messages = @messages.order(updated_at: :desc)
+          @messages_size = @messages.size
+          @messages = @messages.page(params[:page]).per(15)
+        else
+          @messages = @current_user.product_messages
+          @messages = @messages.like(params[:filter]) if params[:filter]
+          @messages = @messages.order(updated_at: :desc)
+          @messages_size = @messages.size
+          @messages = @messages.page(params[:page]).per(15)
+        end
       else
-        @messages = @current_user.messages
-        @messages = @messages.like(params[:filter]) if params[:filter]
-        @messages = @messages.order(updated_at: :desc)
-        @messages_size = @messages.size
-        @messages = @messages.page(params[:page]).per(15)
+        if @current_user.role == 1
+          @messages = Message.all
+          @messages = @messages.like(params[:filter]) if params[:filter]
+          @messages = @messages.order(updated_at: :desc)
+          @messages_size = @messages.size
+          @messages = @messages.page(params[:page]).per(15)
+        else
+          @messages = @current_user.messages
+          @messages = @messages.like(params[:filter]) if params[:filter]
+          @messages = @messages.order(updated_at: :desc)
+          @messages_size = @messages.size
+          @messages = @messages.page(params[:page]).per(15)
+        end
       end
+
 
 
   end
@@ -50,6 +80,14 @@ def new
   end
   def show
     @reply = Reply.new
+  render :layout => false
+  end
+  def product_message
+  @message = ProductMessage.find(params[:id])
+  render :layout => false
+  end
+  def order_message
+  @message = OrderMessage.find(params[:id])
   render :layout => false
   end
   def destroy

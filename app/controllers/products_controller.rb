@@ -8,7 +8,7 @@ before_action :set_product, only: [:edit, :update, :destroy]
         @products = Product.all.includes(:productimages,:producttype).includes(:type_one).where(on_store: true)
         # binding.pry
         @products = @products.like(params[:filter]) if params[:filter]
-        @products = @products.order(updated_at: :desc) if params[:recent]
+        @products = @products.order(updated_at: :desc)
         @products_size = @products.size
         @products = @products.page(params[:page]).per(15)
         if params[:brand].present?
@@ -28,9 +28,9 @@ before_action :set_product, only: [:edit, :update, :destroy]
 
         @brands = Brand.all
         @type_ones = TypeOne.all
-        @products = Product.all.includes(:productimages,:type_one,:producttype)
+        @products = Product.all.includes(:productimages,:type_one,:producttype,:product_options)
         @products = @products.like(params[:filter]) if params[:filter]
-        @products = @products.order(updated_at: :desc) if params[:recent]
+        @products = @products.order(updated_at: :desc)
         @products_size = @products.size
         @products = @products.page(params[:page]).per(15)
 
@@ -45,6 +45,23 @@ before_action :set_product, only: [:edit, :update, :destroy]
           @type = TypeOne.find(params[:type])
         end
   end
+  def outofstock
+        @brands = Brand.all
+        @type_ones = TypeOne.all
+        if params[:less].present?
+        @i = params[:less].to_i
+        @products = ProductOption.where("surplus <= ?" , @i ).includes(:product_registers,:product => [:productimages,:type_one])
+        else
+        @products = ProductOption.where("surplus = ?" , 0 ).includes(:product_registers,:product => [:productimages,:type_one])
+        end
+        @products = @products.like(params[:filter]) if params[:filter]
+        @products = @products.order(updated_at: :desc)
+        @products_size = @products.size
+        @products = @products.page(params[:page]).per(15)
+        @registerlists = ProductRegister.all.includes(:account,:product_option)
+        @registerlists_size = @registerlists.size
+
+  end
 
 def new
     @product = Product.new
@@ -52,12 +69,9 @@ def new
   end
 
   def create
-    @product = Product.new
-    @product.name = params[:product][:name]
-    @product.briefdescription = params[:product][:briefdescription]
-    @product.type_one_id = params[:product][:type_one_id]
-    @product.brand_id = params[:product][:brand_id]
-    @product.point = params[:product][:point]
+    @product = Product.new(product_params)
+    # params.require(:product).permit(:name, :briefdescription,:type_one_id,:brand_id,:point,delivery_ids:[])
+
     if params[:product][:type_two_id] != ''
       @product.type_two_id = params[:product][:type_two_id]
     end
@@ -82,12 +96,6 @@ def new
     @product.content = params[:content]
 
     if @product.save
-      params[:delivery_id].each do |d|
-        ProductDeliveryship.create(:product_id => @product.id, :delivery_id => d)
-      end
-      params[:payment_id].each do |d|
-        ProductPaymentship.create(:product_id => @product.id, :payment_id => d)
-      end
       if params[:productstyle] == "option"
         params[:product][:options].each do |a|
           @option = ProductOption.new
@@ -159,12 +167,14 @@ def destroy
   def add_to_shoppingcart
     product_id = params[:product_id]
     option_id = params[:option_id]
+    @product = Product.find(product_id)
     sum = params[:sum]
     if @current_user
     @shoppingcart = Shoppingcart.new
     @shoppingcart.account_id = @current_user.id
     @shoppingcart.product_id = product_id
     @shoppingcart.sum = sum
+    @shoppingcart.get_point = @product.point*sum.to_i
     @shoppingcart.option_id = option_id
     begin @shoppingcart.save
       render :text => "success"
@@ -205,7 +215,12 @@ def destroy
   end
   def shoppingcart_plus
     cart= Shoppingcart.find(params[:cart_id])
-    if cart.update(sum: cart.sum+1)
+    if cart.get_point != 0
+      get_point = cart.get_point*(cart.sum+1)/cart.sum
+    else
+      get_point = cart.product.point
+    end
+    if cart.update(sum: cart.sum+1,get_point: get_point)
       render :text => "success"
     else
       render :text => "error"
@@ -214,7 +229,7 @@ def destroy
   end
     def shoppingcart_minus
 cart= Shoppingcart.find(params[:cart_id])
-     if cart.update(sum: cart.sum-1)
+     if cart.update(sum: cart.sum-1,get_point: cart.get_point*(cart.sum-1)/cart.sum)
       render :text => "success"
     else
       render :text => "error"
@@ -232,14 +247,91 @@ cart= Shoppingcart.find(params[:cart_id])
 
   def copy
     @product = Product.find(params[:id])
-    @copy_product = Product.new
+    @copy_product = Product.new(@product.attributes)
+    product_deliveryships = @product.product_deliveryships
+    product_paymentships = @product.product_paymentships
+    productoptions = @product.product_options
+    productimages = @product.productimages
+    @copy_product.created_at = nil
+    @copy_product.updated_at = nil
+    @copy_product.id = nil
+    if @copy_product.save
+      product_deliveryships.each do |p|
+        product_delivery_copy = ProductDeliveryship.new(p.attributes)
+        product_delivery_copy.product_id = @copy_product.id
+        product_delivery_copy.id = nil
+        product_delivery_copy.created_at = nil
+        product_delivery_copy.updated_at = nil
+        product_delivery_copy.save
+      end
+      product_paymentships.each do |p|
+        product_paymentship_copy = ProductPaymentship.new(p.attributes)
+        product_paymentship_copy.product_id = @copy_product.id
+        product_paymentship_copy.id = nil
+        product_paymentship_copy.created_at = nil
+        product_paymentship_copy.updated_at = nil
+        product_paymentship_copy.save
+      end
+      productoptions.each do |p|
+        product_option_copy = ProductOption.new(p.attributes)
+        product_option_copy.product_id = @copy_product.id
+        product_option_copy.id = nil
+        product_option_copy.created_at = nil
+        product_option_copy.updated_at = nil
+        product_option_copy.save
+      end
+      productimages.each do |p|
+        product_image_copy = Productimage.new(p.attributes)
+        product_image_copy.product_id = @copy_product.id
+        product_image_copy.id = nil
+        product_image_copy.created_at = nil
+        product_image_copy.updated_at = nil
+        product_image_copy.save
+      end
     render :text => "success"
+    else
+      render :text => "error"
+    end
   end
+  
   def shopprocess
   end
-
-    def product_params
-    params.require(:product).permit(:name, :briefdescription,:price,:surplus,:type_one_id,:brand_id)
+  def register
+    @register  = ProductRegister.new
+    @product_id = params[:product_id]
+    @product_option_id = params[:product_option_id]
+    render :layout => false
+    
+  end
+  def product_register
+    @register = ProductRegister.new(register_params)
+    @register.email = @current_user.email
+    @register.account_id = @current_user.id
+    @register.account_name = @current_user.name
+    if params[:sendemail] == "on"
+      @register.sendemail = true
+    else
+      @register.sendemail = false
+    end
+    if @register.save
+      redirect_to product_path(params[:product_register][:product_id])
+    else
+      render :text => "error"
+    end
+  end
+  def del_register
+    @register = ProductRegister.find(params[:id])
+    if @register.destroy
+      render :text =>"success"
+    else
+      render :text => "error"
+    end
+  end
+  def register_params
+    params.require(:product_register).permit(:product_id,:product_option_id,:quantity)
+  end
+  def product_params
+    params.require(:product).permit(:name, :briefdescription,:point,:type_one_id,:brand_id,delivery_ids:[],payment_ids:[])
   end
   def photo_params
       params.require(:product).permit(:upload)

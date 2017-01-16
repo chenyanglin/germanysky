@@ -59,18 +59,9 @@ def new
     redirect_to messages_path
   end
   def reply
-    @reply = Reply.new
-    @message = Message.find(params[:message_id])
-    @reply.message_id = params[:message_id]
-    @reply.account_id = @current_user.id
-    @reply.account_name = @current_user.name
-    @reply.content = params[:replycontent]
-    if @current_user.role == 1
+    @message = ProductMessage.find(params[:message_id])
+    if @message.update(reply: params[:replycontent])
       @message.update(status: 1)
-    else
-      @message.update(status: 0)
-    end
-    if @reply.save
       render :text => "success"
     else
       render :text => "error"

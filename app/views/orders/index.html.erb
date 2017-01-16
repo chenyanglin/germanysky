@@ -44,6 +44,69 @@
               篩選條件
             </h4>
           </div>
+          <div class="item" >
+            <h4 class="ui header">
+            <a class="ui red tag label" style="width:84px;text-align:center;" href="/orders?status=1">
+        未付款
+        </a>
+            </h4>
+            </div>
+            <div class="item" >
+            <h4 class="ui header">
+            <a class="ui teal tag label" style="width:140px;text-align:center;">
+        已付款未確認
+        </a>
+            </h4>
+            </div>
+             <div class="item" >
+            <h4 class="ui header">
+            <a class="ui green tag label" style="width:140px;text-align:center;">
+        已確認付款
+        </a>
+            </h4>
+            </div>
+            <div class="item" >
+            <h4 class="ui header">
+            <a class="ui teal tag label" style="width:140px;text-align:center;">
+        貨到付款
+        </a>
+            </h4>
+            </div>
+        <div class="item" >
+            <h4 class="ui header">
+<a class="ui red tag label" style="width:84px;text-align:center;">
+        未出貨
+        </a>
+            </h4>
+            </div>
+            <div class="item" >
+            <h4 class="ui header">
+      <a class="ui teal tag label" style="width:140px;text-align:center;">
+        已出貨
+        </a>
+            </h4>
+            </div>
+            <div class="item" >
+            <h4 class="ui header">
+      <a class="ui green tag label" style="width:140px;text-align:center;">
+        已確認取貨
+        </a>
+            </h4>
+            </div>
+                        <div class="item" >
+            <h4 class="ui header">
+      <a class="ui red tag label" style="width:140px;text-align:center;">
+        逾期未取貨
+        </a>
+            </h4>
+            </div>
+      <div class="item" >
+            <h4 class="ui header">
+      <a class="ui teal tag label" style="width:140px;text-align:center;">
+        訂單完成
+        </a>
+            </h4>
+            </div>
   <!--  #pay_status 
   #1:未付款
   #2:已付款未確認
@@ -62,6 +125,7 @@
         </div>
       </div>
   </div>
+
   <div id="content_part" class="thirteen wide column" style="margin-top:5px;">
     <div class="ui inverted dimmer main">
       <div class="ui text loader">讀取中</div>
@@ -76,6 +140,7 @@
         </div>
       </div>
     </div>
+
     <% if @orders.present? %>
       <% if @orders.size != 0 %>
         <div class="infinite-table">
@@ -84,9 +149,9 @@
               <tr>
               <% if @current_user.role == 1 %>
               <th >
-                <div class="ui master checkbox">
+<div class="ui master checkbox">
                   <input type="checkbox">
-                  <label>全選</label>
+                  <label id="checktest">全選</label>
                 </div>
               </th>
               <%end%>
@@ -331,7 +396,7 @@ $(function(){
     $rowCheckbox.checkbox('toggle');
     $(this).closest('tr').toggleClass("active");
   });
-  $('#orders_table').tablesort();
+  // $('#orders_table').tablesort();
 
  $("#checkorder").click(function(){
     selected_data_array = [];
@@ -537,7 +602,10 @@ $(function(){
     });
 
   });
+  $("#checktest").click(function(){
+     $('.child.checkbox').checkbox('check').closest('tr').addClass("active");
 
+  });
 
 
 });

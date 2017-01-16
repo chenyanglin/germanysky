@@ -1,0 +1,55 @@
+<div class="ui container">
+  <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
+ 
+    <div class="content">
+      缺貨登記
+    </div>
+  </h1>
+<div class="ui horizontal divider">Product Register</div>
+
+<%= form_for @register , :url => product_register_products_path, method: :post do |f| %>
+<input type="hidden" id="product_id" name="product_register[product_id]" value="<%= @product_id %>" />
+<input type="hidden" id="product_option_id" name="product_register[product_option_id]" value="<%= @product_option_id %>" />
+<div class="ui stackable one column centered grid">
+  <div class="fourteen wide column">
+    <div class="ui large form" style="text-align:left;">
+       缺貨登記僅為登記購買意願，並非實際購買，我們會因應登記狀況決定是否進貨，謝謝。
+        <br></br>
+      <div class="ui segment">
+        <label>登記數量：</label>
+        <div class="ui input">
+        <%= f.text_field :quantity, placeholder: "請填入可能數量" ,maxlength: 3, size: 20,onkeyup: "return ValidateNumber($(this),value)"%>
+        </div>
+      </div>
+      <div class="ui segment">
+      <div class="ui toggle checkbox">
+		<input type="checkbox"  name="sendemail" checked="checked">
+		<label>上架後以Email通知：</label>
+		</div>
+      </div>
+    </div>
+    <br>
+    <div>
+
+
+    <div class="ui divider"></div>
+    <button id="paycheck_submit" class="ui teal basic button">
+      <i class="write icon"></i>確認登記
+    </button>
+
+  </div>
+</div>
+<% end %>
+<script type="text/javascript">
+function ValidateNumber(e, pnumber)
+{
+    if (!/^\d+$/.test(pnumber))
+    {
+        $(e).val(/^\d+/.exec($(e).val()));
+    }
+
+
+    return false;
+}
+
+</script>

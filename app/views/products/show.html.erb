@@ -93,6 +93,9 @@
     <p>品牌：<%= @product.brand.name %></p>
   </div>
   <%end%>
+  <div class="ui segment">
+    <p>單件可得點數：<%= @product.point %></p>
+  </div>
     <% if @product.product_options.size > 1 %>
     <div class="ui segment">
     <input type="hidden" id="option_id" value="">
@@ -129,7 +132,7 @@
   </div>
   <div class="ui segment">
   <% if @product.product_options.first.surplus == 0%>
-  <p>選擇數量：無庫存，請進行缺貨登記</p>
+  <p>選擇數量：無庫存，請進行<a id ="product_register" href="javascript: return false;" onclick="productregister(<%=@product.id%>,<%=@product.product_options.first.id%>);" class = "registerbtn" >缺貨登記</a></p>
   <%else%>
         <div id="selectsum">
       選擇數量：
@@ -142,7 +145,7 @@
       <% end %>
   <% if @current_user.present? %>
      <% if @product.available == true %>
-      <div class="ui two buttons">
+      <div id = "command-btn"class="ui two buttons">
       <a id="add_cart"  class="small ui bottom attached red button">
         <i class="chevron circle right icon"></i>
         加入購物車
@@ -152,8 +155,10 @@
         直接購買
       </a></div>
       <% else %>
+      <div id = "command-btn">
       <div class="ui grey inverted stacked segment" style="text-align:center;">
   <label>此商品目前無法購買，如有意願請至留言版留言</label>
+</div>
 </div>
 <%end%>
 <%else%>
@@ -232,20 +237,58 @@
 </div>
 <div class="ui bottom attached button">GermanySky 德心應手</div>
 
+<div class="ui small modal product-register" style="padding-top:0px;">
+  <i class="close icon"></i>
+  <div id="edit_from" style="padding:10px;">
+  </div>
+</div>
+
 <script type="text/javascript">
 $('.menu .item')
   .tab()
 ;
+var on =false;
 function optionclick(price,surplus,id) {
-  document.getElementById('selectsum').style.display = '';
+  product_id = document.getElementById('optionprice').value;
+  $("#selectsum").empty();
+   if (on == false){
+   $("#selectsum").on("click",".btn-add",function(){ 
+    var sum = Number(document.getElementById("sum").innerHTML);
+    var surplus = document.getElementById("optionsurplus").value;
+    if (sum+1 > surplus)
+      {alert("不得大於庫存量");}
+    else
+    {document.getElementById("sum").innerHTML = sum +1;}
+  });
+  $("#selectsum").on("click",".btn-minus",function(){ 
+  var sum = Number(document.getElementById("sum").innerHTML);
+  if (sum == 1)
+    {alert("無法低於1");}
+  else
+    {document.getElementById("sum").innerHTML = sum - 1;}
+  });
+  $("#selectsum").on("click",".registerbtn",function(){ 
+    productregister(product_id,id);
+  });
+  on = true;
+  }
+
   document.getElementById('optionprice').style.display = '';
   document.getElementById("optionsurplus").style.display = '';
-  document.getElementById("sum").innerHTML = 1;
+  
   document.getElementById('optionprice').innerHTML = '售價：NT$'+price;
   document.getElementById("optionprice").value = price;
   document.getElementById('optionsurplus').innerHTML = '庫存：'+surplus;
   document.getElementById("optionsurplus").value = surplus;
   document.getElementById("option_id").value = id;
+  if(surplus>0){
+  $("#selectsum").append('選擇數量：<span class="input-group-btn"><button id ="minus" type="button" class="btn btn-default btn-minus">－</button>  <d id = "sum" size="2" value ="1">1</d>  <span class="input-group-btn"><button id = "plus" type="button" class="btn btn-default btn-add">＋</button>');
+    document.getElementById("sum").innerHTML =1;
+}
+  else{
+    $("#selectsum").append('選擇數量：此規格無庫存，請進行<a id ="product_register" href="javascript: product_register(); return false;" class = "registerbtn" >缺貨登記</a>');
+  }
+  document.getElementById('selectsum').style.display = '';
 }
 $(function(){
   $('.ui.sticky.control-menu')
@@ -321,6 +364,7 @@ function ValidateSurplus(e, point)
     return false;
 }
 
+
 $("#plus").click(function(){
 var sum = Number(document.getElementById("sum").innerHTML);
 
@@ -345,6 +389,24 @@ $("#minus").click(function(){
 function changephoto(click_id) {
   
 　document.getElementById("productimage").src= click_id;
+}
+
+function productregister(product_id,option_id)
+{
+    $('.ui.dimmer.main').dimmer('show');
+    $.get( "/products/register?product_id="+product_id+"&product_option_id="+option_id, function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $('.ui.dimmer.main').dimmer('hide');
+
+      $('.ui.modal.product-register').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $('.ui.dimmer.main').dimmer('hide');
+      alert( "error" );
+    });
 }
 
 $("#add_cart").click(function(){

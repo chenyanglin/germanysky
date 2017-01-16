@@ -1,0 +1,82 @@
+<div style="width:200px;height:50px;margin:0 auto;">
+        庫存低於：
+        <div class="ui input">
+        <input type="text" id = "less" size="2" maxlength="2" name="fname" /></input>
+        <button class="ui small button" id = "surplusless">確定</button>
+        </div>
+      </div>
+<input type="hidden" id="find_product" value="<%= @product_info %>">
+<div class="ui grid content-section" style="margin-top:0px;padding-top:0px;">
+
+  <div id="content_part" class="sixteen wide column" style="margin-top:5px;padding-top:0px;margin-left:15px;">
+    <div class="ui inverted dimmer main">
+      <div class="ui text loader">讀取中</div>
+    </div>
+    
+    <% if @products.present? %>
+      <% if @products.size != 0 %>
+        <div class="infinite-table">
+          <table id="products_table" class="site-font ui sortable selectable teal table">
+<thead>
+              <tr>
+                <th class="AutoNewline" style="width:100px;" >名稱</th>
+                <th style="width:120px;">圖片</th>
+                <th>商品分類</th>
+                <th>規格</th>
+                <th>售價</th>
+                <th>庫存</th>
+                <th>登記數量</th>
+                <th style="margin: 0 10px 0 10px;">Function</th>
+              </tr>
+            </thead>
+            <tbody>
+<% @products.each do |product| %>
+<tr>
+  <td class="product_info not-icon"  style= "word-break:break-all;" data-value="<%= product.id %>"><%= product.product.name %></td>
+    <td><div class="item">
+<%begin%>
+     <img class="ui centered tiny image" src="<%= asset_path product.product.productimages.first.phourl %>">
+     <%rescue%>
+     <img class="ui centered tiny image" src="<%= asset_path '100px.png' %>">
+     <%end%>
+    </div></td>
+  <td class="collapsing product_info not-icon" data-value="<%= product.id %>"><%= product.product.type_one.name %></td>
+
+   <td class="product_info not-icon" style= "word-break:break-all;" data-value="<%= product.id %>">
+ <%= product.option1 %></br>
+
+ </td>
+ <td>
+ <%= product.price %></br>
+ </td>
+ <td> 
+ <%= product.surplus %></br>
+ </td>
+ <td>
+ <% @size =0 %>
+ <% product.product_registers.each do |s| %>
+  <% @size += s.quantity %>
+  <% end %>
+  <%=@size%>
+ </td>
+  <td class="collapsing">
+    <button class="ui blue basic button product_edit" data-value="<%= product.id %>">修改</button>
+  </td>
+</tr>
+<% end %>
+</tbody>
+</table>
+          <p class="pagination">
+            <%= link_to_next_page @products, 'Next Page', :params => {:filter => @search_param}%>
+          </p>
+        </div>
+      <% else %>
+        <h3>未建立分類！</h3>
+      <% end %>
+    <% end %>
+    
+          </tbody>
+        </table>
+  </div>
+
+</div>

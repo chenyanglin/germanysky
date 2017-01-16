@@ -16,6 +16,21 @@ class ConsolesController < ApplicationController
       render :text => "register"
     end
   end
+
+  def googlelogin
+    @account = Account.find_by_account_name(params[:googleid])
+    if @account != nil
+      session[:user_id] = @account.id
+      # session[:profile_photo] = params[:profile_photo]
+      render :text => "login"
+    else
+      session[:name] = params[:name]
+      session[:email] = params[:email]
+      session[:googleid] = params[:googleid]
+      render :text => "register"
+    end
+  end
+
 	def login
     if session[:user_id] != nil
          @account = Account.find_by(id: session[:user_id])
@@ -58,6 +73,8 @@ class ConsolesController < ApplicationController
     redirect_to consoles_path
   end
   def aboutus
+  end
+  def templateindex
   end
   def subscription
     @newsletteremail = NewsletterEmail.new

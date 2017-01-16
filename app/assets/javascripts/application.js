@@ -28,7 +28,11 @@
 
 
 $(document).ready(function() {
-
+  $('#product_manage').popup({
+    inline   : true,
+    position : 'bottom right',
+    on: 'click'
+  });
   $('#user_profile').popup({
     inline   : true,
     position : 'bottom right',

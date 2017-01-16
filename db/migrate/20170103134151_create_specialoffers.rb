@@ -3,7 +3,7 @@ class CreateSpecialoffers < ActiveRecord::Migration
     create_table :specialoffers do |t|
 
       t.string :name
-      t.string :type #價格優惠、折扣優惠
+      t.string :offertype #價格優惠、折扣優惠
       t.integer :productcount
       t.integer :saleprice
       t.integer :discount

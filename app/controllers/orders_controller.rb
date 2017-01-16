@@ -5,6 +5,7 @@ before_action :set_order, only: [:edit, :update, :destroy,
                                  :orderdetail,:confirmpay,:confirmdelivery,
                                  :orderdone,:takeproduct]
   def index
+    
     if @current_user.role ==1
     @orders = Order.all
     @orders = @orders.like(params[:filter]) if params[:filter]
@@ -27,7 +28,9 @@ def new
     @order_price = 0
     @payments = []
     @deliveries =[]
+    @get_point = 0
     @shoppingcarts.each do |s|
+      @get_point += s.get_point
       @order_price += s.product.product_options.find(s.option_id).price*s.sum
       s.product.payments.each do |p| 
          if @payments.include?(p)
@@ -71,8 +74,10 @@ def new
     if @order.save
       ordernumber = Time.now.strftime("%Y%m%d")+@order.id.to_s.rjust(4, '0')
       @order.update(ordernumber: ordernumber)
+      get_point = 0
       @shoppingcarts = Shoppingcart.where('account_id = ?',@current_user.id.to_s)
       @shoppingcarts.each do |s|
+      get_point += s.get_point
       @order_product = OrderProduct.new
       @order_product.order_id = @order.id
       @order_product.product_id = s.product.id
@@ -93,6 +98,7 @@ def new
       NewsMailer.normal_email("訂單成立通知","感謝您訂購GermanySky商品，您已於"+@order.created_at.to_s+"訂購完成。訂單編號為"+@order.ordernumber.to_s+"，總金額為"+@order.total_price.to_s+"。您可以登入網站查看訂單詳細資訊與進行訂單程序。",@current_user.id).deliver_now!
       content = "使用者 "+@current_user.name.to_s+" 剛建立一筆訂單，詳細資訊請登入後台查詢。"
       NewsMailer.system_email("訂單成立通知",content).deliver_now!
+      @order.update(get_point: get_point)
       render :text => "success"
     else
       render :text => "error"
@@ -114,6 +120,8 @@ def new
   end
 
   def orderdetail
+    @messages = @order.order_messages
+    @message = OrderMessage.new
     render :layout => false
   end
 
@@ -169,6 +177,15 @@ def new
   end
   def orderdone
     if @order.update(delivery_status: 5,pay_status: 6)
+      new_score = @current_user.score.to_i+@order.total_price.to_i-@order.delivery_price.to_i-@order.payment_price.to_i
+      @current_user.update(score: new_score)
+      @level = AccountLevel.where("score >= ?",new_score).order(:score).last
+      if @current_user.account_level_id.to_s == @level.id.to_s
+      else
+        @current_user.update(account_level_id: @level.id)
+        NewsMailer.normal_email("會員等級更改通知","您的會員等級更改為"+@level.level_name.to_s,@current_user.id).deliver_now!
+      end
+      @current_user.update(point: @current_user.point+@order.get_point)
       content_to_user = "訂單編號"+@order.ordernumber.to_s+"之訂單已完成所有付款與寄送事宜，希望您滿意我們的商品，有任何疑問都可以在留言板聯繫我們。此筆訂單將封存於系統中，謝謝。"
       NewsMailer.normal_email("訂單狀態通知（訂單完成）",content_to_user,@order.account_id).deliver_now!
       content = "您已將使用者 "+@current_user.name.to_s+"之訂單編號"+@order.ordernumber.to_s+"之訂單狀態改變為完成訂單，訂單資料將封存於系統中，謝謝。"

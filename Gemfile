@@ -74,6 +74,7 @@ gem 'omniauth'
 gem 'omniauth-facebook'
 gem 'omniauth-google-oauth2'
 gem "letter_opener", :group => :development
+gem 'whenever', :require => false
 
 group :development do
   gem 'mysql2', '0.3.18'
