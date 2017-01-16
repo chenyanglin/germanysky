@@ -11,8 +11,10 @@
 // about supported directives.
 //
 
+//= require_tree .
 //= require jquery
 //= require jquery_ujs
+//= require bootstrap
 //= require react
 //= require react_ujs
 //= require components
@@ -20,11 +22,10 @@
 //= require_tree
 //= require jquery.infinite-pages
 //= require jquery-fileupload
-//= require smart_listing
 //= require js.cookie
 //= require semantic-ui
 //= require clipboard
-
+//= require shop
 
 
 $(document).ready(function() {

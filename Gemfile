@@ -52,13 +52,13 @@ gem 'geocoder', '1.2.9' #googlemap使用
 gem "cancancan", '1.12.0'
 
 gem 'aws-sdk', '< 2.0'
-# gem 'bootstrap-modal-rails'
-# gem 'bootstrap-table-rails'
-# gem 'bootstrap-multiselect-rails'
-# gem 'bootstrap-tooltip-rails'
+gem 'bootstrap-modal-rails'
+gem 'bootstrap-table-rails'
+gem 'bootstrap-multiselect-rails'
+gem 'bootstrap-tooltip-rails'
 gem 'react-rails', '~> 1.6', '>= 1.6.2'
 gem 'smart_listing'
-# gem 'bootstrap-sass'
+gem 'bootstrap-sass'
 gem 'js_cookie_rails'
 
 gem 'imgkit'

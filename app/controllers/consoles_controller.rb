@@ -75,6 +75,7 @@ class ConsolesController < ApplicationController
   def aboutus
   end
   def templateindex
+
   end
   def subscription
     @newsletteremail = NewsletterEmail.new
