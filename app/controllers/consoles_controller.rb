@@ -83,13 +83,19 @@ class ConsolesController < ApplicationController
   end
   def templateindex
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 7001d9e... update
     @new_products = Product.includes(:productimages).where(on_store: true).limit(4)
     @new_products = @new_products.order("created_at desc")
   end
   def testtemplate
+<<<<<<< HEAD
 =======
 
 >>>>>>> b2867074238d0572110b76f57aefa3a0ef6aaed6
+=======
+>>>>>>> 7001d9e... update
   end
   def subscription
     @newsletteremail = NewsletterEmail.new
