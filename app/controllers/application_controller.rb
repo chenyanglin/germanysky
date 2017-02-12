@@ -14,6 +14,11 @@ class ApplicationController < ActionController::Base
     end
     #@current_user ||= User.find_by_auth_token!(cookies[:auth_token]) if cookies[:auth_token]
   end
+  def setting
+    @brands = Brand.all
+    @type_ones = TypeOne.all
+    @newsboards = Newsboard.limit(5).order('id desc')
+  end
 
   # def image_server
   #   @image_server = 

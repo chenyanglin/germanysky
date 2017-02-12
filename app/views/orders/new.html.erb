@@ -1,11 +1,51 @@
-<div class="ui container">
-  <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>GermanySky 德心應手</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Bootstrap styles -->
+    <!-- <link href="assets/css/bootstrap.css" rel="stylesheet"/> -->
+    <!-- Customize styles -->
+    <!-- <link href="style.css" rel="stylesheet"/> -->
+    <!-- font awesome styles -->
+	<!-- <link href="assets/font-awesome/css/font-awesome.css" rel="stylesheet"> -->
+		<!--[if IE 7]>
+			<link href="css/font-awesome-ie7.min.css" rel="stylesheet">
+		<![endif]-->
+
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+
+	<!-- Favicons -->
+    <link rel="shortcut icon" href="<%= asset_path 'ico/favicon.ico' %>">
+  </head>
+<body style="background:url('<%= asset_path("white_leather.png") %>') repeat 0 0;">
+<!-- 
+	Upper Header Section 
+-->
+<%= render "common/topbar" %>
+
+<!--
+Lower Header Section 
+-->
+<div class="container">
+<%= render "common/header" %>
+<%= render "common/leftmenu" %>
+<!-- 
+Body Section 
+-->
+<div class="span9">
+<h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
  
     <div class="content">
       建立訂單
     </div>
   </h1>
-<div class="ui horizontal divider">New Order</div>
+  <div class="ui horizontal divider">New Order</div>
   <%= form_for(@order) do |f| %>
    <% if @shoppingcarts.present? %>
       <% if @shoppingcarts.size != 0 %>
@@ -18,14 +58,14 @@
                 <th ><label>圖片</label></th>
                 <th ><label>單價</label></th>
                 <th ><label>數量</label></th>
-                <th ><label>紅利</label></th>
+                <th ><label>可得紅利</label></th>
                 <th ><label>總價</label></th>
               </tr>
             </thead>
             <tbody>
             <% @shoppingcarts.each do |shoppingcart| %>
-            <input type="hidden" id="surplus<%= shoppingcart.id%>" value="<%=shoppingcart.product.product_options.find(shoppingcart.option_id).surplus %>">
-            <% price = shoppingcart.product.product_options.find(shoppingcart.option_id).price%>
+            <input type="hidden" id="surplus<%= shoppingcart.id%>" value="<%=shoppingcart.product_option.surplus %>">
+            <% price = shoppingcart.product_option.price%>
 <tr>
   <td><%= shoppingcart.product.name %></td>
   <td><%= shoppingcart.option_id %></td>
@@ -41,6 +81,54 @@
   
 </tr>
 
+<% end %>
+<% if @salecarts.present?%>
+<tr>
+  <thead>
+        <th colspan="7" >
+    <label>
+        促銷活動訂單
+    </label>
+        </th>
+        </thead>
+</tr>
+<%@salecarts.each do |carts|%>
+
+<tr>
+<td colspan="7">
+訂購群組
+</td>
+</tr>
+<tr>
+    <th>促銷活動</th>
+    <th>商品名稱</th>
+    <th>圖片</th>
+    <th>單價</th>
+    <th>數量</th>
+    <th>紅利</th>
+    <th>總價</th>
+    </tr>
+    <% carts.salecart_products.each do |cart|%>
+<tr>
+  <td><%=carts.specialoffer.name%></td>
+  <td><%= cart.product.name %><br>規格：<%= cart.product_option.option1 %></td>
+  <td>
+  <% begin %>
+  <img class="ui centered mini image" src="<%= asset_path cart.product.productimages.first.phourl %>" style='height: 80px; width: 80px; object-fit: contain'>
+  <%rescue%>
+  <img class="ui centered mini image" src="<%= asset_path '100px.png' %>" style='height: 80px; width: 80px; object-fit: contain'>
+  <%end%>
+  </td>
+  <td><s>$<%= cart.originalprice %></s><br>$<%= cart.sellprice %></td>
+  <td>
+       <div id = "sum<%= cart.id %>" type="text" name="lname" size="2" value ="<%= cart.sum %> "><%= cart.sum %></div> 
+  </td>
+      <td><div style="display: inline-block;" id ="get_point<%= cart.id %>"><%= cart.get_point%></div>點</td>
+  <td><b id="option_total_price<%= cart.id %>">$<%= cart.sellprice*cart.sum %></b></td>
+  
+</tr>
+<%end%>
+<%end%>
 <% end %>
 <tr>
 
@@ -92,25 +180,24 @@
       <tr>
         <td colspan="2" >
   <label>姓名：</label>
-  <input placeholder="姓名" type="text" name="order[receiver_name]" id="receiver_name" value="<%=@current_user.name%>" />
+  <input placeholder="姓名" type="text" name="order[receiver_name]" id="receiver_name" value="<%=@current_user.name%>"style="width:100%;" />
         </td>
         <td colspan="2" >
-  <label>電話：</label><input placeholder="電話" type="text" name="order[receiver_phone]" id="receiver_phone" onkeyup="return ValidateNumber($(this),value)" value="<%=@current_user.phone1%>"/>
+  <label>電話：</label><input placeholder="電話" type="text" name="order[receiver_phone]" id="receiver_phone" onkeyup="return ValidateNumber($(this),value)" value="<%=@current_user.phone1%>"style="width:100%;"/>
         </td>
         <td colspan="2" >
-  <label>收貨地址：</label><input placeholder="收貨地址" type="text" name="order[receiver_address]" id="receiver_address" value="<%=@current_user.address%>" />
+  <label>收貨地址：</label><input placeholder="收貨地址" type="text" name="order[receiver_address]" id="receiver_address" value="<%=@current_user.address%>" style="width:100%;"/>
         </td>
         </tr>
         <tr>
         <td colspan="7" >
-  <label>備註：</label><textarea name="order[note]" id="content" rows="3" cols="120">
+  <label>備註：</label><textarea name="order[note]" id="content" rows="3" style="width:100%;">
 </textarea>
         </td>
         </tr>
         <tr>
         <td colspan="7" >
         <button id="to_order"  class="ui blue button">
-        <i class="chevron circle right icon"></i>
         立即結帳
       </button>
         </td>
@@ -136,7 +223,44 @@
 <% end %>
 <%end%>
 </div>
+</div>
+<!-- 
+Clients 
+-->
+<!--
+Footer
+-->
+<%= render "common/footerbar" %>
+
+  </body>
+</html>
 <script type="text/javascript">
+
+$("#subscription").click(function(){
+	email = document.getElementById("newsletter_email").value;
+	if (email =="")
+		{alert("請輸入郵件");}
+	else{
+    var request = "/consoles/subscription?email="+email;
+    var aj = $.ajax({
+        url: request,
+        type: 'get',
+        data: $(this).serialize(),
+        dataType: 'text'
+    }).done(function (data) {
+     if (data="success"){
+      alert( "訂閱成功");
+  		}else{
+  			alert("訂閱失敗");
+  		}
+
+    }).fail(function (data) {
+      alert("此email已訂閱");
+    });
+	}
+    });
+ </script>
+ <script type="text/javascript">
 $(function(){
   $('select.dropdown')
     .dropdown()
@@ -244,3 +368,13 @@ function choicepayment(s)
 } 
 
 </script>
+ <style type="text/css">
+.box1{                           
+ position:absolute;    
+ bottom: 0px;              
+}
+.box2{                            
+ height: 480px;               
+ position: relative;
+}
+</style>

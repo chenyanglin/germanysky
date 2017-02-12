@@ -1,5 +1,6 @@
 class NewsboardsController < ApplicationController
 before_filter :current_user
+before_filter :setting
 before_action :set_newsboard, only: [:edit, :update, :destroy]
 	def index
 		    @newsboards = Newsboard.all

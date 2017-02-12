@@ -1,56 +1,56 @@
-<input type="hidden" id="find_specialoffer" value="<%= @specialoffer_info %>">
-<div class="ui grid content-section" style="margin-top:0px;padding-top:0px;">
-  <div class="three wide column" style="margin-right:-15px;padding-top:0px;">
-      <div id="control_panel" class="ui sticky control-menu">
-        <div class="ui fluid vertical large menu">
-          <div class="header item">
-            <h3 class="site-font ui brown header">
-              促銷活動
-            </h3>
-          </div>
-        <% if @current_user.present? && @current_user.role == 1 %>
-            <div class="item">
-              <button class="site-font fluid ui blue right labeled icon button btn_new_offer">
-                <i class="add icon"></i>
-                新增優惠
-              </button>
-            </div>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>GermanySky 德心應手</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Bootstrap styles -->
+    <!-- <link href="assets/css/bootstrap.css" rel="stylesheet"/> -->
+    <!-- Customize styles -->
+    <!-- <link href="style.css" rel="stylesheet"/> -->
+    <!-- font awesome styles -->
+	<!-- <link href="assets/font-awesome/css/font-awesome.css" rel="stylesheet"> -->
+		<!--[if IE 7]>
+			<link href="css/font-awesome-ie7.min.css" rel="stylesheet">
+		<![endif]-->
 
-         <%end%>
-          <div class="header item">
-            搜尋
-          </div>
-          <div class="ui item">
-            <div class="ui transparent icon input">
-              <input id="filter" type="text" placeholder="Search...">
-                <div id="empty_msg" class="ui popup transition hidden">
-                  <span style="color:#db2828;">請輸入條件</span>
-                </div>
-              <i id="search_go" class="search link icon"></i>
-            </div>
-          </div>
-         
-        </div>
-      </div>
-  </div>
-  <div id="content_part" class="thirteen wide column" style="margin-top:5px;">
-    <div class="ui inverted dimmer main">
-      <div class="ui text loader">讀取中</div>
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+
+	<!-- Favicons -->
+    <link rel="shortcut icon" href="<%= asset_path 'ico/favicon.ico' %>">
+  </head>
+<body style="background:url('<%= asset_path("white_leather.png") %>') repeat 0 0;">
+<!-- 
+	Upper Header Section 
+-->
+<%= render "common/topbar" %>
+
+<!--
+Lower Header Section 
+-->
+<div class="container">
+<input type="hidden" id="find_newsboard" value="<%= @specialoffer_info %>">
+<%= render "common/header" %>
+<%= render "common/leftmenu" %>
+<!-- 
+Body Section 
+-->
+<div class="span9">
+<h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
+ 
+    <div class="content">
+      促銷活動
     </div>
-    <div class="ui compact segment">
-      <div class="ui horizontal mini blue statistic" style="margin:0;">
-        <div class="value">
-          <%= number_with_delimiter(@specialoffers_size, :delimiter => ',') %>
-        </div>
-        <div class="site-font label">
-          優惠總數
-        </div>
-      </div>
-    </div>
-    <% if @specialoffers.present? %>
+  </h1>
+  <div class="ui horizontal divider">Special Offers</div>
+<% if @specialoffers.present? %>
       <% if @specialoffers.size != 0 %>
         <div class="infinite-table">
-          <table id="specialoffers_table" class="site-font ui sortable selectable teal table">
+          <table id="specialoffers_table" class="site-font ui sortable selectable table">
             <thead>
               <tr>
                 <th>名稱</th>
@@ -74,14 +74,15 @@
         <h3>未建立！</h3>
       <% end %>
     <% end %>
-    
-          </tbody>
-        </table>
-  </div>
-
 </div>
-
-
+</div>
+<!-- 
+Clients 
+-->
+<!--
+Footer
+-->
+<%= render "common/footerbar" %>
 <div class="ui modal edit-specialoffer" style="padding:10px;">
   <i class="close icon"></i>
 
@@ -166,9 +167,43 @@
     </div>
   </div>
 </div>
-
-
+  </body>
+</html>
 <script type="text/javascript">
+
+$("#subscription").click(function(){
+	email = document.getElementById("newsletter_email").value;
+	if (email =="")
+		{alert("請輸入郵件");}
+	else{
+    var request = "/consoles/subscription?email="+email;
+    var aj = $.ajax({
+        url: request,
+        type: 'get',
+        data: $(this).serialize(),
+        dataType: 'text'
+    }).done(function (data) {
+     if (data="success"){
+      alert( "訂閱成功");
+  		}else{
+  			alert("訂閱失敗");
+  		}
+
+    }).fail(function (data) {
+      alert("此email已訂閱");
+    });
+	}
+    });
+  $('body').on('click','.specialoffer_info',function(){
+    var row_id = $(this).data("value");
+    show_info(row_id);
+  });
+  function show_info(specialoffer_id){
+    
+  window.location.replace("http://"+location.host+"/specialoffers/"+specialoffer_id);
+  }
+ </script>
+ <script type="text/javascript">
 
   function loadContentForm(){
     var selected_type = $("#type_select").val();
@@ -350,3 +385,13 @@ window.location.replace("http://"+location.host+"/specialoffers/"+newsboard_id);
 
 });
 </script>
+ <style type="text/css">
+.box1{                           
+ position:absolute;    
+ bottom: 0px;              
+}
+.box2{                            
+ height: 480px;               
+ position: relative;
+}
+</style>

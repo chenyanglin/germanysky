@@ -1,0 +1,61 @@
+<div class="row pull-left">
+<div id="sidebar" class="span3">
+
+<div class="well well-small">
+	<ul class="nav nav-list">
+		<li><a href="/accounts/myaccount"><h4>・基本資料</h4></a></li>
+		<li><a href="/orders"><h4>・我的訂單</h4></a></li>
+		<li><a href="/products/shoppingcart"><h4>・購物車</h4></a></li>
+		<li style="border:0"> &nbsp;</li>
+		<% if @current_user.present? && @current_user.role!=1%>
+		<li> <a class="totalInCart" href="/products/shoppingcart"><strong>購物車金額  <span class="badge badge-warning pull-right" style="line-height:18px;"><%if @catrprice.present? %>$<%=@cartprice%><%else%>沒有商品<%end%></span></strong></a></li>
+		<%end%>
+	</ul>
+</div>
+
+<div class="well well-small alert alert-info" >
+  <h2 class= "cntr">最新消息</h2>
+  <% if @newsboards.present? %>
+  	<% @newsboards.each do |n| %>
+  	<div id="<%= n.id %>">
+   	<i class="browser icon"></i><a href="/newsboards/<%=n.id%>"><%= n.title %></a>
+   	<font size="0.1" ><span class="float:right"><%= n.created_at.strftime("%Y-%m-%d") %></span></font>
+    </div>
+    </br>
+    <%end%>
+<%end%>
+</div>
+		<div class="well well-small alert alert-warning cntr">
+			<h2>優惠活動</h2>
+				  <p>多種促銷組合優惠！！ <br><br><a class="defaultBtn" href="/specialoffers">Click here </a></p>
+		</div>
+		<div class="well well-small alert alert-info cntr" >
+  			<h2>訂閱電子報</h2>接收最新商品與優惠通知
+  				<input id="newsletter_email" type="text" placeholder="Enter email"><br>
+ 				<a class="ui primary small button" id="subscription" height="2">訂閱</a>
+		</div>
+			<br>
+			<br>
+			<ul class="nav nav-list promowrapper">
+			<li>
+			  <div class="thumbnail">
+				<a class="zoomTool" href="product_details.html" title="add to cart"><span class="icon-search"></span> QUICK VIEW</a>
+				<img src="<%= asset_path 'bootstrap-ecommerce-templates.png' %>" alt="bootstrap ecommerce templates">
+				<div class="caption">
+				  <h4><a class="defaultBtn" href="product_details.html">VIEW</a> <span class="pull-right">$22.00</span></h4>
+				</div>
+			  </div>
+			</li>
+			<li style="border:0"> &nbsp;</li>
+			<li>
+			  <div class="thumbnail">
+				<a class="zoomTool" href="product_details.html" title="add to cart"><span class="icon-search"></span> QUICK VIEW</a>
+				<img src="<%= asset_path 'shopping-cart-template.png' %>" alt="shopping cart template">
+				<div class="caption">
+				  <h4><a class="defaultBtn" href="product_details.html">VIEW</a> <span class="pull-right">$22.00</span></h4>
+				</div>
+			  </div>
+			</li>
+		  </ul>
+
+	</div>

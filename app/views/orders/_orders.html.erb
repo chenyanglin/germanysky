@@ -30,38 +30,29 @@
   <%case status = order.pay_status %>
   	<% when order.pay_status = 1%>
   		<div style="text-align: center;">
-  		<a class="ui red tag label" style="width:84px;text-align:center;">
         未付款
-      	</a>
       	<br></br>
+        <% if @current_user.role == 1 %>
+        <button class="ui blue tiny basic button usercheckpay" data-value="<%= order.id %>">通知匯款</button>
+        <% end %>
       	<% if @current_user.role == 2 %>
-        <button class="ui blue tiny basic button usercheckpay" data-value="<%= order.id %>">通知已匯款</button>
+        <button class="ui blue tiny basic button usercheckpay" data-value="<%= order.id %>">通知匯款</button>
         <%end%></div>
    	<% when status = 2%>
    	<div style="text-align: center;">
-  		<a class="ui teal tag label" style="width:140px;text-align:center;">
         已付款未確認
-      	</a>
       	<br></br>
       	<% if @current_user.role == 1 %>
         <button class="ui blue tiny basic button confirmpay"  data-value="<%= order.id %>">確認匯款</button>
         <%end%></div>
     <% when order.pay_status = 3%>
-  		<a class="ui green tag label" style="width:140px;text-align:center;">
         已確認付款
-      	</a>
    	<% when order.pay_status = 4%>
-  		<a class="ui red tag label" style="width:140px;text-align:center;">
         逾期未付款
-      	</a>
     <% when order.pay_status = 5%>
-  		<a class="ui teal tag label" style="width:140px;text-align:center;">
         貨到付款
-      	</a>
     <% when order.pay_status = 6%>
-  		<a class="ui green tag label" style="width:140px;text-align:center;">
         訂單完成
-      	</a>
     <% end %>
   </td>
   <!-- 出貨tag -->
@@ -69,38 +60,32 @@
   <%case order.delivery_status %>
   	<% when order.delivery_status = 1%>
   	<div style="text-align: center;">
-  		<a class="ui red tag label" style="width:84px;text-align:center;">
         未出貨
-      	</a>
       	<br></br>
       	<% if @current_user.role == 1 %>
         <button class="ui blue tiny basic button confirmdelivery"  data-value="<%= order.id %>">確認出貨</button>
         <%end%></div>
    	<% when order.delivery_status = 2%>
    	<div style="text-align: center;">
-  		<a class="ui teal tag label" style="width:140px;text-align:center;">
         已出貨
-      	</a>
       	<br></br>
+        <% if @current_user.role == 1 %>
+         <button class="ui blue tiny basic button takeproduct" data-value="<%= order.id %>">確認取貨</button>
+         <% end %>
       	<% if @current_user.role == 2 %>
       	 <button class="ui blue tiny basic button takeproduct" data-value="<%= order.id %>">確認取貨</button>
       	 <% end %></div>
     <% when order.delivery_status = 3%>
-  		<a class="ui green tag label" style="width:140px;text-align:center;">
         已確認取貨
-      	</a>
    	<% when order.delivery_status = 4%>
-  		<a class="ui red tag label" style="width:140px;text-align:center;">
         逾期未取貨
-      	</a>
     <% when order.delivery_status = 5%>
-  		<a class="ui teal tag label" style="width:140px;text-align:center;">
         訂單完成
-      	</a>
     <% end %>
   </td>
  <td>
-   <button class="ui brown button order_detail" data-value="<%= order.id %>">詳細資料</button>
+
+   <div class="order_detail" data-value="<%= order.id %>"><span class="glyphicons glyphicons-search"></span></div>
  </td>
  <td>
  <%= order.created_at.strftime("%Y-%m-%d") %>

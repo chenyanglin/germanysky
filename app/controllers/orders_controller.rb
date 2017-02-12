@@ -1,5 +1,6 @@
 class OrdersController < ApplicationController
 before_filter :current_user
+before_filter :setting
 before_action :set_order, only: [:edit, :update, :destroy,
                                  :usercheckpay_update,:usercheckpay,
                                  :orderdetail,:confirmpay,:confirmdelivery,
@@ -7,11 +8,19 @@ before_action :set_order, only: [:edit, :update, :destroy,
   def index
     
     if @current_user.role ==1
-    @orders = Order.all
-    @orders = @orders.like(params[:filter]) if params[:filter]
-        @orders = @orders.order(updated_at: :desc)
-        @orders_size = @orders.size
-        @orders = @orders.page(params[:page]).per(15)
+      @orders = Order.all
+      @orders = @orders.like(params[:filter]) if params[:filter]
+      @orders = @orders.order(updated_at: :desc)
+
+      if params[:p_status].present?
+        @orders = @orders.where("pay_status = ?",params[:p_status])
+      end
+      if params[:d_status].present?
+        @orders = @orders.where("delivery_status = ?",params[:d_status])
+      end
+
+      @orders = @orders.page(params[:page]).per(15)
+      @orders_size = @orders.size
     else
       @orders = @current_user.orders
         @orders = @orders.like(params[:filter]) if params[:filter]
@@ -42,6 +51,27 @@ def new
          if @deliveries.include?(d)
          else
          @deliveries << d
+        end
+      end
+    end
+    
+    if @current_user.salecarts.present?
+      @salecarts = @current_user.salecarts.includes(:salecart_products)
+      @salecarts.each do |cart|
+        cart.salecart_products.each do |s|
+          @order_price += s.sellprice*s.sum
+          s.product.payments.each do |p| 
+            if @payments.include?(p)
+            else
+            @payments << p
+            end
+          end
+          s.product.deliveries.each do |d| 
+            if @deliveries.include?(d)
+            else
+            @deliveries << d
+            end
+          end
         end
       end
     end
@@ -77,24 +107,48 @@ def new
       get_point = 0
       @shoppingcarts = Shoppingcart.where('account_id = ?',@current_user.id.to_s)
       @shoppingcarts.each do |s|
-      get_point += s.get_point
-      @order_product = OrderProduct.new
-      @order_product.order_id = @order.id
-      @order_product.product_id = s.product.id
-      @order_product.product_name = s.product.name
-      @order_product.option_name = s.product.product_options.find(s.option_id).option1
-      @order_product.single_price = s.product.product_options.find(s.option_id).price
-      @order_product.sum_price = s.product.product_options.find(s.option_id).price*s.sum
-      @order_product.sum = s.sum
-      @order_product.save
-      @product=ProductOption.find(s.option_id)
-      @product.update(surplus: @product.surplus-s.sum)
-      if @product.surplus <= 0
-        content = "商品「 "+@product.product.name+"」之規格「"+@product.option1+"」已無庫存，請評估是否補貨上架。"
-        NewsMailer.system_email("商品缺貨通知",content).deliver_now!
+        get_point += s.get_point
+        @order_product = OrderProduct.new
+        @order_product.order_id = @order.id
+        @order_product.product_id = s.product.id
+        @order_product.product_name = s.product.name
+        @order_product.option_name = s.product_option.option1
+        @order_product.single_price = s.product_option.price
+        @order_product.sum_price = s.product_option.price*s.sum
+        @order_product.sum = s.sum
+        @order_product.save
+        @product=ProductOption.find(s.option_id)
+        @product.update(surplus: @product.surplus-s.sum)
+        if @product.surplus <= 0
+          content = "商品「 "+@product.product.name+"」之規格「"+@product.option1+"」已無庫存，請評估是否補貨上架。"
+          NewsMailer.system_email("商品缺貨通知",content).deliver_now!
+        end
+        s.destroy
       end
-      s.destroy
+
+      @salecarts = @current_user.salecarts.includes(:salecart_products)
+      @salecarts.each do |carts|
+        carts.each do |cart|
+        @order_product = OrderProduct.new
+        @order_product.order_id = @order.id
+        @order_product.product_id = cart.product.id
+        @order_product.product_name = cart.product.name
+        @order_product.option_name = cart.product_option.option1
+        @order_product.single_price = cart.sellprice
+        @order_product.sum_price = cart.sellprice*cart.sum
+        @order_product.sum = cart.sum
+        @order_product.save
+        @product=cart.product_option
+        @product.update(surplus: @product.surplus-cart.sum)
+        if @product.surplus <= 0
+          content = "商品「 "+@product.product.name+"」之規格「"+@product.option1+"」已無庫存，請評估是否補貨上架。"
+          NewsMailer.system_email("商品缺貨通知",content).deliver_now!
+        end
+        cart.destroy
+        end
+        carts.destroy
       end
+
       NewsMailer.normal_email("訂單成立通知","感謝您訂購GermanySky商品，您已於"+@order.created_at.to_s+"訂購完成。訂單編號為"+@order.ordernumber.to_s+"，總金額為"+@order.total_price.to_s+"。您可以登入網站查看訂單詳細資訊與進行訂單程序。",@current_user.id).deliver_now!
       content = "使用者 "+@current_user.name.to_s+" 剛建立一筆訂單，詳細資訊請登入後台查詢。"
       NewsMailer.system_email("訂單成立通知",content).deliver_now!
@@ -185,7 +239,7 @@ def new
         @current_user.update(account_level_id: @level.id)
         NewsMailer.normal_email("會員等級更改通知","您的會員等級更改為"+@level.level_name.to_s,@current_user.id).deliver_now!
       end
-      @current_user.update(point: @current_user.point+@order.get_point)
+      @current_user.update(point: @current_user.point.to_i+@order.get_point.to_i)
       content_to_user = "訂單編號"+@order.ordernumber.to_s+"之訂單已完成所有付款與寄送事宜，希望您滿意我們的商品，有任何疑問都可以在留言板聯繫我們。此筆訂單將封存於系統中，謝謝。"
       NewsMailer.normal_email("訂單狀態通知（訂單完成）",content_to_user,@order.account_id).deliver_now!
       content = "您已將使用者 "+@current_user.name.to_s+"之訂單編號"+@order.ordernumber.to_s+"之訂單狀態改變為完成訂單，訂單資料將封存於系統中，謝謝。"

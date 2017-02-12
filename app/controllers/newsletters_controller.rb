@@ -1,5 +1,6 @@
 class NewslettersController < ApplicationController
 before_filter :current_user
+before_filter :setting
 before_action :set_newsletter, only: [:edit, :update, :destroy]
 	def index
 		    @newsletters = Newsletter.all

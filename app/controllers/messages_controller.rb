@@ -1,5 +1,6 @@
 class MessagesController < ApplicationController
 before_filter :current_user
+before_filter :setting
 before_action :set_message, only: [:edit, :update, :destroy,:show]
   def index
       if params[:order].present?

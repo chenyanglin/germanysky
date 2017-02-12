@@ -1,0 +1,52 @@
+<div class="navbar navbar-inverse navbar-fixed-top">
+	<div class="topNav">
+		<div class="container">
+			<div class="alignR">
+				<a class="active" href="/"> <i class="home icon"></i> 首頁</a> 
+				
+				
+	<% if @current_user.present? && @current_user.role!=1%>
+    <a class="inline item" href="/products/shoppingcart" data-html="<%if @barcarts.size>0 %>
+    您的購物車商品列表<br>
+    <div class='divider'></div>
+    <table class='striped table'>
+    <%@cartprice=0%>
+    <%@barcarts.each do |b| %>
+    <tr>
+    <tr>
+    <td class='graybg'>
+    <img class='ui centered mini image' src='<%= asset_path '100px.png' %>' style='height: 40px; width: 40px; object-fit: contain'>
+    </td>
+    </tr>
+    <td>
+    <tr class='graybg'>
+    <%=b.product.name%>
+    </tr>
+    <tr class='graybg'>數量：<%=b.sum %></tr>
+    <tr class='graybg'>價格：<%=b.product_option.price*b.sum%>
+    <%@cartprice += b.product_option.price*b.sum%>
+    </tr>
+    </td></tr><br>
+    <%end%>
+    </table>
+    <div class='divider'></div>
+    總價：<%=@cartprice%>
+    <%else%>購物車是空的<%end%>">
+        <a href="/products/shoppingcart"><i class="shipping icon"></i>購物車<span class="badge badge-warning"><%if @catrprice.present? %>$<%=@cartprice%><%end%></span></a>
+      </a>
+      <%end%>
+      <% if @current_user.present? %>
+      <% if @current_user.role==1 %>
+      <a href="/accounts/myaccount"><i class="user icon"></i>管理員介面</a> 
+      <%else%>
+      <a href="/accounts/myaccount"><i class="user icon"></i><%= @current_user.name %></a> 
+      <%end%>
+      <a href="/consoles/logout"><i class="user icon"></i>登出</a> 
+      <% else %>
+      <a href="/consoles/login"><i class="user icon"></i>登入</a> 
+      <% end %>
+   
+			</div>
+		</div>
+	</div>
+</div>

@@ -77,29 +77,28 @@
             <%= f.file_field :upload, :id => 'image_file' %>
           </div>
           </div> -->
-    <div class="file row">
+  
     <input type="hidden" name="count" value="1" />
         <div class="control-group" id="fields">
         <div class="required field">
             <label for="field1">上傳圖片 Upload Photo</label>
-            <div class="controls" id="fileprofs"> 
+            <div  id="fileprofs"> 
                
                     <div id="field" class="col-md-7"><input id="field1" name="product[files][file1]" type="file" /><button id="add-more" class="btn add-more" type="button">+</button></div>
                 
             <br>
             </div>
             </div>
-        </div>
+
   </div>
       <div class="required field">
       <label>可用運送方式：</label>
-        <%= f.select :delivery_ids, Delivery.all.collect {|x| [x.name, x.id]}, {}, :class => "ui search selection dropdown", :multiple => true %>
+        <%= f.select :delivery_ids, Delivery.all.collect {|x| [x.name, x.id]}, {}, :class => "ui search selection dropdown", :multiple => true, :id =>"delivery_ids" %>
       </div>
       <div class="required field">
       <label>可用運送方式：</label>
         <%= f.select :payment_ids, Payment.all.collect {|x| [x.name, x.id]}, {}, :class => "ui search selection dropdown", :multiple => true ,:data => {validate:"payment_id"}%>
       </div>
-
         <div class="field">
         <div class="ui horizontal segments">
     <div class="ui blue segment">
@@ -371,4 +370,9 @@ $(document).on('change','#typetwo_select', function () {
            
           });
 });
+</script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#delivery_ids').multiselect();
+    });
 </script>

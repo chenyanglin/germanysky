@@ -1,10 +1,15 @@
 class ConsolesController < ApplicationController
-  before_filter :current_user, :only => [:index]
+  before_filter :current_user, :only => [:index,:notice,:aboutus]
+  before_filter :setting
 	def index
 		# @console_user ||= ManagerAccount.find(1)
     @product = Product.includes(:productimages).where(on_store: true).limit(4)
     @product = @product.order("created_at desc")
-    @newsboards = Newsboard.limit(5).order('id desc')
+    @new_products = Product.includes(:productimages).where(on_store: true).limit(8)
+    @new_products = @new_products.order("created_at desc")
+    @last_products = @new_products[4..8]
+    @new_products = @new_products[0..3]
+    @hotsale_products = @new_products[0..2]
 	end
   def fblogin
     @account = Account.find_by_account_name(params[:uid])
@@ -74,7 +79,13 @@ class ConsolesController < ApplicationController
   end
   def aboutus
   end
+  def notice
+  end
   def templateindex
+    @new_products = Product.includes(:productimages).where(on_store: true).limit(4)
+    @new_products = @new_products.order("created_at desc")
+  end
+  def testtemplate
   end
   def subscription
     @newsletteremail = NewsletterEmail.new

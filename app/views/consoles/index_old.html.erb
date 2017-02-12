@@ -1,0 +1,227 @@
+<style style="text/css">
+a{text-decoration:none;}
+a:hover{text-decoration:underline;}
+</style>
+<div class="ui container">
+	<h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
+ 
+	  <div class="content">
+	    Germanysky 徳心應手
+	  </div>
+	</h1>
+<div class="ui two stackable cards" >
+
+<div class="ui grey card">
+  <div class="content">
+	  <div class="ui big image">
+      <img src="<%= asset_path 'mymytw.png' %>">
+      </div>
+  </div>
+</div>
+
+<div class="ui grey card">
+  <div class="content" >
+  	<h2>最新消息</h2>
+  	<% if @newsboards.present? %>
+  		<% @newsboards.each do |n| %>
+  			<div id="<%= n.id %>">
+   			<i class="browser icon"></i><a href="/newsboards/<%=n.id%>"><%= n.title %></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font size="0.5"  ><span class="float:right"><%= n.created_at.strftime("%Y-%m-%d") %></span></font>
+    		</div>
+    		</br>
+    		<div class="divider"></div>
+    	<%end%>
+	<%end%>
+	</div>
+</div>
+
+</div>
+
+<% if @product.present? %>
+<div class="ui four stackable link cards" >
+<% if @product.first.present? %>
+	<div id="first_card" class="card">
+			<div class="content" >
+				<div class="header">
+	   				<h2 class="site-font ui blue header"><i class="shopping basket icon"></i><%= @product.first.name %></h2>
+	      		</div>
+	      	<div class="divider"></div>
+			</div>
+		
+	    <div class="content">
+	      <div class="center aligned description">
+		      <div class="ui statistic">
+					  <div class="item">
+					  
+      				<img class="ui centered small image" src="<%= asset_path '100px.png' %>" style='height: 140px; width: 120px; object-fit: contain' >
+    					</div>
+				</div>
+
+	      </div>
+	    </div>
+	    <a id="first_btn"  href="/products/<%= @product.first.id %>" class="large ui bottom attached blue button">
+	      <i class="chevron circle right icon"></i>查看商品
+	    </a>
+	 </div>
+<%end%>
+<% if @product.second.present? %>
+	  <div id="second_card" class="card">
+		  <div class="content">
+		  	<div class="header">
+	      	<h2 class="site-font ui orange header"><i class="shopping basket icon"></i><%= @product.second.name %></h2>
+	      </div>
+	      <div class="divider"></div>
+		  </div>
+	    <div class="content">
+	    
+	      <div class="center aligned description">
+		      <div class="ui statistic">
+					  <div class="item">
+					  
+      <img class="ui centered small image" src="<%= asset_path '100px.png' %>" style='height: 140px; width: 120px; object-fit: contain'>
+    </div>
+					</div>
+
+	      </div>
+	    </div>
+	    <a id="second_btn" href="/products/<%= @product.second.id %>" class="large ui bottom attached orange button">
+	      <i class="chevron circle right icon"></i>
+	      查看商品
+	    </a>
+	  </div>
+<%end%>
+<% if @product.third.present? %>
+	 <div id="third_card" class="card">
+	  	<div class="content">
+	  		<div class="header">
+	  			<h2 class="site-font ui green header">
+		  			<i class="shopping basket icon"></i>
+			      
+		       		<%= @product.third.name %>
+		      
+       		</h2>
+				</div>
+				<div class="divider"></div>
+	  	</div>
+	    <div class="content">
+	    
+	      <div class="center aligned description">
+		      <div class="ui statistic">
+					   <div class="item">
+					  
+      <img class="ui centered small image" src="<%= asset_path '100px.png' %>" style='height: 140px; width: 120px; object-fit: contain'>
+    </div>
+</div>
+	      </div>
+	    </div>
+	    <a id="third_btn" href="/products/<%= @product.third.id %>" class="large ui bottom attached green button">
+	      <i class="chevron circle right icon"></i>
+	      查看商品
+	    </a>
+	  </div>
+	  <%end%>
+	  <% if @product.fourth.present? %>
+	  <div id="fourth_card" class="card">
+	  	<div class="content">
+	  		<div class="header">
+	  			<h2 class="site-font ui yellow header">
+		  			<i class="shopping basket icon"></i>
+			      
+		       		<%= @product.fourth.name %>
+		      
+       		</h2>
+				</div>
+				<div class="divider"></div>
+	  	</div>
+	    <div class="content">
+	    
+	      <div class="center aligned description">
+		      <div class="ui statistic">
+					   <div class="item">
+					   
+    <img class="ui centered small image" src="<%= asset_path '100px.png' %>" style='height: 140px; width: 120px; object-fit: contain'> 
+    </div>
+</div>
+	      </div>
+	    </div>
+	    <a id="fourth_btn" href="/products/<%= @product.fourth.id %>" class="large ui bottom attached yellow button">
+	      <i class="chevron circle right icon"></i>
+	      查看商品
+	    </a>
+	  </div>
+	  <%end%>
+</div>
+<%end%>
+<br></br>
+<div class="ui right labeled left icon input">
+  <i class="tags icon"></i>
+  <input id="newsletter_email" type="text" placeholder="Enter email">
+ <button class="ui primary button" id="subscription">
+  訂閱電子報
+</button>
+</div>
+
+</div>
+
+
+<script type="text/javascript">
+
+$("#subscription").click(function(){
+	email = document.getElementById("newsletter_email").value;
+    var request = "/consoles/subscription?email="+email;
+    var aj = $.ajax({
+        url: request,
+        type: 'get',
+        data: $(this).serialize(),
+        dataType: 'text'
+    }).done(function (data) {
+     if (data="success"){
+      alert( "訂閱成功");
+  		}else{
+  			alert("訂閱失敗");
+  		}
+
+    }).fail(function (data) {
+      alert("此email已訂閱");
+    });
+    });
+
+$(function(){
+	$("#first_card").click(function(){
+		$('#first_btn')[0].click();
+	});
+	$("#second_card").click(function(){
+		$('#second_btn')[0].click();
+	});
+	$("#third_card").click(function(){
+		$('#third_btn')[0].click();
+	});
+	$("#fourth_card").click(function(){
+		$('#fourth_btn')[0].click();
+	});
+
+	
+});
+
+$("#test").click(function(){
+    var area_id = $('#area_select').val();
+    var request = "/products/test";
+    var aj = $.ajax({
+        url: request,
+        type: 'get',
+        data: $(this).serialize(),
+        dataType: 'text'
+    }).done(function (data) {
+      alert( data );
+         document.getElementById('test').innerHTML='abc';
+    }).fail(function (data) {
+      alert("ss");
+         document.getElementById('test2').innerHTML='efg';
+    });
+
+  });
+
+</script>
+
+
+
+

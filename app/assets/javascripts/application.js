@@ -24,6 +24,13 @@
 //= require js.cookie
 //= require semantic-ui
 //= require clipboard
+//= require shop
+//= require bootstrap
+//= require bootstrap.min
+//= require jquery.easing-1.3.min
+//= require jquery.scrollTo-1.4.3.1-min
+//= require bootstrap/dropdown
+//= require bootstrap/alert
 
 
 

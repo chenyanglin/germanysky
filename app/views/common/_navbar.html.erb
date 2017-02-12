@@ -135,8 +135,8 @@
     <%=b.product.name%>
     </tr>
     <tr class='graybg'>數量：<%=b.sum %></tr>
-    <tr class='graybg'>價格：<%=b.product.product_options.find(b.option_id).price*b.sum%>
-    <%@cartprice += b.product.product_options.find(b.option_id).price*b.sum%>
+    <tr class='graybg'>價格：<%=b.product_options.price*b.sum%>
+    <%@cartprice += b.product_options.price*b.sum%>
     </tr>
     </td></tr><br>
     <%end%>

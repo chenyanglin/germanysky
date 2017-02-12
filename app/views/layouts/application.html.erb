@@ -4,7 +4,6 @@
   </style>
   <head>
     <title>Germanysky</title>
-
       <%= Gon::Base.render_data %>
       <%= include_gon(:init => true) %>
       <%= stylesheet_link_tag   "application", :media => "all"%>
@@ -12,8 +11,6 @@
       <%= csrf_meta_tags %>
   </head>
   <body>
-
  <%= yield %>
-    <%= render "common/navbar" %>
   </body>
 </html>

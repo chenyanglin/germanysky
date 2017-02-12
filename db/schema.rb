@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170113120522) do
+ActiveRecord::Schema.define(version: 20170208071730) do
 
   create_table "account_levels", force: :cascade do |t|
     t.string   "level_name",  limit: 255
@@ -120,6 +120,18 @@ ActiveRecord::Schema.define(version: 20170113120522) do
     t.string   "status",     limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+  end
+
+  create_table "offer_images", force: :cascade do |t|
+    t.string   "specialoffer_id",     limit: 255
+    t.string   "phourl",              limit: 255
+    t.string   "name",                limit: 255
+    t.string   "upload_file_name",    limit: 255
+    t.string   "upload_content_type", limit: 255
+    t.integer  "upload_file_size",    limit: 4
+    t.datetime "upload_updated_at"
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
   end
 
   create_table "order_messages", force: :cascade do |t|
@@ -327,6 +339,26 @@ ActiveRecord::Schema.define(version: 20170113120522) do
     t.datetime "updated_at",               null: false
   end
 
+  create_table "salecart_products", force: :cascade do |t|
+    t.string   "product_id",    limit: 255
+    t.string   "option_id",     limit: 255
+    t.string   "salecart_id",   limit: 255
+    t.integer  "sum",           limit: 4
+    t.integer  "originalprice", limit: 4
+    t.integer  "sellprice",     limit: 4
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.integer  "get_point",     limit: 4
+  end
+
+  create_table "salecarts", force: :cascade do |t|
+    t.string   "account_id",      limit: 255
+    t.string   "specialoffer_id", limit: 255
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+    t.integer  "get_point",       limit: 4
+  end
+
   create_table "shoppingcarts", force: :cascade do |t|
     t.string   "account_id",    limit: 255
     t.string   "product_id",    limit: 255
@@ -343,7 +375,7 @@ ActiveRecord::Schema.define(version: 20170113120522) do
 
   create_table "specialoffers", force: :cascade do |t|
     t.string   "name",         limit: 255
-    t.string   "offertype",         limit: 255
+    t.string   "offertype",    limit: 255
     t.integer  "productcount", limit: 4
     t.integer  "saleprice",    limit: 4
     t.integer  "discount",     limit: 4
