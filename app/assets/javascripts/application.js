@@ -28,6 +28,9 @@
 //= require shop
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 7001d9e... update
 =======
 >>>>>>> 7001d9e... update
 //= require bootstrap
@@ -38,8 +41,11 @@
 //= require bootstrap/alert
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> b2867074238d0572110b76f57aefa3a0ef6aaed6
+=======
+>>>>>>> 7001d9e... update
 =======
 >>>>>>> 7001d9e... update
 

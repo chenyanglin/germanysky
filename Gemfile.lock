@@ -9,10 +9,14 @@ GIT
   remote: git://github.com/gregbell/active_admin.git
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   revision: 169bad98f2746be19b71357bb16a81065640a337
 =======
   revision: b1f96a39c6126364c661a952be28000e39d73938
 >>>>>>> b2867074238d0572110b76f57aefa3a0ef6aaed6
+=======
+  revision: 169bad98f2746be19b71357bb16a81065640a337
+>>>>>>> 7001d9e... update
 =======
   revision: 169bad98f2746be19b71357bb16a81065640a337
 >>>>>>> 7001d9e... update

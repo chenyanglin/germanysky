@@ -84,6 +84,9 @@ class ConsolesController < ApplicationController
   def templateindex
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 7001d9e... update
 =======
 >>>>>>> 7001d9e... update
     @new_products = Product.includes(:productimages).where(on_store: true).limit(4)
@@ -91,9 +94,12 @@ class ConsolesController < ApplicationController
   end
   def testtemplate
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> b2867074238d0572110b76f57aefa3a0ef6aaed6
+=======
+>>>>>>> 7001d9e... update
 =======
 >>>>>>> 7001d9e... update
   end
