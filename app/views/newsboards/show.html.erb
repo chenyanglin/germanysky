@@ -1,0 +1,119 @@
+<div class="ui grid content-section" style="margin-top:0px;padding-top:0px;">
+  <div class="three wide column" style="margin-right:-15px;padding-top:0px;">
+      <div id="control_panel" class="ui sticky control-menu">
+        <div class="ui fluid vertical large menu">
+          <div class="header item">
+            <h3 class="site-font ui teal header">
+              最新消息
+            </h3>
+          </div>
+          <div class="header item">
+            搜尋
+          </div>
+          <div class="ui item">
+            <div class="ui transparent icon input">
+              <input id="filter" type="text" placeholder="Search...">
+                <div id="empty_msg" class="ui popup transition hidden">
+                  <span style="color:#db2828;">請輸入條件</span>
+                </div>
+              <i id="search_go" class="search link icon"></i>
+            </div>
+          </div>
+         
+        </div>
+      </div>
+  </div>
+  <div id="content_part" class="thirteen wide column" style="margin-top:5px;">
+    <div class="ui inverted dimmer main">
+      <div class="ui text loader">讀取中</div>
+    </div>
+<div class="ui top attached button">GermanySky 德心應手</div>
+
+<div class="ui grid">
+  <div class="sixteen wide column"><div> </div><h2 class="site-font ui blue header"><%= @newsboard.title %></h2></div>
+
+  <div class="eight wide column">
+  <div class="ui divider"></div>
+    <div><%= @newsboard.content.html_safe %></div>
+     
+  </div>
+
+</div>
+<div class="ui grid">
+  <div class="sixteen wide column"></div>
+</div>
+<div class="ui bottom attached button">GermanySky 德心應手</div>
+
+<script type="text/javascript">
+$(function(){
+  $('.ui.sticky.control-menu')
+  .sticky({
+    offset            : 81,
+    observeChanges    : true,
+    context: '#content_part'
+  });
+
+// search functions
+  var search_msg = $('#filter')
+    .popup({
+      inline   : true,
+      hoverable: false,
+      position : 'top center',
+      delay: {
+        show: 100,
+        hide: 800
+      },
+      on: 'manual'
+    })
+  ;
+
+  $("#search_go").click(function(){
+    start_search();
+  });
+
+  $(document).on('keypress', function(e) {
+    if(e.which == 13) {
+      start_search();
+    }
+  });
+
+  $( "#filter" ).focus(function() {
+    search_msg.popup('hide');
+  });
+
+  function start_search(){
+    var search_string = $("#filter").val();
+    if(search_string == ""){
+      search_msg.popup('toggle');
+    }else{
+      var target_url = "";
+      if(window.location.href == "http://"+location.host+"/products"){
+        target_url = window.location.href+"?filter="+search_string;
+      }else if(window.location.href.indexOf('filter') > -1){
+        target_url = "http://"+location.host+"/products?filter="+search_string;
+      }else{
+        target_url = window.location.href+"&filter="+search_string;
+      }
+      window.location.replace(target_url);
+    }
+  }
+// search functions
+
+  $('#products_table').tablesort();
+
+$("#plus").click(function(){
+  var sum = Number(document.getElementById("sum").value);
+document.getElementById("sum").value = sum +1;
+  });
+
+$("#minus").click(function(){
+  var sum = Number(document.getElementById("sum").value);
+  if (sum == 1)
+    {alert("無法低於1");}
+  else
+{document.getElementById("sum").value = sum - 1;}
+  });
+
+
+});
+</script>
