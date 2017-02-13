@@ -11,8 +11,10 @@
 // about supported directives.
 //
 
+//= require_tree .
 //= require jquery
 //= require jquery_ujs
+//= require bootstrap
 //= require react
 //= require react_ujs
 //= require components
@@ -20,11 +22,11 @@
 //= require_tree
 //= require jquery.infinite-pages
 //= require jquery-fileupload
-//= require smart_listing
 //= require js.cookie
 //= require semantic-ui
 //= require clipboard
 //= require shop
+<<<<<<< HEAD
 //= require bootstrap
 //= require bootstrap.min
 //= require jquery.easing-1.3.min
@@ -32,6 +34,8 @@
 //= require bootstrap/dropdown
 //= require bootstrap/alert
 
+=======
+>>>>>>> b2867074238d0572110b76f57aefa3a0ef6aaed6
 
 
 $(document).ready(function() {
