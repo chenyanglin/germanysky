@@ -1,0 +1,220 @@
+<div class="ui grid content-section" style="margin-top:0px;padding-top:0px;">
+  <div class="three wide column" style="margin-right:-15px;padding-top:0px;">
+      <div id="control_panel" class="ui sticky control-menu">
+        <div class="ui fluid vertical large menu">
+          <div class="header item">
+            <h3 class="site-font ui teal header">
+              付款管理
+            </h3>
+          </div>
+        
+            <div class="item">
+              <button id="btn_new_payment" class="site-font fluid ui blue right labeled icon button">
+                <i class="add icon"></i>
+                新增付款方式
+              </button>
+            </div>
+         
+        </div>
+      </div>
+  </div>
+  <div id="content_part" class="thirteen wide column" style="margin-top:5px;">
+    <div class="ui inverted dimmer main">
+      <div class="ui text loader">讀取中</div>
+    </div>
+    <div class="ui compact segment">
+      <div class="ui horizontal mini blue statistic" style="margin:0;">
+        <div class="value">
+          <%= number_with_delimiter(@payments_size, :delimiter => ',') %>
+        </div>
+        <div class="site-font label">
+          付款方式總數
+        </div>
+      </div>
+    </div>
+    <% if @payments.present? %>
+      <% if @payments.size != 0 %>
+        <div class="infinite-table">
+          <table id="payments_table" class="site-font ui sortable selectable teal table">
+            <thead>
+              <tr>
+                <th>名稱</th>
+                <th>敘述</th>
+                <th>付款期限</th>
+                <th style="margin: 0 10px 0 10px;">Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <%= render :partial => 'payments', :object => @payments %>
+            </tbody>
+          </table>
+          <p class="pagination">
+            <%= link_to_next_page @payments, 'Next Page', :params => {:filter => @search_param}%>
+          </p>
+        </div>
+      <% else %>
+        <h3>未建立！</h3>
+      <% end %>
+    <% end %>
+    
+          </tbody>
+        </table>
+  </div>
+
+</div>
+
+<div class="ui small modal edit-account" style="padding-top:0px;">
+  <i class="close icon"></i>
+  <div id="edit_from" style="padding:10px;">
+  </div>
+</div>
+
+<div class="ui basic modal delete-check">
+  <i class="close icon"></i>
+  <div class="header">
+    刪除運送方式 <span class="primary-orange target_payment"></span>
+  </div>
+  <div class="image content">
+    <div class="image">
+      <i class="user icon"></i>
+    </div>
+    <div class="description">
+      <p>確定要刪除<span class="primary-orange target_payment"></span>嗎?</p>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="two fluid ui inverted buttons">
+      <div class="ui ok red basic inverted button">
+        <i class="remove icon"></i>
+        刪除
+      </div>
+      <div class="ui cancel blue basic inverted button">
+        <i class="checkmark icon"></i>
+        取消
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+$(function(){
+  $('.ui.sticky.control-menu')
+  .sticky({
+    offset            : 81,
+    observeChanges    : true,
+    context: '#content_part'
+  });
+
+// search functions
+  var search_msg = $('#filter')
+    .popup({
+      inline   : true,
+      hoverable: false,
+      position : 'top center',
+      delay: {
+        show: 100,
+        hide: 800
+      },
+      on: 'manual'
+    })
+  ;
+
+  $("#search_go").click(function(){
+    start_search();
+  });
+
+  $(document).on('keypress', function(e) {
+    if(e.which == 13) {
+      start_search();
+    }
+  });
+
+  $( "#filter" ).focus(function() {
+    search_msg.popup('hide');
+  });
+
+  function start_search(){
+    var search_string = $("#filter").val();
+    if(search_string == ""){
+      search_msg.popup('toggle');
+    }else{
+      var target_url = "";
+      if(window.location.href == "http://"+location.host+"/payments"){
+        target_url = window.location.href+"?filter="+search_string;
+      }else if(window.location.href.indexOf('filter') > -1){
+        target_url = "http://"+location.host+"/payments?filter="+search_string;
+      }else{
+        target_url = window.location.href+"&filter="+search_string;
+      }
+      window.location.replace(target_url);
+    }
+  }
+// search functions
+
+  $('#payments_table').tablesort();
+
+  $('body').on('click','.payment_edit',function(){
+    $('.ui.dimmer.main').dimmer('show');
+
+    var row_id = $(this).data("value");
+    $.get( "/payments/"+row_id+"/edit", function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $('.ui.dimmer.main').dimmer('hide');
+
+      $('.ui.modal.edit-account').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $('.ui.dimmer.main').dimmer('hide');
+      alert( "error" );
+    });
+  });
+
+  $('body').on('click', '.payment_del',function(){
+    var href = this.href;
+    var orign_link = $(this);
+    var payment_name = $(this).data("name");
+    console.log(payment_name);
+
+    $(".target_payment").text(payment_name);
+
+    $('.delete-check').modal({
+        onApprove : function() {
+          $.ajax({
+            type: "get",
+            method: "delete",
+            url: href
+          });
+          $('.ui.dimmer.main').dimmer('show');
+          location.reload();
+        }
+      }).modal('refresh').modal('show');
+
+    return false;
+  });
+
+  $("#btn_new_payment").click(function(){
+    $("#btn_new_payment").addClass("loading");
+    $.get( "/payments/new", function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $("#btn_new_payment").removeClass("loading");
+
+      $('.ui.modal.edit-account').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $("#btn_new_payment").removeClass("loading");
+      alert( "error" );
+    });
+
+  });
+
+
+
+});
+</script>

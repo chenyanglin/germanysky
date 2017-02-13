@@ -1,5 +1,6 @@
 class AccountsController < ApplicationController
 before_filter :current_user
+before_filter :setting
 before_action :set_account, only: [:edit, :update,:show, :destroy,:console_edit]
   def index
 
@@ -99,7 +100,7 @@ def new
       render :text => "success"
   end
 
-def destroy
+  def destroy
     @account.destroy
 
     redirect_to accounts_path
@@ -112,7 +113,9 @@ def destroy
   def failure
     super
   end
-
+  def myaccount
+    @messages = @current_user.messages
+  end
   def facebook
     @user = User.from_omniauth(request.env["omniauth.auth"])
     if @user.persisted?

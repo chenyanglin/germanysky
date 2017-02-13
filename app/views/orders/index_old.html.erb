@@ -1,0 +1,612 @@
+<div class="ui grid content-section" style="margin-top:0px;padding-top:0px;">
+  <div class="three wide column" style="margin-right:-15px;padding-top:0px;">
+      <div id="control_panel" class="ui sticky control-menu">
+        <div class="ui fluid vertical large menu">
+          <div class="header item">
+            <% if @current_user.role == 1%>
+            <h3 class="site-font ui teal header">
+              訂單管理
+            </h3>
+            <% else %>
+            <h3 class="site-font ui teal header">
+              我的訂單
+            </h3>
+            <% end %>
+          </div>
+          <% if @current_user.role ==1 %>
+         <div class="fitted item">
+            <button id="checkorder" class="fluid ui labeled icon yellow button"
+                    data-tooltip="選取多筆訂單匯出檢貨單"
+                    data-position="right center">
+              <i class="edit icon"></i>
+              <span class="site-font yen" style="font-size:16px;">建立檢貨單</span>
+            </button>
+            <div class="ui no-selected popup">
+              <div class="site-font yen" style="color:#db2828">未選擇訂單</div>
+            </div>
+          </div>
+          <%end%>
+          <div class="header item">
+            搜尋
+          </div>
+          <div class="ui item">
+            <div class="ui transparent icon input">
+              <input id="filter" type="text" placeholder="Search...">
+                <div id="empty_msg" class="ui popup transition hidden">
+                  <span style="color:#db2828;">請輸入條件</span>
+                </div>
+              <i id="search_go" class="search link icon"></i>
+            </div>
+          </div>
+          
+          <div class="header item">
+            <h4 class="site-font ui blue horizontal fitted divider header">
+              篩選條件
+            </h4>
+          </div>
+          <div class="item" >
+            <h4 class="ui header">
+            <a class="ui red tag label" style="width:84px;text-align:center;" href="/orders?status=1">
+        未付款
+        </a>
+            </h4>
+            </div>
+            <div class="item" >
+            <h4 class="ui header">
+            <a class="ui teal tag label" style="width:140px;text-align:center;">
+        已付款未確認
+        </a>
+            </h4>
+            </div>
+             <div class="item" >
+            <h4 class="ui header">
+            <a class="ui green tag label" style="width:140px;text-align:center;">
+        已確認付款
+        </a>
+            </h4>
+            </div>
+            <div class="item" >
+            <h4 class="ui header">
+            <a class="ui teal tag label" style="width:140px;text-align:center;">
+        貨到付款
+        </a>
+            </h4>
+            </div>
+        <div class="item" >
+            <h4 class="ui header">
+<a class="ui red tag label" style="width:84px;text-align:center;">
+        未出貨
+        </a>
+            </h4>
+            </div>
+            <div class="item" >
+            <h4 class="ui header">
+      <a class="ui teal tag label" style="width:140px;text-align:center;">
+        已出貨
+        </a>
+            </h4>
+            </div>
+            <div class="item" >
+            <h4 class="ui header">
+      <a class="ui green tag label" style="width:140px;text-align:center;">
+        已確認取貨
+        </a>
+            </h4>
+            </div>
+                        <div class="item" >
+            <h4 class="ui header">
+      <a class="ui red tag label" style="width:140px;text-align:center;">
+        逾期未取貨
+        </a>
+            </h4>
+            </div>
+      <div class="item" >
+            <h4 class="ui header">
+      <a class="ui teal tag label" style="width:140px;text-align:center;">
+        訂單完成
+        </a>
+            </h4>
+            </div>
+  <!--  #pay_status 
+  #1:未付款
+  #2:已付款未確認
+  #3:已確認付款
+  #4:逾期未付款
+  #5:貨到付款
+  #6:完成
+  #delivery_status
+  #1:未出貨
+  #2:已出貨
+  #3:已確認取貨
+  #4:逾期未取貨
+  #5:完成
+   -->
+
+        </div>
+      </div>
+  </div>
+
+  <div id="content_part" class="thirteen wide column" style="margin-top:5px;">
+    <div class="ui inverted dimmer main">
+      <div class="ui text loader">讀取中</div>
+    </div>
+    <div class="ui compact segment">
+      <div class="ui horizontal mini blue statistic" style="margin:0;">
+        <div class="value">
+          <%= number_with_delimiter(@orders_size, :delimiter => ',') %>
+        </div>
+        <div class="site-font label">
+          訂單總數
+        </div>
+      </div>
+    </div>
+
+    <% if @orders.present? %>
+      <% if @orders.size != 0 %>
+        <div class="infinite-table">
+          <table id="orders_table" class="site-font ui sortable selectable teal table">
+            <thead>
+              <tr>
+              <% if @current_user.role == 1 %>
+              <th >
+<div class="ui master checkbox">
+                  <input type="checkbox">
+                  <label id="checktest">全選</label>
+                </div>
+              </th>
+              <%end%>
+                <th>訂單編號</th>
+                <th style="width:40px;">總價</th>
+                <th style="width:150px;">付款狀態</th>
+                <th style="width:150px;">出貨狀態</th>
+                <th style="width:150px;">詳細資料</th>
+                <th>建立日期</th>
+                <th style="margin: 0 10px 0 10px;">功能</th>
+              </tr>
+            </thead>
+            <tbody>
+              <%= render :partial => 'orders', :object => @orders %>
+            </tbody>
+          </table>
+          <p class="pagination">
+            <%= link_to_next_page @orders, 'Next Page', :params => {:filter => @search_param}%>
+          </p>
+        </div>
+      <% else %>
+        <h3>未建立！</h3>
+      <% end %>
+    <% end %>
+    
+          </tbody>
+        </table>
+  </div>
+
+</div>
+
+<div class="ui small modal edit-order" style="padding-top:0px;">
+  <i class="close icon"></i>
+  <div id="edit_from" style="padding:10px;">
+  </div>
+</div>
+
+<div class="ui basic modal delete-check">
+  <i class="close icon"></i>
+  <div class="header">
+    刪除訂單 <span class="primary-orange target_order"></span>
+  </div>
+  <div class="image content">
+    <div class="image">
+      <i class="announcement icon"></i>
+    </div>
+    <div class="description">
+      <p>確定要刪除訂單<span class="primary-orange target_order"></span>嗎?</p>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="two fluid ui inverted buttons">
+      <div class="ui ok red basic inverted button">
+        <i class="remove icon"></i>
+        刪除
+      </div>
+      <div class="ui cancel blue basic inverted button">
+        <i class="checkmark icon"></i>
+        取消
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ui basic modal confirmpay-check">
+  <i class="close icon"></i>
+  <div class="header">
+    確認匯款 <span class="primary-orange target_order"></span>
+  </div>
+  <div class="image content">
+    <div class="image">
+      <i class="announcement icon"></i>
+    </div>
+    <div class="description">
+      <p>確定更改訂單<span class="primary-orange target_order"></span>狀態為已匯款？</p>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="two fluid ui inverted buttons">
+      <div class="ui ok red basic inverted button">
+        <i class="checkmark icon"></i>
+        確認
+      </div>
+      <div class="ui cancel blue basic inverted button">
+        <i class="remove icon"></i>
+        取消
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ui basic modal confirmdelivery-check">
+  <i class="close icon"></i>
+  <div class="header">
+    確認出貨 <span class="primary-orange target_order"></span>
+  </div>
+  <div class="image content">
+    <div class="image">
+      <i class="announcement icon"></i>
+    </div>
+    <div class="description">
+      <p>確定更改訂單<span class="primary-orange target_order"></span>狀態為已出貨？</p>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="two fluid ui inverted buttons">
+      <div class="ui ok red basic inverted button">
+        <i class="checkmark icon"></i>
+        確認
+      </div>
+      <div class="ui cancel blue basic inverted button">
+        <i class="remove icon"></i>
+        取消
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ui basic modal takeproduct-check">
+  <i class="close icon"></i>
+  <div class="header">
+    確認取貨 <span class="primary-orange target_order"></span>
+  </div>
+  <div class="image content">
+    <div class="image">
+      <i class="announcement icon"></i>
+    </div>
+    <div class="description">
+      <p>確定更改訂單<span class="primary-orange target_order"></span>狀態為已取貨？</p>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="two fluid ui inverted buttons">
+      <div class="ui ok red basic inverted button">
+        <i class="checkmark icon"></i>
+        確認
+      </div>
+      <div class="ui cancel blue basic inverted button">
+        <i class="remove icon"></i>
+        取消
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ui basic modal orderdone-check">
+  <i class="close icon"></i>
+  <div class="header">
+    確認訂單完成 <span class="primary-orange target_order"></span>
+  </div>
+  <div class="image content">
+    <div class="image">
+      <i class="announcement icon"></i>
+    </div>
+    <div class="description">
+      <p>確定更改訂單<span class="primary-orange target_order"></span>狀態為完成狀態？</p>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="two fluid ui inverted buttons">
+      <div class="ui ok red basic inverted button">
+        <i class="checkmark icon"></i>
+        確認
+      </div>
+      <div class="ui cancel blue basic inverted button">
+        <i class="remove icon"></i>
+        取消
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+$(function(){
+  $('.ui.sticky.control-menu')
+  .sticky({
+    offset            : 81,
+    observeChanges    : true,
+    context: '#content_part'
+  });
+
+// search functions
+  var search_msg = $('#filter')
+    .popup({
+      inline   : true,
+      hoverable: false,
+      position : 'top center',
+      delay: {
+        show: 100,
+        hide: 800
+      },
+      on: 'manual'
+    })
+  ;
+
+  $("#search_go").click(function(){
+    start_search();
+  });
+
+  $(document).on('keypress', function(e) {
+    if(e.which == 13) {
+      start_search();
+    }
+  });
+
+  $( "#filter" ).focus(function() {
+    search_msg.popup('hide');
+  });
+
+  function start_search(){
+    var search_string = $("#filter").val();
+    if(search_string == ""){
+      search_msg.popup('toggle');
+    }else{
+      var target_url = "";
+      if(window.location.href == "http://"+location.host+"/payments"){
+        target_url = window.location.href+"?filter="+search_string;
+      }else if(window.location.href.indexOf('filter') > -1){
+        target_url = "http://"+location.host+"/payments?filter="+search_string;
+      }else{
+        target_url = window.location.href+"&filter="+search_string;
+      }
+      window.location.replace(target_url);
+    }
+  }
+// search functions
+
+  $('.master.checkbox')
+    .checkbox({
+      // check all children
+      onChecked: function() {
+        $('.child.checkbox').checkbox('check').closest('tr').addClass("active");
+      },
+      // uncheck all children
+      onUnchecked: function() {
+        $('.child.checkbox').checkbox('uncheck').closest('tr').removeClass("active");
+      }
+    })
+  ;
+  $('body').on('click','.order-setting',function(){
+    $rowCheckbox = $(this).siblings('.order-setting').find('.child.checkbox');
+    $rowCheckbox.checkbox('toggle');
+    $(this).closest('tr').toggleClass("active");
+  });
+  // $('#orders_table').tablesort();
+
+ $("#checkorder").click(function(){
+    selected_data_array = [];
+    var is_empty = true;
+    $( ".child.checkbox" ).find("input").each(function( index ) {
+      var checkbox_value = $(this).val();
+      var is_checked = $(this).is(":checked");
+      if (is_checked) {
+        selected_data_array.push(checkbox_value);
+        is_empty = false;
+      }
+    });
+    if(is_empty){
+      $('#checkorder').popup('show');
+      setTimeout(function(){
+        $('#checkorder').popup('hide');
+      }, 2000);
+    }else{
+      var newWindow = window.open("/orders/checkorder?data="+String(selected_data_array));
+
+    }
+  });
+
+  $('body').on('click','.order_edit',function(){
+    $('.ui.dimmer.main').dimmer('show');
+
+    var row_id = $(this).data("value");
+    $.get( "/orders/"+row_id+"/edit", function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $('.ui.dimmer.main').dimmer('hide');
+
+      $('.ui.modal.edit-order').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $('.ui.dimmer.main').dimmer('hide');
+      alert( "error" );
+    });
+  });
+
+  $('body').on('click', '.order_del',function(){
+    var href = this.href;
+    var orign_link = $(this);
+    var order_id = $(this).data("id");
+    console.log(order_id);
+
+    $(".target_id").text(order_id);
+
+    $('.delete-check').modal({
+        onApprove : function() {
+          $.ajax({
+            type: "get",
+            method: "delete",
+            url: href
+          });
+          $('.ui.dimmer.main').dimmer('show');
+          location.reload();
+        }
+      }).modal('refresh').modal('show');
+
+    return false;
+  });
+
+    $('body').on('click', '.confirmpay',function(){
+    var order_id = $(this).data("id");
+    var row_id = $(this).data("value");
+    var request ="/orders/confirmpay?id="+row_id
+    console.log(order_id);
+
+    $(".target_id").text(order_id);
+
+    $('.confirmpay-check').modal({
+        onApprove : function() {
+          $.ajax({
+            type: "get",
+            url: request,
+            data: $(this).serialize()
+          });
+          $('.ui.dimmer.main').dimmer('show');
+          location.reload();
+        }
+      }).modal('refresh').modal('show');
+    return false;
+  });
+    $('body').on('click', '.confirmdelivery',function(){
+    var order_id = $(this).data("id");
+    var row_id = $(this).data("value");
+    var request ="/orders/confirmdelivery?id="+row_id
+    console.log(order_id);
+
+    $(".target_id").text(order_id);
+
+    $('.confirmdelivery-check').modal({
+        onApprove : function() {
+          $.ajax({
+            type: "get",
+            url: request,
+            data: $(this).serialize()
+          });
+          $('.ui.dimmer.main').dimmer('show');
+          location.reload();
+        }
+      }).modal('refresh').modal('show');
+    return false;
+  });
+
+  $('body').on('click', '.takeproduct',function(){
+    var order_id = $(this).data("id");
+    var row_id = $(this).data("value");
+    var request ="/orders/takeproduct?id="+row_id
+    console.log(order_id);
+
+    $(".target_id").text(order_id);
+
+    $('.takeproduct-check').modal({
+        onApprove : function() {
+          $.ajax({
+            type: "get",
+            url: request,
+            data: $(this).serialize()
+          });
+          $('.ui.dimmer.main').dimmer('show');
+          location.reload();
+        }
+      }).modal('refresh').modal('show');
+    return false;
+  });
+
+
+    $('body').on('click','.usercheckpay',function(){
+    $('.ui.dimmer.main').dimmer('show');
+
+    var row_id = $(this).data("value");
+    $.get( "/orders/usercheckpay?id="+row_id, function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $('.ui.dimmer.main').dimmer('hide');
+
+      $('.ui.modal.edit-order').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $('.ui.dimmer.main').dimmer('hide');
+      alert( "error" );
+    });
+  });
+
+    $('body').on('click','.orderdone',function(){
+    $('.ui.dimmer.main').dimmer('show');
+
+    var row_id = $(this).data("value");
+    $.get( "/orders/orderdone?id="+row_id, function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $('.ui.dimmer.main').dimmer('hide');
+
+      $('.ui.modal.edit-order').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $('.ui.dimmer.main').dimmer('hide');
+      alert( "error" );
+    });
+  });
+
+    $('body').on('click','.order_detail',function(){
+    $('.ui.dimmer.main').dimmer('show');
+
+    var row_id = $(this).data("value");
+    $.get( "/orders/orderdetail?id="+row_id, function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $('.ui.dimmer.main').dimmer('hide');
+
+      $('.ui.modal.edit-order').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $('.ui.dimmer.main').dimmer('hide');
+      alert( "error" );
+    });
+  });
+
+  $("#btn_new_order").click(function(){
+    $("#btn_new_order").addClass("loading");
+    $.get( "/orders/new", function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $("#btn_new_order").removeClass("loading");
+
+      $('.ui.modal.edit-order').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $("#btn_new_payment").removeClass("loading");
+      alert( "error" );
+    });
+
+  });
+  $("#checktest").click(function(){
+     $('.child.checkbox').checkbox('check').closest('tr').addClass("active");
+
+  });
+
+
+});
+</script>

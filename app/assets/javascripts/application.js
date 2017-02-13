@@ -26,6 +26,22 @@
 //= require semantic-ui
 //= require clipboard
 //= require shop
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 7001d9e... update
+//= require bootstrap
+//= require bootstrap.min
+//= require jquery.easing-1.3.min
+//= require jquery.scrollTo-1.4.3.1-min
+//= require bootstrap/dropdown
+//= require bootstrap/alert
+
+<<<<<<< HEAD
+=======
+>>>>>>> b2867074238d0572110b76f57aefa3a0ef6aaed6
+=======
+>>>>>>> 7001d9e... update
 
 
 $(document).ready(function() {

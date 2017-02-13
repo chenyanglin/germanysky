@@ -1,7 +1,28 @@
 class ProductsController < ApplicationController
 before_filter :current_user
+before_filter :setting
 before_action :set_product, only: [:edit, :update, :destroy]
   def index
+        @products = Product.all.includes(:productimages,:producttype).includes(:type_one).where(on_store: true)
+        # binding.pry
+        @products = @products.like(params[:filter]) if params[:filter]
+        @products = @products.order(updated_at: :desc)
+        @products_size = @products.size
+        @products = @products.page(params[:page]).per(15)
+        if params[:brand].present?
+          @products = @products.where("brand_id = ?",params[:brand])
+          @products_size = @products.size
+          @brand = Brand.find(params[:brand])
+        end
+        if params[:type].present?
+          @products = @products.where("type_one_id = ?",params[:type])
+          @products_size = @products.size
+          @type = TypeOne.find(params[:type])
+        end
+        @product_info = false
+
+  end
+    def products_template
 
         @brands = Brand.all
         @type_ones = TypeOne.all
@@ -150,11 +171,11 @@ def new
     end
   end
 def show
-  @brands = Brand.all
-  @type_ones = TypeOne.all
   @product = Product.find(params[:id])#.includes(:product_options)
   @messages = @product.product_messages
   @message = ProductMessage.new
+  @new_products = Product.includes(:productimages).where(on_store: true).limit(3)
+    @new_products = @new_products.order("created_at desc")
   if @product.on_store == false
     redirect_to "/"
   end
@@ -187,14 +208,13 @@ def destroy
   end
 
   def shoppingcart
-
     @shoppingcarts = Shoppingcart.where('account_id = ?',@current_user.id.to_s)
     @order_price = 0
     @payments = []
     @deliveries =[]
     begin
     @shoppingcarts.each do |s|
-      @order_price += s.product.product_options.find(s.option_id).price*s.sum
+      @order_price += s.product_option.price*s.sum
       s.product.payments.each do |p| 
          if @payments.include?(p)
          else
@@ -209,6 +229,26 @@ def destroy
       end
     end
     rescue
+    end
+    if @current_user.salecarts.present?
+      @salecarts = @current_user.salecarts.includes(:salecart_products)
+      @salecarts.each do |cart|
+        cart.salecart_products.each do |s|
+          @order_price += s.sellprice*s.sum
+          s.product.payments.each do |p| 
+            if @payments.include?(p)
+            else
+            @payments << p
+            end
+          end
+          s.product.deliveries.each do |d| 
+            if @deliveries.include?(d)
+            else
+            @deliveries << d
+            end
+          end
+        end
+      end
     end
     # render :layout => "empty"
     

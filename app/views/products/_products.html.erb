@@ -46,9 +46,11 @@
  <% end %>
   <td class="collapsing">
     <button class="ui blue basic button product_edit" data-value="<%= product.id %>">修改</button>
+    </br>
     <%= link_to product, class: 'ui orange basic button product_del', method: :delete, data:{name: product.name} do %>
       刪除
     <% end %>
+    </br>
     <button class="ui teal basic button product_copy" data-value="<%= product.id %>">複製</button>
   </td>
 </tr>

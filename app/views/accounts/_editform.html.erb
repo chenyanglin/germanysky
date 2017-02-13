@@ -14,8 +14,6 @@
       <%= f.password_field :password_confirmation, placeholder: "請再次輸入密碼" %>
       </div>
       <%end%>
-
-      
       <div class="required field">
         <label>姓名 Name：</label>
         <%= f.text_field :name, placeholder: "請輸入姓名" %>
@@ -33,7 +31,7 @@
         <%= f.text_field :address, placeholder: "請輸入地址" %>
       </div>
       <div class="ui segment">
-      <div class="ui toggle checkbox">
+      
       <% if @current_user.newsletter_email.status == 1 %>
               <input type="checkbox" id="subscription" name="subscription" checked="checked">
               <%else%>
@@ -41,9 +39,8 @@
               <%end%>
               <label>是否願意收到電子報</label>
             </div>
+    
     </div>
-    </div>
-    <br>
     <div>
 
 

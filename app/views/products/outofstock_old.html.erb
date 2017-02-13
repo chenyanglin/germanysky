@@ -1,0 +1,133 @@
+<div class="ui container">
+  <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
+ 
+    <div class="content">
+      缺貨管理
+    </div>
+  </h1>
+<div class="ui horizontal divider">Out Of Stock</div>
+<div style="width:300px;height:50px;margin:0 auto;">
+<div class="ui center large buttons">
+  <button class="ui blue button" id = "registerlist">缺貨登記列表</button>
+  <div class="or"></div>
+  <button class="ui red button" id = "outofstockproduct">缺貨商品列表</button>
+</div>
+</div>
+  
+<div id='partial_one' style='display:none'>
+  <%= render :partial => 'registerlist', :object => @registerlists %>
+</div>
+<% if @i.present? %>
+<div id='partial_two'>
+  <%= render :partial => 'outofstockproduct', :object => @products %>
+</div>
+<%else%>
+<div id='partial_two' style='display:none'>
+  <%= render :partial => 'outofstockproduct', :object => @products %>
+</div>
+<%end%>
+<div class="ui small modal edit-product" style="padding-top:0px;">
+  <i class="close icon"></i>
+  <div id="edit_from" style="padding:10px;">
+  </div>
+</div>
+
+<div class="ui basic modal delete-check">
+  <i class="close icon"></i>
+  <div class="header">
+    刪除登記
+  </div>
+  <div class="image content">
+    <div class="image">
+      <i class="user icon"></i>
+    </div>
+    <div class="description">
+      <p>確定要刪除此筆登記？</p>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="two fluid ui inverted buttons">
+      <div class="ui ok red basic inverted button">
+        <i class="remove icon"></i>
+        刪除
+      </div>
+      <div class="ui cancel blue basic inverted button">
+        <i class="checkmark icon"></i>
+        取消
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+$(function(){
+  $('.ui.sticky.control-menu')
+  .sticky({
+    offset            : 81,
+    observeChanges    : true,
+    context: '#content_part'
+  });
+
+// search functions
+
+  $('#products_table').tablesort();
+  $('#registers_table').tablesort();
+  
+
+  $('body').on('click', '.register-del',function(){
+    
+    var orign_link = $(this);
+    var register_id = $(this).data("value");
+
+    $(".target_register").text(register_id);
+    var href = "/products/del_register?id="+register_id;
+    $('.delete-check').modal({
+        onApprove : function() {
+          $.ajax({
+            type: "get",
+            url: href
+          });
+          $('.ui.dimmer.main').dimmer('show');
+          location.reload();
+        }
+      }).modal('refresh').modal('show');
+
+    return false;
+  });
+
+$("#registerlist").click(function(){
+    $('#partial_one').show();
+// document.getElementById("partial_one").style.display = "none";
+document.getElementById("partial_two").style.display = "none";
+  });
+$("#outofstockproduct").click(function(){
+    $('#partial_two').show();
+document.getElementById("partial_one").style.display = "none";
+// document.getElementById("partial_one").style.display = "block";
+  });
+$("#surplusless").click(function(){
+  less = document.getElementById("less").value;
+  window.location="http://"+location.host+"/products/outofstock?less="+less;
+  });
+
+$('body').on('click','.product_info',function(){
+    var row_id = $(this).data("value");
+    show_info(row_id);
+  });
+  function show_info(product_id){
+    
+window.location="http://"+location.host+"/products/"+product_id;
+
+  }
+
+
+});
+
+</script>
+<style type="text/css">
+.AutoNewline
+{
+word-break: break-all;/*必須*/
+}
+</style>

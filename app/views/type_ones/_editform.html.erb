@@ -1,0 +1,223 @@
+<div class="form-check">
+<%= form_for @typeone,authenticity_token: true do |f| %>
+<div class="ui stackable one column centered grid">
+  <div class="fourteen wide column">
+    <div class="ui large form" style="text-align:left;">
+      <div class="required field">
+        <label>名稱 Name：</label>
+        <%= f.text_field :name, placeholder: "請輸入分類名稱." %>
+      </div>
+      <div class="required field">
+        <label>敘述 Description：</label>
+        <%= f.text_field :description, placeholder: "請輸入敘述" %>
+      </div>
+      <% if @typeone.type_twos.present? %>
+      <br>
+      <label style="font-size:16px;color:#005AB5;">第二層子分類：</label>
+      <br>
+      <% i=1 %>
+      <% @typeone.type_twos.each do |two| %>
+      <label style="font-size:14px;color:#005AB5;">&nbsp;第二層分類<%=i%>：</label>
+       <input type="hidden" id="type_two<%= two.id%>" name ="[typetwo][typetwo<%=two.id%>][id]" value="<%=two.id %>">
+      <div class="fields">
+        <div class="inline six wide field">
+          <div class="required field">
+          <label style="font-size:14px;">名稱 Name：</label>
+          <input type="text" name="[typetwo][typetwo<%=two.id%>][name]" value="<%=two.name%>">
+          </div>
+        </div>
+        <div class="inline six wide field">
+          <div class="required field">
+          <label style="font-size:14px;">敘述 Description：</label>
+          <input type="text" name="[typetwo][typetwo<%=two.id%>][description]" value="<%=two.description%>">
+          </div>
+        </div>
+        <div class="inline two wide field">
+        <div class="sontype_delete" data-value="<%= two.id %>" style="margin:20px 0 0 0;cursor:pointer" onClick="delete_typetwo('<%=two.id%>')">
+          <i class="delete icon"></i>
+        </div>
+        </div>
+      </div>
+          <% if two.type_threes.present? %>
+            <label style="font-size:12px;color:#F75000;">&nbsp;&nbsp;第三層子分類：</label>
+          <br>
+            <% x = 1%>
+            <% two.type_threes.each do |three| %>
+            <input type="hidden" id="type_three<%= three.id%>" name ="[typethree][typethree<%= three.id%>][id]" value="<%=three.id %>">
+            <label style="font-size:10px;color:#F75000;">&nbsp;&nbsp;&nbsp;第三層分類<%=x%>：</label>
+              <div class="fields">
+              <div class="inline one wide field">
+              </div>
+                <div class="inline six wide field">
+                  <div class="required field">
+                  <label style="font-size:10px;">名稱 Name：</label>
+                  <input type="text" name="[typethree][typethree<%= three.id%>][name]" value="<%=three.name%>">
+                  </div>
+                </div>
+                <div class="inline six wide field">
+                  <div class="required field">
+                  <label style="font-size:10px;">敘述 Description：</label>
+                  <input type="text" name="[[typethree]typethree<%= three.id%>][description]" value="<%=three.description%>">
+                  </div>
+                </div>
+                <div class="inline one wide field">
+                <div class="sontype_delete" data-value="<%= three.id %>" style="margin:20px 0 0 0;cursor:pointer" onClick="delete_typethree('<%=three.id%>')">
+                  <i class="delete icon"></i>
+                </div>
+                </div>
+              </div>
+              <% x+=1%>
+              <%end%>
+          <% end %>
+      <% i+=1%>
+      <%end%>
+      <%end%>
+
+<!--       <div class="row">
+    <input type="hidden" name="count" value="1" />
+        <div class="control-group" id="fields">
+        <div class="required field">
+            <label for="field1">上傳圖片 Upload Photo</label>
+            <div class="controls" id="profs"> 
+                <form class="input-append">
+                    <div id="field" class="col-md-7"><div id="field"><input autocomplete="off" class="input" id="field1" name="prof1" type="text" placeholder="Type something" data-items="8"/><button id="b1" class="btn add-more" type="button">+</button></div>
+                </form>
+            <br>
+            </div>
+            </div>
+        </div> -->
+  </div>
+
+    <div class="ui divider"></div>
+    <button id="type_form_submit" class="ui teal basic button">
+      <i class="write icon"></i>送出
+    </button>
+    </div>
+
+
+</div>
+</div>
+<% end %>
+
+
+
+
+<script type="text/javascript">
+$(function(){
+  $('select.dropdown')
+    .dropdown()
+  ;
+  $('form').submit(function() {
+    var valuesToSubmit = $(this).serialize();
+    $("#type_form_submit").addClass("loading");
+    console.log($(this).attr('action'));
+    $.ajax({
+        url: $(this).attr('action'), //sumbits it to the given url of the form
+        type: 'POST',
+        processData: false,
+        contentType: false,
+        data: new FormData(this)
+    }).success(function(upload_result){
+        console.log(upload_result);
+        if(upload_result == "success" ){
+          window.location.replace("http://"+location.host+"/type_ones?recent=true");
+        }
+    }).fail(function(e) {
+        console.log(e);
+    }).done(function(){
+      $("#type_form_submit").removeClass("loading");
+    });
+    return false; // prevents normal behaviour
+  });
+    });
+  $(document).ready(function(){
+    var next = 1;
+    $(".add-more").click(function(e){
+        e.preventDefault();
+        var addto = "#field" + next;
+        var addRemove = "#field" + (next);
+        next = next + 1;
+        var newIn = '<input autocomplete="off" class="input form-control" id="field' + next + '" name="field' + next + '" type="text">';
+        var newInput = $(newIn);
+        var removeBtn = '<button id="remove' + (next - 1) + '" class="btn btn-danger remove-me" >-</button></div><div id="field">';
+        var removeButton = $(removeBtn);
+        $(addto).after(newInput);
+        $(addRemove).after(removeButton);
+        $("#field" + next).attr('data-source',$(addto).attr('data-source'));
+        $("#count").val(next);  
+        
+            $('.remove-me').click(function(e){
+                e.preventDefault();
+                var fieldNum = this.id.charAt(this.id.length-1);
+                var fieldID = "#field" + fieldNum;
+                $(this).remove();
+                $(fieldID).remove();
+            });
+    });
+    
+});
+  $("#typeoneparent_select").change(function(){
+    console.log($(this).val());
+    if($(this).val() != ""){
+      $("#typetwo_field").removeClass("disabled");
+    }
+    $("#typetwoparent_select").dropdown('clear');
+  });
+$(document).on('change','#typeoneparent_select', function () {
+    $("#typetwoparent_select").val([]);
+    $("#typetwoparent_select").empty();
+    var typeone_id = $('#typeoneparent_select').val();
+    var request = "/type_ones/type_two_get?typeone_id="+ typeone_id;
+    $.get(request, function(data) {
+      $("#typetwoparent_select").append(//add in an option for each major
+                $("<option></option>").attr("value", '').text('')
+            );
+       if(data.length != 0){
+        for(i = 0;i<data.length;i++){
+           $("#typetwoparent_select").append(//add in an option for each major
+                $("<option></option>").attr("value", data[i].id).text(data[i].name)
+            );
+          
+          }
+    }
+           
+          });
+});
+
+function delete_typetwo(id) {
+  var request = "/type_ones/type_two_del";
+
+      var aj = $.ajax({
+          url: request,
+          type: 'post',
+          data:{
+             id: id,
+           },
+          dataType: 'json'
+        }).success(function(upload_result) {
+          if(upload_result == "success" ){
+            window.location.reload();
+          }
+        }).fail(function(data) {
+       window.location.reload();
+        });
+}
+function delete_typethree(id) {
+  var request = "/type_ones/type_three_del";
+
+      var aj = $.ajax({
+          url: request,
+          type: 'post',
+          data:{
+             id: id,
+           },
+          dataType: 'json'
+        }).success(function(upload_result) {
+          if(upload_result == "success" ){
+            window.location.reload();
+          }
+        }).fail(function(data) {
+       window.location.reload();
+        });
+}
+</script>
