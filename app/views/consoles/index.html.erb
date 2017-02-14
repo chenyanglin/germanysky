@@ -104,6 +104,7 @@ New Products
 			  </div>
 		   <div class="item">
 		  <ul class="thumbnails">
+		  <% if @last_products.present? %>
 		  <% @last_products.each do |p|%>
 			<li class="span3">
 			  <div class="thumbnail">
@@ -112,7 +113,7 @@ New Products
 			  </div>
 			</li>
 			<%end%>
-			
+			<%end%>
 			
 		  </ul>
 		  </div>
@@ -124,6 +125,7 @@ New Products
 		  <h3>熱銷商品</h3>
 		<div class="row-fluid">
 		  <ul class="thumbnails">
+		  <% if @hotsale_products.present? %>
 		<% @hotsale_products.each do |p|%>
 		<% surplus = 0%>
 		<% if p.product_options.size > 1 %>
@@ -154,7 +156,7 @@ New Products
 			  </div>
 			</li>
 		<%end%>
-
+		<%end%>
 		  </ul>
 		</div>
 	</div>
@@ -162,7 +164,7 @@ New Products
 	Featured Products
 	-->
 		<div class="well well-small">
-		  <h3><a class="btn btn-mini pull-right" href="products.html" title="View more">VIew More<span class="icon-plus"></span></a> Featured Products  </h3>
+		  <h3> 更多商品  </h3>
 		  <hr class="soften"/>
 		  <div class="row-fluid">
 		  <ul class="thumbnails">
