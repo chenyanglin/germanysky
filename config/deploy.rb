@@ -15,7 +15,7 @@ set :branch, ENV['branch'] || current_branch || "bootstraptemplate"
 
 # set :rbenv_path, "/home/johnwu/.rbenv"
 set :deploy_to, '/home/chenyang/germanysky'
-
+set :tmp_dir, "/home/chenyang/tmp"
 set :log_level, :debug
 set :keep_releases, 5
 # set :linked_files, %w(config/database.yml config/secrets.yml)
