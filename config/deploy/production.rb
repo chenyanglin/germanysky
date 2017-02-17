@@ -21,16 +21,18 @@
 # role :web, %w{user1@primary.com user2@additional.com}, other_property: :other_value
 # role :db,  %w{deploy@example.com}
 
-  role :app, %w{root@45.33.24.241}
-  role :web, %w{root@45.33.24.241}
-  role :db,  %w{root@45.33.24.241}
+server '45.33.24.241', user: 'chenyang', roles: %w{app db web}, my_property: :my_value
 
-  set :ssh_options, {
-    forward_agent: false,
-    auth_methods: %w(password),
-    password: 'xup6yaya',
-    user: 'root'
-  }
+  # role :app, %w{chenyang@45.33.24.241}
+  # role :web, %w{chenyang@45.33.24.241}
+  # role :db,  %w{chenyang@45.33.24.241}
+
+  # set :ssh_options, {
+  #   forward_agent: false,
+  #   auth_methods: %w(password),
+  #   password: 'xup6yaya',
+  #   user: 'chenyang'
+  # }
 
 # Configuration
 # =============
