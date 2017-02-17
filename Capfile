@@ -3,10 +3,7 @@ require 'capistrano/setup'
 
 # Include default deployment tasks
 require 'capistrano/deploy'
-require 'capistrano/rails'
-require 'capistrano/passenger'
-require "capistrano/scm/git"
-install_plugin Capistrano::SCM::Git
+
 # Include tasks from other gems included in your Gemfile
 #
 # For documentation on these, see for example:
@@ -18,13 +15,13 @@ install_plugin Capistrano::SCM::Git
 #   https://github.com/capistrano/rails
 #   https://github.com/capistrano/passenger
 #
-# require 'capistrano/rvm'
-# require 'capistrano/rbenv'
+ require 'capistrano/rails'
+ #require 'capistrano/rbenv'
 # require 'capistrano/chruby'
-# require 'capistrano/bundler'
-# require 'capistrano/rails/assets'
-# require 'capistrano/rails/migrations'
-# require 'capistrano/passenger'
+ require 'capistrano/bundler' # 會自動幫你跑 bundle install
+ require 'capistrano/rails/assets' # 會自動幫你跑 rake assets:precompile
+ require 'capistrano/rails/migrations' # 會自動幫你跑 rake db:migrate
+ require 'capistrano/passenger'
 
 # Load custom tasks from `lib/capistrano/tasks` if you have any defined
 Dir.glob('lib/capistrano/tasks/*.rake').each { |r| import r }
