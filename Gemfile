@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 gem 'rails_12factor', group: :production
 
 gem 'rails', '4.2.6'
-
+gem 'mysql2', '~> 0.3.18'
 gem 'sass-rails'
 gem 'uglifier', '2.7.1'
 gem 'coffee-rails', '4.1.0'
@@ -77,7 +77,7 @@ gem "letter_opener", :group => :development
 gem 'whenever', :require => false
 
 group :development do
-  gem 'mysql2', '0.3.18'
+  gem 'mysql2','~> 0.3.18'
   gem "brakeman", require: false
   gem "rails_best_practices", require: false
   gem 'byebug'

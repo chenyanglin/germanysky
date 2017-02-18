@@ -445,7 +445,7 @@ DEPENDENCIES
   kaminari (= 0.16.3)
   letter_opener
   mini_magick
-  mysql2 (= 0.3.18)
+  mysql2 (~> 0.3.18)
   omniauth
   omniauth-facebook
   omniauth-google-oauth2
