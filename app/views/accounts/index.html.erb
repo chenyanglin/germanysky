@@ -59,7 +59,7 @@ Body Section
 <% if @accounts.present? %>
       <% if @accounts.size != 0 %>
         <div class="infinite-table">
-          <table id="payments_table" class="site-font ui sortable selectable teal table">
+          <table id="accounts_table" class="site-font ui sortable selectable teal table">
             <thead>
               <tr>
                 <th>帳號名稱</th>
@@ -153,52 +153,8 @@ $("#subscription").click(function(){
 $(function(){
 
 // search functions
-  var search_msg = $('#filter')
-    .popup({
-      inline   : true,
-      hoverable: false,
-      position : 'top center',
-      delay: {
-        show: 100,
-        hide: 800
-      },
-      on: 'manual'
-    })
-  ;
 
-  $("#search_go").click(function(){
-    start_search();
-  });
-
-  $(document).on('keypress', function(e) {
-    if(e.which == 13) {
-      start_search();
-    }
-  });
-
-  $( "#filter" ).focus(function() {
-    search_msg.popup('hide');
-  });
-
-  function start_search(){
-    var search_string = $("#filter").val();
-    if(search_string == ""){
-      search_msg.popup('toggle');
-    }else{
-      var target_url = "";
-      if(window.location.href == "http://"+location.host+""){
-        target_url = window.location.href+"?filter="+search_string;
-      }else if(window.location.href.indexOf('filter') > -1){
-        target_url = "http://"+location.host+"/payments?filter="+search_string;
-      }else{
-        target_url = window.location.href+"&filter="+search_string;
-      }
-      window.location.replace(target_url);
-    }
-  }
-// search functions
-
-  $('#payments_table').tablesort();
+  $('#accounts_table').tablesort();
 
   $('body').on('click','.account_edit',function(){
     $('.ui.dimmer.main').dimmer('show');
