@@ -35,7 +35,20 @@ Lower Header Section
 -->
 <div class="container">
 <%= render "common/header" %>
-<%= render "common/leftmenu" %>
+<div class="row pull-left">
+<div id="sidebar" class="span3">
+
+<div class="well well-small">
+  <ul class="nav nav-list">
+  <div class="ui center aligned icon header" style="font-size:18px;margin:20px 0 22px 0;">
+  <li> 文章總數： <%= number_with_delimiter(@newsboards_size, :delimiter => ',') %></li>
+  <li><br></li>
+    <li><button class="ui orange basic button" id = "btn_new_newsboard">新增最新消息</button></li>
+    </div>
+  </ul>
+</div>
+
+  </div>
 <!-- 
 Body Section 
 -->
