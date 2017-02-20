@@ -21,7 +21,10 @@
 # role :web, %w{user1@primary.com user2@additional.com}, other_property: :other_value
 # role :db,  %w{deploy@example.com}
 
-server '45.33.24.241', user: 'chenyang', roles: %w{app db web}, my_property: :my_value
+server '45.33.24.241', 
+		user: 'chenyang', 
+		roles: %w{app db web}, 
+		my_property: :my_value
 
   # role :app, %w{chenyang@45.33.24.241}
   # role :web, %w{chenyang@45.33.24.241}
