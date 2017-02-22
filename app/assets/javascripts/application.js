@@ -88,36 +88,6 @@ $(document).ready(function() {
     });
   });
   
-$(function() {
-  $("#map").click
-  (function(e) {
-
-    var offset = $(this).offset();
-
-    var relativeX = (e.pageX - offset.left);
-    var relativeY = (e.pageY - offset.top);
-    var imagemap_width = $('#map').width();
-    var imagemap_height = $('#map').height();
-    /*alert(relativeX+':'+relativeY);*/
-    $(".position").val("afaf");
-
-    $('#x_point').text("x = " + relativeX);
-    $('#y_point').text("y = " + relativeY);
-    $('#image_width').text("width = " + imagemap_width);
-    $('#image_hight').text("hight = " + imagemap_height);
-
-    $('#beacon_x').val(relativeX);
-    $('#beacon_y').val(relativeY);
-    $('#map_width').val(imagemap_width);
-    $('#map_hight').val(imagemap_height);
-    $('#offsetleft').val(offset.left);
-    $('#offsettop').val(offset.top);
-
-    $("#add_beacon").show();
-
-    });
-  $("#add_beacon").hide();
-});
 
 $(function()
 {

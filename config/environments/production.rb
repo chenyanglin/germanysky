@@ -4,7 +4,7 @@ Rails.application.configure do
   config.action_mailer.delivery_method = :test 
   config.action_mailer.default_url_options = { host: "http://localhost:3000" }
   config.action_mailer.smtp_settings = config_for(:email).symbolize_keys
-  config.serve_static_assets = false
+
   # Code is not reloaded between requests.
   config.cache_classes = true
 
@@ -26,7 +26,7 @@ Rails.application.configure do
 
   # Disable serving static files from the `/public` folder by default since
   # Apache or NGINX already handles this.
-  config.serve_static_files = ENV['RAILS_SERVE_STATIC_FILES'].present?
+  config.serve_static_files = true
 
   # Compress JavaScripts and CSS.
   config.assets.js_compressor = :uglifier
