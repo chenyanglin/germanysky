@@ -24,6 +24,8 @@ Rails.application.routes.draw do
       get :test
       get :subscription
       get :templateindex
+      get :testtemplate
+      get :notice
     end
   end
   resources :accounts do
@@ -36,6 +38,7 @@ Rails.application.routes.draw do
       post :signin
       get :logout
       get :test
+      get :myaccount
     end
   end
   resources :account_levels do
@@ -46,6 +49,8 @@ Rails.application.routes.draw do
     collection do
       get :select_product
       post :insertproduct
+      get :index_old
+      post :add_to_salecart
     end
   end
   resources :newsboards do
@@ -89,6 +94,7 @@ Rails.application.routes.draw do
       get :shoppingcart_plus
       get :shoppingcart_minus
       get :newlist
+      get :products_template
       get :shopprocess
       get :register
       post :product_register
@@ -99,12 +105,14 @@ Rails.application.routes.draw do
       get :type_two_get
       get :type_three_get
       get :progressbar
-
+      post :type_two_del
+      post :type_three_del
     end
   end
   resources :deliveries do
     collection do
       get :progressbar
+      get :index_old
     end
   end
   resources :payments do
