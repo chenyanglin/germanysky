@@ -24,6 +24,9 @@
 //= require js.cookie
 //= require semantic-ui
 //= require clipboard
+//= require shop
+//= require js.cookie
+
 
 
 
