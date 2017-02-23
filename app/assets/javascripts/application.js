@@ -26,6 +26,8 @@
 //= require clipboard
 //= require shop
 //= require js.cookie
+//= require bootstrap/dropdown
+//= require bootstrap/alert
 
 
 
