@@ -1,0 +1,208 @@
+<div class="ui container">
+  <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
+ 
+    <div class="content">
+      購物車
+    </div>
+  </h1>
+  <div class="ui horizontal divider">Shopping Cart</div>
+<div class="ui top attached blue message">
+    <h3 class="site-font ui header">
+      購買步驟
+    </h3>
+  </div>
+  <div class="ui three bottom attached ordered steps">
+    <a class="step">
+      <div class="content">
+        <div class="site-font yen title" style="font-size:16px;">瀏覽商品 </div>
+        <div class="description">瀏覽商品，選擇商品規格並點選加入購物車</div>
+      </div>
+    </a>
+   <a class="step">
+      <div class="content">
+        <div class="site-font yen title" style="font-size:16px;">加入購物車</div>
+        <div class="description">隨時滑到購物車icon上觀看購物車內容，並在購物車修改數量</div>
+      </div>
+    </a>
+   <a class="step">
+      <div class="content">
+        <div class="site-font yen title" style="font-size:16px;">建立訂單</div>
+        <div class="description">選擇付款、收貨方式，填寫收件人資料</div>
+      </div>
+    </a>
+  </div>
+  <br></br>
+      <% if @shoppingcarts.size > 0 %>
+        <div class="infinite-table">
+          <table id="products_table" class="ui celled table" style="table-layout:fixed">
+            <thead>
+              <tr>
+                <th>商品名稱</th>
+                <th>圖片</th>
+                <th>單價</th>
+                <th>數量</th>
+                <th>紅利</th>
+                <th>總價</th>
+                <th>Function</th>
+              </tr>
+            </thead>
+            <tbody>
+            <% @shoppingcarts.each do |shoppingcart| %>
+  <input type="hidden" id="surplus<%= shoppingcart.id%>" value="<%=shoppingcart.product_option.surplus %>">
+  <input type="hidden" id="single_point<%= shoppingcart.id%>" value="<%=shoppingcart.product.point %>">
+<% price = shoppingcart.product.product_options.find(shoppingcart.option_id).price%>
+<tr>
+  <td><%= shoppingcart.product.name %><br>規格：<%= shoppingcart.option_id %></td>
+  <td>
+  <% begin %>
+  <img class="ui centered mini image" src="<%= asset_path shoppingcart.product.productimages.first.phourl %>" style='height: 80px; width: 80px; object-fit: contain'>
+  <%rescue%>
+  <img class="ui centered mini image" src="<%= asset_path '100px.png' %>" style='height: 80px; width: 80px; object-fit: contain'>
+  <%end%>
+  </td>
+  <td>$<%= price %></td>
+  <td><div  id="selectsum">
+       <span class="input-group-btn"><button id ="minus" type="button" class="btn btn-default btn-minus" data-id="<%= shoppingcart.id %>" data-price = "<%= price %>">－</button>  <input id = "sum<%= shoppingcart.id %>" type="text" name="lname" size="2" value ="<%= shoppingcart.sum %> ">  <span class="input-group-btn"><button id = "plus" type="button" class="btn btn-default btn-plus" data-id="<%= shoppingcart.id %>" data-price = "<%= price %>">＋</button>
+      </div></td>
+      <td><div style="display: inline-block;" id ="get_point<%= shoppingcart.id %>"><%= shoppingcart.get_point%></div>點</td>
+  <td><b id="option_total_price<%= shoppingcart.id %>">$<%= price*shoppingcart.sum %></b></td>
+  <td>
+    <button class="ui red basic button" id="cart_del" value="<%= shoppingcart.id %>">刪除</button>
+     </td>
+  
+</tr>
+
+<% end %>
+<tr>
+<td align="center" colspan="7" ><label>商品小計：</label><b id='product_price'><%= @order_price%></b></td>
+</tr>
+        <tr>
+        <td colspan="7" >
+    
+        <a id="to_order"  href="/orders/new" class="small ui bottom attached blue button">
+        <i class="chevron circle right icon"></i>
+        結帳去！
+      </a>
+        </td>
+        </tr>
+            </tbody>
+          </table>
+          
+        </div>
+
+        <div class="divider"></div>
+          
+
+          
+      <% else %>
+        <h3 class="ui center aligned icon header">購物車是空的，快去選購吧！！</h3>
+      <% end %>
+    
+  </div>
+
+
+
+</div>
+<script type="text/javascript">
+$(function(){
+  $('select.dropdown')
+    .dropdown()
+  ;
+  $('form').submit(function() {
+    var valuesToSubmit = $(this).serialize();
+    $("#payment_form_submit").addClass("loading");
+    console.log($(this).attr('action'));
+    $.ajax({
+        url: $(this).attr('action'), //sumbits it to the given url of the form
+        type: 'POST',
+        processData: false,
+        contentType: false,
+        data: new FormData(this)
+    }).success(function(upload_result){
+        console.log(upload_result);
+        if(upload_result == "success" ){
+          window.location.replace("http://"+location.host+"/payments?recent=true");
+        }
+    }).fail(function(e) {
+        console.log(e);
+    }).done(function(){
+      $("#payment_form_submit").removeClass("loading");
+    });
+    return false; // prevents normal behaviour
+  });
+});
+
+function ValidateNumber(e, pnumber)
+{
+    if (!/^\d+$/.test(pnumber))
+    {
+        $(e).val(/^\d+/.exec($(e).val()));
+    }
+    return false;
+}
+$("#cart_del").click(function(){
+    var cart_id = $('#cart_del').val();
+    var request = "/products/shoppingcart_del?id="+cart_id;
+    var aj = $.ajax({
+        url: request,
+        type: 'get',
+        data: $(this).serialize(),
+        dataType: 'text'
+    }).done(function (data) {
+      window.location.replace("http://"+location.host+"/products/shoppingcart");
+         
+    }).fail(function (data) {
+      alert(data);
+         
+    });
+
+  });
+
+
+  $('body').on('click','.btn-minus',function(){
+    var cart_id = $(this).data("id");
+    var price = $(this).data("price");
+    var sum = Number(document.getElementById("sum"+cart_id).value);
+    if (sum <= 1 )
+      {alert("不得小於1")}
+    else{
+    $.get( "/products/shoppingcart_minus?cart_id="+cart_id, function(html) {
+      document.getElementById("get_point"+cart_id).innerHTML = Number(document.getElementById("get_point"+cart_id).innerHTML)/sum*(sum-1)
+      sum = sum-1;
+      document.getElementById("sum"+cart_id).value = sum ;
+      document.getElementById("option_total_price"+cart_id).innerHTML = "$"+sum*price;
+
+      order_price = Number(document.getElementById("product_price").innerHTML);
+      document.getElementById("product_price").innerHTML = order_price-price;
+    }).fail(function() {
+
+      alert( "error" );
+    });
+      }
+  });
+    $('body').on('click','.btn-plus',function(){
+    var cart_id = $(this).data("id");
+    var price = $(this).data("price");
+    var sum = Number(document.getElementById("sum"+cart_id).value);
+    if (sum == Number(document.getElementById("surplus"+cart_id).value)){
+      alert("不得大於庫存");
+    }else{
+    $.get( "/products/shoppingcart_plus?cart_id="+cart_id, function(html) {
+      if (sum != 0){
+      document.getElementById("get_point"+cart_id).innerHTML = Number(document.getElementById("get_point"+cart_id).innerHTML)/sum*(sum+1);
+    }else{
+      document.getElementById("get_point"+cart_id).innerHTML = Number(document.getElementById("single_point"+cart_id).value)
+      
+    }
+      sum = sum+1;
+      document.getElementById("sum"+cart_id).value = sum ;
+      document.getElementById("option_total_price"+cart_id).innerHTML = "$"+sum*price;
+      order_price = Number(document.getElementById("product_price").innerHTML);
+      document.getElementById("product_price").innerHTML = order_price+price;
+    }).fail(function() {
+
+      alert( "error" );
+    });
+    }
+  });
+</script>

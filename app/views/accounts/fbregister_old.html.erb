@@ -1,0 +1,174 @@
+<body onload="ShowHello()">
+<div class="ui container" >
+  <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
+ 
+    <div class="content">
+     FB註冊
+    </div>
+  </h1>
+<div class="ui horizontal divider">Register</div>
+<%= form_for(@FBaccount) do |f| %>
+<div class="ui stackable one column centered grid">
+  <div class="fourteen wide column">
+    <div class="ui large form" style="text-align:left;">
+       <input type="hidden" name="account[account_name]" id="account_account_name" value="">
+       <input type="hidden" name="account[password]" id="account_password" value="">
+       <input type="hidden" name="account[uid]" id="account_uid" value="">
+       <input type="hidden" name="account[profile_photo]" id="account_profile_photo" value="">
+      <div class="required field">
+        <label>姓名 Name：</label>
+        <%= f.text_field :name, placeholder: "請輸入姓名" %>
+      </div>
+      <div class="required field">
+        <label>信箱 Email：</label>
+        <%= f.text_field :email, placeholder: "請輸入Email" %>
+      </div>
+    </div>
+    <br>
+    <div>
+
+
+    <div class="ui divider"></div>
+    <button id="account_form_submit" class="ui teal basic button">
+      <i class="write icon"></i>送出
+    </button>
+
+  </div>
+</div>
+
+<% end %>
+</body>
+<script type="text/javascript">
+$(function(){
+  $('select.dropdown')
+    .dropdown()
+  ;
+  $('form').submit(function() {
+    var valuesToSubmit = $(this).serialize();
+    $("#account_form_submit").addClass("loading");
+    $.ajax({
+        url: $(this).attr('action'), //sumbits it to the given url of the form
+        type: 'POST',
+        processData: false,
+        contentType: false,
+        data: new FormData(this)
+    }).success(function(upload_result){
+        console.log(upload_result);
+        if(upload_result == "success" ){
+          window.location.replace("http://"+location.host+"/consoles");
+        }
+    }).fail(function(e) {
+        console.log(e);
+    }).done(function(){
+      $("#account_form_submit").removeClass("loading");
+    });
+    return false; // prevents normal behaviour
+  });
+});
+
+function ValidateNumber(e, pnumber)
+{
+    if (!/^\d+$/.test(pnumber))
+    {
+        $(e).val(/^\d+/.exec($(e).val()));
+    }
+    return false;
+}
+</script>
+<script>
+  // This is called with the results from from FB.getLoginStatus().
+  function statusChangeCallback(response) {
+    console.log('statusChangeCallback');
+    console.log(response);
+    // The response object is returned with a status field that lets the
+    // app know the current login status of the person.
+    // Full docs on the response object can be found in the documentation
+    // for FB.getLoginStatus().
+    if (response.status === 'connected') {
+      // Logged into your app and Facebook.
+      FB.api('/me',{fields: 'name,email,gender'}, function(response) {
+      document.getElementById("account_name").value = response.name;
+      document.getElementById("account_email").value = response.email;
+      document.getElementById("account_account_name").value = response.id;
+      document.getElementById("account_password").value = response.id;
+      document.getElementById("account_uid").value = response.id;
+      // document.getElementById("account_profile_photo").value = response.data.url;
+      });
+      FB.api("/me/picture?width=180&height=180",  function(response) {
+        document.getElementById("account_profile_photo").value = response.data.url;
+        // alert(response.data.url);
+      }); 
+ 
+      // testAPI();
+    } else if (response.status === 'not_authorized') {
+      // The person is logged into Facebook, but not your app.
+      FB.api('/me',{fields: 'name,email,gender,picture'}, function(response) {
+      document.getElementById("account_name").value = response.name;
+      document.getElementById("account_email").value = response.email;
+      });
+      document.getElementById('status').innerHTML = 'Pplease log ' +
+        'into this app.';
+    } else {
+      // The person is not logged into Facebook, so we're not sure if
+      // they are logged into this app or not.
+      document.getElementById('status').innerHTML = 'Please log ' +
+        'into Facebook.';
+    }
+  }
+
+  // This function is called when someone finishes with the Login
+  // Button.  See the onlogin handler attached to it in the sample
+  // code below.
+  function checkLoginState() {
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
+    });
+  }
+
+  window.fbAsyncInit = function() {
+  FB.init({
+    appId      : '299198517102709',
+    cookie     : true,  // enable cookies to allow the server to access 
+                        // the session
+    xfbml      : true,  // parse social plugins on this page
+    version    : 'v2.8' // use graph api version 2.8
+  });
+
+  // Now that we've initialized the JavaScript SDK, we call 
+  // FB.getLoginStatus().  This function gets the state of the
+  // person visiting this page and can return one of three states to
+  // the callback you provide.  They can be:
+  //
+  // 1. Logged into your app ('connected')
+  // 2. Logged into Facebook, but not your app ('not_authorized')
+  // 3. Not logged into Facebook and can't tell if they are logged into
+  //    your app or not.
+  //
+  // These three cases are handled in the callback function.
+
+  FB.getLoginStatus(function(response) {
+    statusChangeCallback(response);
+  });
+
+  };
+
+  // Load the SDK asynchronously
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
+  // Here we run a very simple test of the Graph API after login is
+  // successful.  See statusChangeCallback() for when this call is made.
+  function testAPI() {
+    console.log('Welcome!  Fetching your information.... ');
+    FB.api('/me', function(response) {
+      console.log('Successful login for: ' + response.name);
+      document.getElementById('status').innerHTML =
+        'Thanks for logging in, ' + response.authResponse.userID + '!';
+    });
+  }
+</script>

@@ -1,0 +1,115 @@
+<header id="header">
+<div class="row">
+	<div class="span4">
+	<h1>
+		<img src="<%= asset_path 'logo-bootstrap-shoping-cart.png' %>" alt="bootstrap sexy shop">
+	</h1>
+	</div>
+
+          <div class="ui item pull-right" style="margin-top:35px; ">
+              <input id="filter" type="text" placeholder="Search...">
+              <i id="search_go" class="search link icon"></i>
+          </div>
+</div>
+</header>
+<!--
+Navigation Bar Section 
+-->
+<% if @current_user != nil && @current_user.role == 1 %>
+<div class="main_menu_area">
+      <ul id="nav">
+        <li><a href="/">首頁</a></li>
+        <li><a href="/newsboards">公佈欄設定</a></li>
+        <li><a >商品管理</a>
+          <ul>
+            <li><a href="/products/console_index">商品管理</a></li>
+            <li><a href="/products/outofstock">缺貨管理</a></li>
+            <li><a href='/specialoffers'>促銷管理</a></li>
+          </ul>
+          </li>
+        <li><a>分類與品牌</a>
+          <ul>
+            <li><a href="/type_ones">分類管理</a></li>
+            <li><a href="/brands">品牌管理</a></li>
+          </ul>
+          </li>
+        <li><a>付款與運送</a>
+          <ul>
+            <li><a href="/payments">付款管理</a></li>
+            <li><a href="/deliveries">運送管理</a></li>
+          </ul>
+        </li>
+        <li><a href="/orders">訂單管理</a></li>
+        <li><a >使用者管理</a>
+          <ul>
+            <li><a href="/accounts">會員管理</a></li>
+            <li><a href="/account_levels">等級管理</a></li>
+            <li><a href="/messages">問答管理</a></li>
+          </ul>
+        </li>
+        <li><a href="/newsletters">電子報發送</a></li>
+
+      </ul>
+  </div>
+<%else%>
+<div class="main_menu_area">
+      <ul id="nav">
+        <li><a href="/">首頁</a></li>
+        <li><a href="/newsboards">最新消息</a></li>
+        <li><a href="/consoles/aboutus">關於我們</a></li>
+        <li><a href="/specialoffers">促銷活動</a></li>
+        <li><a href="/products">商品展示</a>
+          <ul>
+            <li><a href="#">===分類===</a></li>
+            <% @type_ones.each do |t| %>
+             <li><a href="/products?type=<%=t.id%>"><%=t.name %></a>
+              <% if t.type_twos.size>0 %>
+              <ul>
+                <% t.type_twos.each do |two| %>
+                <li><a href="#"><%= two.name %></a></li>
+                <% end %>
+              </ul>
+              <%end%>
+            <% end %></li>
+            <li><a href="#">===品牌===</a></li>
+            <% @brands.each do |b| %>
+            <li><a href="/products?brand=<%=b.id%>"><%=b.name %></a></li>
+            <%end%>
+          </ul>
+        </li>
+        <li><a href="/products/shopprocess">購物流程</a></li>
+        <li><a href="/consoles/notice">注意事項</a></li>
+        <li><a href="/messages/new">留言版</a></li>
+
+      </ul>
+  </div>
+<%end%>
+    <script type="text/javascript">
+
+ $("#search_go").click(function(){
+    start_search();
+  });
+
+  $(document).on('keypress', function(e) {
+    if(e.which == 13) {
+      start_search();
+    }
+  });
+
+  function start_search(){
+    var search_string = $("#filter").val();
+    if(search_string == ""){
+      search_msg.popup('toggle');
+    }else{
+      var target_url = "";
+      if(window.location.href == "http://"+location.host+"/products"){
+        target_url = window.location.href+"?filter="+search_string;
+      }else if(window.location.href.indexOf('filter') > -1){
+        target_url = "http://"+location.host+"/products?filter="+search_string;
+      }else{
+        target_url = "http://"+location.host+"/products?filter="+search_string;
+      }
+      window.location.replace(target_url);
+    }
+  }
+ </script>

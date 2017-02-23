@@ -1,0 +1,289 @@
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+<meta name="google-signin-client_id" content="103495519586-8mkenfl2qrp1t22bgb60sc1f3p33fskk.apps.googleusercontent.com">
+<body style="background-color:#5B5B5B">.
+<div class="center container">
+<div class="ui one column centered grid">
+  <div class="sixteen wide mobile eight wide computer column">
+  <%= form_tag signin_consoles_path, class:"ui huge form", id:"login_form" do %>
+    <div class="ui fluid card">
+      <div class="content">
+        <div class="ui orange header">登入 Sign in</div>
+      </div>
+
+      <div class="content">
+          <div class="field">
+            <label style="color:#1678c2;"> 帳號 account <i class="mail icon"></i></label>
+            <input type="text" id="name" name="email" placeholder="Please enter your account name." onkeyup="e04();">
+          </div>
+          <div class="field">
+            <label style="color:#1678c2;"> 密碼 Password <i class="lock icon"></i></label>
+            <input type="password" name="password" placeholder="Please enter your password.">
+          </div>
+          <div class="field">
+            <div class="ui toggle checkbox">
+              <input type="checkbox" id="remember_email" name="remember_email">
+              <label>記住信箱</label>
+            </div>
+          </div>
+          <div class="ui error message"></div>
+      </div>
+      <div class="extra content">
+        <button class="huge ui basic fluid blue button">
+          <i class="sign in icon"></i>
+          登入
+        </button>
+      </div>
+      <div class="extra content">
+             
+         <button id="register" class="huge ui basic fluid red button" type="button">
+          <i class="sign in icon"></i>
+          註冊
+        </button>
+      </div>
+      <table border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+  <td align='center' valign="middle">
+     <button class="ui facebook button" data-size="xlarge" data-auto-logout-link="false" type="button" onClick="fb_login();"><i class="facebook icon"></i>Facebook登入</button>
+  </td>
+  <td align='center' valign="middle">
+<!--    <button class="ui google plus button" id="googleloginbtn" type="button">
+  <i class="google icon"></i>
+  Google登入
+</button> -->
+<div class="g-signin2" data-onsuccess="onSignIn">googlebtn</div>
+<!-- <button class="ui google plus button"  id = "googlebtn" onClick="onSignIn();"type="button">googlebtn</button> -->
+<!-- <div id="signinButton">
+  <span class="g-signin"
+    data-scope="https://www.googleapis.com/auth/plus.login"
+    data-clientid="103495519586-8mkenfl2qrp1t22bgb60sc1f3p33fskk.apps.googleusercontent.com"
+    data-redirecturi="postmessage"
+    data-accesstype="offline"
+    data-cookiepolicy="single_host_origin"
+    data-callback="signInCallback">
+  </span>
+</div> -->
+  </td>
+ </tr>
+</table>
+
+<div id="status">
+</div> 
+    </div>
+  <% end %>
+  </div>
+</div>
+
+</body>
+<script type="text/javascript">
+  window.onbeforeunload = function(e){
+     gapi.auth2.getAuthInstance().signOut();
+  };
+var count = 0;
+var browser=navigator.appName;
+if(browser=="Netscape"){    //如果瀏覽器為Netscape或者Firefox
+    //開始監聽鍵盤事件
+    document.captureEvents(Event.KEYDOWN)
+    document.onkeydown=function(event){
+        if(event.which==17){
+            //key code 37為→
+            count++;
+            if (count == 10){
+              alert("幹你娘");
+              count = 0;
+            }
+
+        }
+    }
+}
+else{    //假設瀏覽器不為Nescape則猜測為ie
+    //開始監聽鍵盤事件
+    document.onkeydown = function(){
+        count++;
+            if (count == 10){
+              alert("幹你娘");
+              count = 0;
+            }
+    }
+}
+function fb_login()
+{
+    // FB 第三方登入，要求公開資料與email
+    FB.login(function(response)
+    {
+        statusChangeCallback(response);
+        console.log(response);
+    }, {scope: 'public_profile,email'});
+}
+
+function onSignIn(googleUser) {
+  var profile = googleUser.getBasicProfile();
+  googleid = profile.getId(); // Do not send to your backend! Use an ID token instead.
+  name = profile.getName();
+  profile_photo = profile.getImageUrl();
+  email = profile.getEmail();
+      $.ajax({
+        url: "http://"+location.host+"/consoles/googlelogin", //sumbits it to the given url of the form
+        type: 'POST',
+        data: {googleid: googleid,
+             profile_photo: profile_photo,
+             name: name,
+             email: email,
+             },
+        dataType: 'text'
+    }).success(function (upload_result){
+        if(upload_result == "login" ){
+          window.location.replace("http://"+location.host+"/consoles");
+        }else if(upload_result =="register"){
+          window.location.replace("http://"+location.host+"/accounts/googleregister");
+        }
+    }).fail(function(e) {
+        console.log(e);
+    }).done(function(){
+      
+    });
+
+
+}
+
+$(function(){
+
+  $("#register").click(function(){
+    if (document.getElementById("name").value == "你懂我意思嗎")
+      {
+        alert("我就是聽不懂所以拜託講人話");
+      }else{
+    $("#register").addClass("loading");
+    window.location="/accounts/register";}
+    // $.get( "/accounts/register", function(html) {
+    //   $("#loginpage").empty();
+    //   $("#loginpage").append(html);
+    //   $("#register").removeClass("loading");
+
+    //   $('.ui.modal.edit-product').modal({
+    //     observeChanges: true
+    //   }).modal('refresh').modal('show');
+
+    // }).fail(function() {
+    //   $("#register").removeClass("loading");
+    //   alert( "error" );
+    // });
+
+  });
+
+
+});
+</script>
+<script>
+  // This is called with the results from from FB.getLoginStatus().
+  function statusChangeCallback(response) {
+    console.log('statusChangeCallback');
+    console.log(response);
+    // The response object is returned with a status field that lets the
+    // app know the current login status of the person.
+    // Full docs on the response object can be found in the documentation
+    // for FB.getLoginStatus().
+    if (response.status === 'connected') {
+      // Logged into your app and Facebook.
+    FB.api("/me/picture?width=180&height=180",  function(response) {
+
+      var profile_photo = response.data.url;
+      FB.api('/me',{fields: 'name,email,gender,picture'}, function(response) {
+
+    $.ajax({
+        url: "http://"+location.host+"/consoles/fblogin", //sumbits it to the given url of the form
+        type: 'POST',
+        data: {uid: response.id,
+             profile_photo: profile_photo,
+             },
+        dataType: 'text'
+    }).success(function (upload_result){
+        if(upload_result == "login" ){
+          window.location.replace("http://"+location.host+"/consoles");
+        }else if(upload_result =="register"){
+          window.location.replace("http://"+location.host+"/accounts/fbregister");
+        }
+    }).fail(function(e) {
+        console.log(e);
+    }).done(function(){
+      
+    });
+
+      });
+     
+
+        // alert(response.data.url);
+      }); 
+      // testAPI();
+    } else if (response.status === 'not_authorized') {
+      // The person is logged into Facebook, but not your app.
+      FB.api('/me',{fields: 'name,email,gender,picture'}, function(response) {
+      // alert('UserName' + response.name);
+      // alert('UserEmail' + response.email);
+      // alert('UserGender' + response.gender);
+      });
+      document.getElementById('status').innerHTML = 'Pplease log ' +
+        'into this app.';
+    } else {
+      // The person is not logged into Facebook, so we're not sure if
+      // they are logged into this app or not.
+      document.getElementById('status').innerHTML = 'Please log ' +
+        'into Facebook.';
+    }
+  }
+
+  // This function is called when someone finishes with the Login
+  // Button.  See the onlogin handler attached to it in the sample
+  // code below.
+  function checkLoginState() {
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
+    });
+  }
+
+  window.fbAsyncInit = function() {
+  FB.init({
+    appId      : '299198517102709',
+    cookie     : true,  // enable cookies to allow the server to access 
+                        // the session
+    xfbml      : true,  // parse social plugins on this page
+    version    : 'v2.8' // use graph api version 2.8
+  });
+
+  // Now that we've initialized the JavaScript SDK, we call 
+  // FB.getLoginStatus().  This function gets the state of the
+  // person visiting this page and can return one of three states to
+  // the callback you provide.  They can be:
+  //
+  // 1. Logged into your app ('connected')
+  // 2. Logged into Facebook, but not your app ('not_authorized')
+  // 3. Not logged into Facebook and can't tell if they are logged into
+  //    your app or not.
+  //
+  // These three cases are handled in the callback function.
+
+  // FB.getLoginStatus(function(response) {
+  //   statusChangeCallback(response);
+  // });
+
+  };
+
+  // Load the SDK asynchronously
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
+  // Here we run a very simple test of the Graph API after login is
+  // successful.  See statusChangeCallback() for when this call is made.
+  function testAPI() {
+    console.log('Welcome!  Fetching your information.... ');
+    FB.api('/me', function(response) {
+      console.log('Successful login for: ' + response.name);
+      document.getElementById('status').innerHTML =
+        'Thanks for logging in, ' + response.authResponse.userID + '!';
+    });
+  }
+</script>
