@@ -1,5 +1,6 @@
 class Account < ActiveRecord::Base
 	has_many :shoppingcarts, :dependent => :destroy
+	has_many :salecarts, :dependent => :destroy
 	has_many :orders
 	has_many :messages
 	has_many :product_register
@@ -11,11 +12,11 @@ class Account < ActiveRecord::Base
 	# validates :email_backup, presence: true, format: /@/ , uniqueness: true
 	
 
-	validates :password, presence: true, length: { minimum: 4}
+	# validates :password, presence: true, length: { minimum: 4}
 	has_secure_password
 
 
-	validates :account_name, presence: true
+	# validates :account_name, presence: true
 	
 # devise :database_authenticatable, :registerable,
  #         :recoverable, :rememberable, :trackable, :validatable,

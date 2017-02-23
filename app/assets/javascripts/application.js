@@ -139,55 +139,30 @@ $(function()
 
 //------------------------------------Progress Bar
 
-//--- 新增畫面選擇brand_id
-
-$(document).on('change','#new_brand_id', function () {//change majors when user changes school
-
-  var e = document.getElementById("new_brand_id");
-  var brand = e.options[e.selectedIndex].value;
-
-  if ( brand == 1 ){
-    document.getElementById("new_power").checked = true;
-  }
+$(document).on('click','#subscription', function () {
+  email = document.getElementById("newsletter_email").value;
+  alert(email);
+  if (email =="")
+    {alert("請輸入郵件喔喔喔");}
   else{
-    document.getElementById("new_power").checked = false;
+    var request = "/consoles/subscription?email="+email;
+    var aj = $.ajax({
+        url: request,
+        type: 'get',
+        data: $(this).serialize(),
+        dataType: 'text'
+    }).done(function (data) {
+     if (data="success"){
+      alert( "訂閱成功");
+      }else{
+        alert("訂閱失敗");
+      }
+
+    }).fail(function (data) {
+      alert("此email已訂閱");
+    });
   }
-});
-
-//---beacon_uuid dropdown select
-
-// $(document).on('change','#brand_id_dropdown', function () {//change majors when user changes school
-//    var request = "/beacons/find_beacon_uuid_given_brand_id?brand_id=" //access controller of interest
-//         + $('#brand_id_dropdown').val();
-
-//     var aj = $.ajax({
-//         url: request,
-//         type: 'get',
-//         data: $(this).serialize()
-//     }).done(function (data) {
-//          change_uuids(data);//modify the majors' dropdown
-//     }).fail(function (data) {
-//          console.log('AJAX request has FAILED');
-//     });
-// });
-
-// function change_uuids(data) {
-//     $("#beacon_uuid_dropdown").empty();//remove all previous majors
-//     var option;
-//     if(data.length != 0){
-//      for(i = 0;i<data.length;i++){
-//          $("#beacon_uuid_dropdown").append(//add in an option for each major
-//              option = $("<option></option>").attr("value", data[i].beacon_uuid).text(data[i].beacon_uuid),
-//              option.attr('selected', true)
-//          );
-//      }
-//      $("#beacon_description").show();
-//  }
-//  else{
-//    $("#beacon_description").hide();
-//  }
-// };
-
+    });
 
 // 表格排序
 ;(function($) {

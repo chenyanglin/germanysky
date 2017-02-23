@@ -1,10 +1,15 @@
 class ConsolesController < ApplicationController
-  before_filter :current_user, :only => [:index]
+  before_filter :current_user, :only => [:index,:notice,:aboutus]
+  before_filter :setting
 	def index
 		# @console_user ||= ManagerAccount.find(1)
     @product = Product.includes(:productimages).where(on_store: true).limit(4)
     @product = @product.order("created_at desc")
-    @newsboards = Newsboard.limit(5).order('id desc')
+    @new_products = Product.includes(:productimages).where(on_store: true).limit(8)
+    @new_products = @new_products.order("created_at desc")
+    @last_products = @new_products[4..8]
+    @new_products = @new_products[0..3]
+    @hotsale_products = @new_products[0..2]
 	end
   def fblogin
     @account = Account.find_by_account_name(params[:uid])
@@ -74,7 +79,13 @@ class ConsolesController < ApplicationController
   end
   def aboutus
   end
+  def notice
+  end
   def templateindex
+    @new_products = Product.includes(:productimages).where(on_store: true).limit(4)
+    @new_products = @new_products.order("created_at desc")
+  end
+  def testtemplate
   end
   def subscription
     @newsletteremail = NewsletterEmail.new
@@ -92,16 +103,13 @@ class ConsolesController < ApplicationController
     
   end
 	  def test
-    @account = ManagerAccount.new
+Producttype.create!( name: "現貨")
+Producttype.create!( name: "預購空運")
+Producttype.create!( name: "預購海運")
+Account.create!( :account_name => "germanysky", :password => "germanysky" ,:name => "種馬",:sex=>"男",:email => "germanysky@gmail.com",:role =>1 , :account_level_id => "1",:score => 0,:point =>100000)
+AccountLevel.create!(level_name: "基本會員",score: 0,order_price: 0,discount: 0)
 
-    @account.name = "germanysky"
-    @account.password_digest = "germanysky"
-    @account.email = "chenyang1205@gmail.com"
+      redirect_to login_consoles_path
 
-    if @account.save
-      redirect_to login_consoles_path
-    else
-      redirect_to login_consoles_path
-    end
   end
 end

@@ -1,5 +1,6 @@
 class SpecialoffersController < ApplicationController
 before_filter :current_user
+before_filter :setting
 before_action :set_specialoffer, only: [:edit, :update, :destroy]
   def index
 
@@ -11,9 +12,20 @@ before_action :set_specialoffer, only: [:edit, :update, :destroy]
         @specialoffers = @specialoffers.page(params[:page]).per(15)
         @specialoffer_infos = false
         @product_type = TypeOne.all
+        @newsboard_info = false
 
   end
-
+def index_old
+  
+        @specialoffers = Specialoffer.all
+        @specialoffers = @specialoffers.like(params[:filter]) if params[:filter]
+        @specialoffers = @specialoffers.order(updated_at: :desc) if params[:recent]
+        @specialoffers_size = @specialoffers.size
+        @specialoffers = @specialoffers.page(params[:page]).per(15)
+        @specialoffer_infos = false
+        @product_type = TypeOne.all
+        @newsboard_info = false
+end
   def new
     @specialoffer = Specialoffer.new
     render :layout => "empty"
@@ -63,11 +75,39 @@ before_action :set_specialoffer, only: [:edit, :update, :destroy]
       render :text => "error"
     end
   end
-
+def show
+  @specialoffer = Specialoffer.find(params[:id])#.includes(:products,:product_options)
+  @products = @specialoffer.product_options
+  @product_info = false
+end
 def destroy
     @specialoffer.destroy
 
     redirect_to specialoffers_path
+  end
+    def add_to_salecart
+    @salecart = Salecart.new
+    @salecart.account_id = @current_user.id
+    @salecart.specialoffer_id = params[:specialoffer_id]
+    if @salecart.save
+      if params[:product].present?
+        params[:product].each do |p|
+          @product = SalecartProduct.new
+          @product.option_id = p[1][:id]
+          @product.salecart_id = @salecart.id
+          @product.sum = p[1][:sum]
+          @product.sellprice = p[1][:saleprice]
+          option = ProductOption.find(p[1][:id])
+          @product.originalprice = option.price
+          @product.product_id = option.product.id
+          @product.save
+        end
+      end
+      redirect_to shoppingcart_products_path
+    else
+      redirect_to shoppingcart_products_path
+    end
+    
   end
 def select_product
   @offer_id = params[:id]

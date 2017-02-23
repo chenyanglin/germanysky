@@ -53,6 +53,24 @@ end
   end
 
   def update
+    if params[:typetwo].present?
+      params[:typetwo].each do |t|
+        id = t[1][:id]
+        name = t[1][:name]
+        description = t[1][:description]
+        typetwo = TypeTwo.find(id)
+        typetwo.update(name: name,description: description)
+      end
+    end
+    if params[:typethree].present?
+      params[:typethree].each do |t|
+        id = t[1][:id]
+        name = t[1][:name]
+        description = t[1][:description]
+        typetwo = TypeThree.find(id)
+        typetwo.update(name: name,description: description)
+      end
+    end
     if @typeone.update(type_params)
       render :text => "success"
     else
@@ -76,7 +94,22 @@ def destroy
     # binding.pry
     render json: @typethrees
   end
-
+  def type_two_del
+     @typetwo = TypeTwo.find(params[:id])
+    if @typetwo.destroy
+      render :text => "success"
+    else
+      render :text => "error"
+    end
+  end
+  def type_three_del
+    @typethree = TypeThree.find(params[:id])
+    if @typethree.destroy
+      render :text => "success"
+    else
+      render :text => "error"
+    end
+  end
     def type_params
     params.require(:type_one).permit(:name, :description)
   end

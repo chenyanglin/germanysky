@@ -20,9 +20,9 @@
   <div class="ui card" data-id="<%= product.id %>">
 <div class="item" href="/products/<%= product.id %>">
 <%begin%>
-    <img class="ui centered tiny image" href="/products/<%= product.id %>" src="<%= asset_path '100px.png' %>" style='height: 50px; width: 50px; object-fit: contain'>
-    <%rescue%>
   <img class="ui centered tiny image" href="/products/<%= product.id %>" src="<%= asset_path product.productimages.first.phourl %>" style='height: 50px; width: 50px; object-fit: contain'>
+    <%rescue%>
+    <img class="ui centered tiny image" href="/products/<%= product.id %>" src="<%= asset_path '100px.png' %>" style='height: 50px; width: 50px; object-fit: contain'>
   <%end%>
     </div>
     <div style="margin:0 auto;">
@@ -32,7 +32,7 @@
   <span class="center floated">
   
   <% product.product_options.each do |p| %>
-      <div class="ui child checkbox">
+      <div class="child checkbox">
       <input type="checkbox" name="<%= p.id %>" value="<%=product.id%>,<%= p.id %>">
       <label><%= p.option1 %></label>
     </div>
@@ -61,7 +61,7 @@
 </div>
 <script type="text/javascript">
    $(".btn-product").click(function(){
-        selected_data_array = [];
+    selected_data_array = [];
     var offer_id = $("#offer_id").val();
     var is_empty = true;
     $( ".child.checkbox" ).find("input").each(function( index ) {

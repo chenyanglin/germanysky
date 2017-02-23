@@ -1,38 +1,62 @@
-<div class="ui grid content-section" style="margin-top:0px;padding-top:0px;">
-  <div class="three wide column" style="margin-right:-15px;padding-top:0px;">
-      <div id="control_panel" class="ui sticky control-menu">
-        <div class="ui fluid vertical large menu">
-          <div class="header item">
-            <h3 class="site-font ui teal header">
-              付款管理
-            </h3>
-          </div>
-        
-            <div class="item">
-              <button id="btn_new_payment" class="site-font fluid ui blue right labeled icon button">
-                <i class="add icon"></i>
-                新增付款方式
-              </button>
-            </div>
-         
-        </div>
-      </div>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>GermanySky 德心應手</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Bootstrap styles -->
+    <!-- <link href="assets/css/bootstrap.css" rel="stylesheet"/> -->
+    <!-- Customize styles -->
+    <!-- <link href="style.css" rel="stylesheet"/> -->
+    <!-- font awesome styles -->
+	<!-- <link href="assets/font-awesome/css/font-awesome.css" rel="stylesheet"> -->
+		<!--[if IE 7]>
+			<link href="css/font-awesome-ie7.min.css" rel="stylesheet">
+		<![endif]-->
+
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+
+	<!-- Favicons -->
+    <link rel="shortcut icon" href="<%= asset_path 'ico/favicon.ico' %>">
+  </head>
+<body style="background:url('<%= asset_path("white_leather.png") %>') repeat 0 0;">
+<!-- 
+	Upper Header Section 
+-->
+<%= render "common/topbar" %>
+
+<!--
+Lower Header Section 
+-->
+<div class="container">
+<%= render "common/header" %>
+<div class="row pull-left">
+<div id="sidebar" class="span3">
+
+<div class="well well-small">
+  <ul class="nav nav-list">
+  <div class="ui center aligned icon header" style="font-size:18px;margin:20px 0 22px 0;">
+  <li> 付款總數： <%= number_with_delimiter(@payments_size, :delimiter => ',') %></li>
+  <li><br></li>
+    <li><button class="ui orange basic button" id = "btn_new_payment">新增付款方式</button></li>
+    </div>
+  </ul>
+</div>
+
   </div>
-  <div id="content_part" class="thirteen wide column" style="margin-top:5px;">
-    <div class="ui inverted dimmer main">
-      <div class="ui text loader">讀取中</div>
-    </div>
-    <div class="ui compact segment">
-      <div class="ui horizontal mini blue statistic" style="margin:0;">
-        <div class="value">
-          <%= number_with_delimiter(@payments_size, :delimiter => ',') %>
-        </div>
-        <div class="site-font label">
-          付款方式總數
-        </div>
-      </div>
-    </div>
-    <% if @payments.present? %>
+<!-- 
+Body Section 
+-->
+<div class="span9">
+  <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
+    <div class="content">付款管理</div>
+  </h1>
+
+ <% if @payments.present? %>
       <% if @payments.size != 0 %>
         <div class="infinite-table">
           <table id="payments_table" class="site-font ui sortable selectable teal table">
@@ -57,12 +81,15 @@
       <% end %>
     <% end %>
     
-          </tbody>
-        </table>
-  </div>
-
 </div>
-
+</div>
+<!-- 
+Clients 
+-->
+<!--
+Footer
+-->
+<%= render "common/footerbar" %>
 <div class="ui small modal edit-account" style="padding-top:0px;">
   <i class="close icon"></i>
   <div id="edit_from" style="padding:10px;">
@@ -72,7 +99,7 @@
 <div class="ui basic modal delete-check">
   <i class="close icon"></i>
   <div class="header">
-    刪除運送方式 <span class="primary-orange target_payment"></span>
+    刪除付款方式 <span class="primary-orange target_payment"></span>
   </div>
   <div class="image content">
     <div class="image">
@@ -95,8 +122,34 @@
     </div>
   </div>
 </div>
+  </body>
+</html>
+<script type="text/javascript">
 
+$("#subscription").click(function(){
+	email = document.getElementById("newsletter_email").value;
+	if (email =="")
+		{alert("請輸入郵件");}
+	else{
+    var request = "/consoles/subscription?email="+email;
+    var aj = $.ajax({
+        url: request,
+        type: 'get',
+        data: $(this).serialize(),
+        dataType: 'text'
+    }).done(function (data) {
+     if (data="success"){
+      alert( "訂閱成功");
+  		}else{
+  			alert("訂閱失敗");
+  		}
 
+    }).fail(function (data) {
+      alert("此email已訂閱");
+    });
+	}
+    });
+ </script>
 <script type="text/javascript">
 $(function(){
   $('.ui.sticky.control-menu')

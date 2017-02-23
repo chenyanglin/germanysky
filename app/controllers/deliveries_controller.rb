@@ -12,6 +12,17 @@ before_action :set_delivery, only: [:edit, :update, :destroy]
 
 
   end
+    def index_old
+
+
+        @deliveries = Delivery.all
+        @deliveries = @deliveries.like(params[:filter]) if params[:filter]
+        @deliveries = @deliveries.order(updated_at: :desc) if params[:recent]
+        @deliveries_size = @deliveries.size
+        @deliveries = @deliveries.page(params[:page]).per(15)
+
+
+  end
 def new
     @delivery = Delivery.new
     render :layout => false
