@@ -10,7 +10,7 @@ set :git_https_username, 'chenyanglin'
 set :git_https_password, 'xup6yaya'
 
 current_branch = `git branch`.match(/\* (\S+)\s/m)[1]
-set :branch, ENV['branch'] || current_branch || "bootstraptemplate"
+set :branch, ENV['branch'] || current_branch || "master"
 
 
 # set :rbenv_path, "/home/johnwu/.rbenv"
