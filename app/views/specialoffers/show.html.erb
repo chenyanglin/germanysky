@@ -147,29 +147,6 @@ Footer
 </html>
 <script type="text/javascript">
 
-$("#subscription").click(function(){
-	email = document.getElementById("newsletter_email").value;
-	if (email =="")
-		{alert("請輸入郵件");}
-	else{
-    var request = "/consoles/subscription?email="+email;
-    var aj = $.ajax({
-        url: request,
-        type: 'get',
-        data: $(this).serialize(),
-        dataType: 'text'
-    }).done(function (data) {
-     if (data="success"){
-      alert( "訂閱成功");
-  		}else{
-  			alert("訂閱失敗");
-  		}
-
-    }).fail(function (data) {
-      alert("此email已訂閱");
-    });
-	}
-    });
       count=1;
 function optionclick(id,name,orgprice,saleprice) {
         sum = document.getElementById("sum"+id).value;

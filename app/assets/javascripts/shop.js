@@ -30,26 +30,3 @@ $('.thumbnail').mouseleave(function() {
 	});
 
 });
-$(document).on('click','#subscription', function () {
-	email = document.getElementById("newsletter_email").value;
-	if (email =="")
-		{alert("請輸入郵件喔喔喔");}
-	else{
-    var request = "/consoles/subscription?email="+email;
-    var aj = $.ajax({
-        url: request,
-        type: 'get',
-        data: $(this).serialize(),
-        dataType: 'text'
-    }).done(function (data) {
-     if (data="success"){
-      alert( "訂閱成功");
-  		}else{
-  			alert("訂閱失敗");
-  		}
-
-    }).fail(function (data) {
-      alert("此email已訂閱");
-    });
-	}
-    });
