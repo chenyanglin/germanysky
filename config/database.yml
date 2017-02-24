@@ -14,19 +14,19 @@ test:
   password: "iii"
 development:
   <<: *default
-  # #chenyang local
-  # database: germanysky_production
-  # host: localhost
-  # username: root
-  # password: "iii"
-
-  #Linode
-  adapter: mysql2
-  encoding: utf8mb4
-  database: germanysky
+  #chenyang local
+  database: germanysky_production
   host: localhost
   username: root
-  password: 771205
+  password: "iii"
+
+  # #Linode
+  # adapter: mysql2
+  # encoding: utf8mb4
+  # database: germanysky
+  # host: localhost
+  # username: root
+  # password: 771205
 
 production:
   <<: *default
@@ -35,16 +35,16 @@ production:
   # encoding: utf8
   # pool: 5
 
-  # #chenyang local
-  # database: germanysky_production
-  # host: localhost
-  # username: root
-  # password: "iii"
-
-  #Linode
-  adapter: mysql2
-  encoding: utf8mb4
-  database: germanysky
+  #chenyang local
+  database: germanysky_production
   host: localhost
   username: root
-  password: 771205
+  password: "iii"
+
+  # #Linode
+  # adapter: mysql2
+  # encoding: utf8mb4
+  # database: germanysky
+  # host: localhost
+  # username: root
+  # password: 771205

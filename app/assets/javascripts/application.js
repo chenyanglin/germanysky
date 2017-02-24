@@ -25,11 +25,8 @@
 //= require semantic-ui
 //= require clipboard
 //= require shop
-//= require js.cookie
 //= require bootstrap/dropdown
 //= require bootstrap/alert
-
-
 
 
 $(document).ready(function() {
