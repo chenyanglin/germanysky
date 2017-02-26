@@ -5,7 +5,7 @@ class CreateTypeTwos < ActiveRecord::Migration
       t.string :description
       t.string :photourl
       t.string :tag
-      t.string :tier_one_id
+      t.string :type_one_id
 
       t.timestamps null: false
     end
