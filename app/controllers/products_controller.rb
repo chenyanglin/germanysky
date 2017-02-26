@@ -148,11 +148,11 @@ def new
       end
 
       params[:product][:files].each do |a|
-        @photo = Productimage.new#(:upload => a[1])
+        @photo = Productimage.new(:upload => a[1])
         @photo.product_id = @product.id
         @photo.save
-        #@photo.update(:phourl => "products/uploads/"+@photo.id.to_s+"/"+@photo.upload_file_name.to_s )
-        @photo.update(:phourl =>"100px.png")
+        @photo.update(:phourl => "products/uploads/"+@photo.id.to_s+"/"+@photo.upload_file_name.to_s )
+        # @photo.update(:phourl =>"100px.png")
       end
       render :text => "success"
     else
