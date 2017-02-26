@@ -30,7 +30,7 @@ development:
   adapter: mysql2
   encoding: utf8mb4
   database: germanysky
-  host: 45.33.24.241
+  host: localhost
   username: root
   password: 771205
 
@@ -51,6 +51,6 @@ production:
   adapter: mysql2
   encoding: utf8mb4
   database: germanysky
-  host: 45.33.24.241
+  host: localhost
   username: root
   password: 771205
