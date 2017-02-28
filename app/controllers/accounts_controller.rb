@@ -143,7 +143,7 @@ def create_with_fb
   end
 end
     def account_params
-    params.require(:account).permit(:account_name,:name,:email,:password,:password_confirmation,:phone1,:address)
+    params.require(:account).permit(:account_name,:name,:email,:password,:password_confirmation,:phone1,:address,:sex)
   end
 
     def set_account
