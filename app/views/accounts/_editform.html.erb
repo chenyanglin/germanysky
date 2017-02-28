@@ -7,12 +7,14 @@
       <input type="hidden" name="account[password]" id="account_password" value="<%=@current_user.uid%>">
       <input type="hidden" name="account[password_confirmation]" id="account_password_confirmation" value="<%=@current_user.uid%>">
       <%else%>
+       <% if @current_user.present? && @current_user.id == @account.id %>
         <label>密碼 Password：</label>
         <%= f.password_field :password, placeholder: "請輸入密碼" %>
       </div>
       <div class="required field">
       <%= f.password_field :password_confirmation, placeholder: "請再次輸入密碼" %>
       </div>
+      <%end%>
       <%end%>
       <div class="required field">
         <label>姓名 Name：</label>

@@ -76,6 +76,7 @@ def new
       end
     end
     @product_price = @order_price
+
   end
 
   def create

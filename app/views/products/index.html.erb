@@ -51,9 +51,15 @@ New Products
   </h1>
 
 <div class="ui top attached black info message">
+<%begin%>
   <div class="image">
     <img class="ui centered image" src="<%= asset_path @brand.brandimage.phourl %>">
   </div>
+  <%rescue%>
+    <div class="image">
+    <img class="ui centered image" src="<%= asset_path '100px.png' %>">
+  </div>
+  <%end%>
   <div class="content">
     <label><%=@brand.name%></label>
     <div class="description">

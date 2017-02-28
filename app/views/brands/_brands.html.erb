@@ -1,8 +1,16 @@
 <% @brands.each do |brand| %>
 <tr>
-  <td><div class="item">
+  <td>
+  <%begin%>
+  <div class="item">
       <img class="ui centered small image" src="<%= asset_path brand.brandimage.phourl %>">
-    </div></td>
+    </div>
+  <%rescue%>
+  <div class="item">
+      <img class="ui centered small image" src="<%= asset_path '100px.png' %>">
+    </div>
+  <%end%>
+    </td>
   <td><%= brand.name %></td>
   <td><%= brand.briefdescription%></td>
   <td><%= brand.detaildescription%></td>

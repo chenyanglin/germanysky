@@ -97,20 +97,23 @@ Body Section
   <div class="ui segment">
   <div class="ui horizontal segments">
     <div class="ui segment" style="width:20%">
-      <%= m.title%>
+      主旨：<%= m.title%>
     </div>
-    <div class="ui segment" style="width:50%">
-      <%= m.content%>
+    <div class="ui segment" style="width:25%">
+      內容：<%= m.content%>
     </div>
-    <div class="ui segment" style="width:18%">
+    <div class="ui segment" style="width:21%">
       <%= m.created_at.strftime("%Y-%m-%d") %>
     </div>
-    <div class="ui segment" style="width:12%">
+    <div class="ui segment" style="width:14%">
       <% if m.status == 1 %>
       <font color="green" >已回覆</font>
       <% else %>
       <font color="red" >未回覆</font>
       <% end %>
+    </div>
+    <div class="ui segment" style="width:20%">
+    <button class="ui brown basic button message_content" data-value="<%= m.id %>">查看</button>
     </div>
     </div>
       </div>
@@ -132,10 +135,33 @@ Clients
 Footer
 -->
 <%= render "common/footerbar" %>
-
+<div class="ui small modal edit-account" style="padding-top:0px;">
+  <i class="close icon"></i>
+  <div id="edit_from" style="padding:10px;">
+  </div>
+</div>
   </body>
+
 </html>
 <script type="text/javascript">
+$('body').on('click','.message_content',function(){
+    $('.ui.dimmer.main').dimmer('show');
+
+    var row_id = $(this).data("value");
+    $.get( "/messages/"+row_id, function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $('.ui.dimmer.main').dimmer('hide');
+
+      $('.ui.modal.edit-account').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $('.ui.dimmer.main').dimmer('hide');
+      alert( "error" );
+    });
+  });
   $('.menu .item')
   .tab()
 ;

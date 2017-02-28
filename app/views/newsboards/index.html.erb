@@ -43,7 +43,9 @@ Lower Header Section
   <div class="ui center aligned icon header" style="font-size:18px;margin:20px 0 22px 0;">
   <li> 文章總數： <%= number_with_delimiter(@newsboards_size, :delimiter => ',') %></li>
   <li><br></li>
+ <% if @current_user.present? && @current_user.role == 1 %>
     <li><button class="ui orange basic button" id = "btn_new_newsboard">新增最新消息</button></li>
+    <%end%>
     </div>
   </ul>
 </div>
