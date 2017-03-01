@@ -1,8 +1,8 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
-  config.action_mailer.delivery_method = :test 
-  config.action_mailer.default_url_options = { host: "http://localhost:3000" }
+  config.action_mailer.delivery_method = :smtp 
+  config.action_mailer.default_url_options = { host: "http://45.33.24.241" }
   config.action_mailer.smtp_settings = config_for(:email).symbolize_keys
 
   # Code is not reloaded between requests.
