@@ -5,7 +5,7 @@
       
       <div class="required field">
         <label>名稱 Name：</label>
-        <%= f.text_field :name, placeholder: "請輸入分類名稱." %>
+        <%= f.text_field :name, placeholder: "請輸入品牌名稱" ,onkeyup: "return ValidateLimit($(this),value)"%>
       </div>
       <div class="required field">
         <label>簡述 BriefDescription：</label>
@@ -72,11 +72,11 @@ $(function(){
   });
 });
 
-function ValidateNumber(e, pnumber)
+function ValidateLimit(e, value)
 {
-    if (!/^\d+$/.test(pnumber))
+    if (value.length>20)
     {
-        $(e).val(/^\d+/.exec($(e).val()));
+        alert("超過字數限制")
     }
     return false;
 }

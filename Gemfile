@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 # gem 'pg'
-gem 'rails_12factor', group: :production
+# gem 'rails_12factor', group: :production
 
 gem 'rails', '4.2.6'
 gem 'mysql2', '~> 0.3.18'

@@ -63,9 +63,9 @@ Body Section
             <thead>
               <tr>
                 <th>圖片</th>
-                <th>名稱</th>
-                <th style="width:100px;">敘述</th>
-                <th style="width:180px;">完整敘述</th>
+                <th style="width:50px;white-space:nowrap;text-overflow:ellipsis;-o-text-overflow:ellipsis;overflow:hidden;">名稱</th>
+                <th style="width:100px;" class="AutoNewline">敘述</th>
+                <th style="width:180px;" class="AutoNewline">完整敘述</th>
                 <th style="margin: 0 10px 0 10px;">Function</th>
               </tr>
             </thead>
@@ -246,3 +246,9 @@ $(function(){
 
 });
 </script>
+<style type="text/css">
+.AutoNewline
+{
+word-break: break-all;/*必須*/
+}
+</style>

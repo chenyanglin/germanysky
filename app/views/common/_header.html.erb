@@ -66,7 +66,7 @@ Navigation Bar Section
               <% if t.type_twos.size>0 %>
               <ul>
                 <% t.type_twos.each do |two| %>
-                <li><a href="#"><%= two.name %></a></li>
+                <li><a href="/products?type2=<%=two.id%>"><%= two.name %></a></li>
                 <% end %>
               </ul>
               <%end%>

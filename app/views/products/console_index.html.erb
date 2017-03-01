@@ -45,6 +45,16 @@ Lower Header Section
     <li><button class="ui orange basic button" id = "btn_new_product">新增商品</button></li>
     </div>
   </ul>
+  <ul class="nav nav-list">
+    <li><h4>分類</h4></li>
+    <% @type_ones.each do |t| %>
+    <li><a href="/products/console_index?type=<%=t.id%>" style="padding-left:50px;">．<%= t.name %></a></li>
+    <% end %>
+    <li><h4>品牌</h4></li>
+    <% @brands.each do |b| %>
+    <li><a href="/products/console_index??brand=<%=b.id%>" style="padding-left:50px;">．<%= b.name %></a></li>
+    <% end %>
+  </ul>
 </div>
 
   </div>
@@ -64,10 +74,9 @@ Body Section
               <tr>
                 <th class="AutoNewline" style="width:100px;" >名稱</th>
                 <th>圖片</th>
-                <th>庫存分類</th>
-                <th>商品分類</th>
-                <th class="AutoNewline">敘述</th>
-                <th>規格</th>
+                <th class="AutoNewline">庫存分類</th>
+                <th class="AutoNewline">商品分類</th>
+                <th class="AutoNewline">規格</th>
                 <th>售價</th>
                 <th>庫存</th>
 
