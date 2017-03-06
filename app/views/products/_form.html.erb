@@ -93,12 +93,19 @@
   </div>
       <div class="required field">
       <label>可用運送方式：</label>
-        <%= f.select :delivery_ids, Delivery.all.collect {|x| [x.name, x.id]}, {}, :class => "ui search selection dropdown", :multiple => true, :id =>"delivery_ids" %>
+        <%= f.select :delivery_ids, Delivery.all.collect {|x| [x.name, x.id]}, {},  :multiple => true, :id =>"delivery_ids",:data => {validate:"delivery_ids"} %>
       </div>
+
       <div class="required field">
-      <label>可用運送方式：</label>
-        <%= f.select :payment_ids, Payment.all.collect {|x| [x.name, x.id]}, {}, :class => "ui search selection dropdown", :multiple => true ,:data => {validate:"payment_id"}%>
+      <label>可用付款方式：</label>
+        <%= f.select :payment_ids, Payment.all.collect {|x| [x.name, x.id]}, {}, :multiple => true , :id =>"payment_ids",:data => {validate:"payment_ids"}%>
       </div>
+      <script type="text/javascript">
+$(document).ready(function() {
+  $('#delivery_ids').multipleSelect();
+  $('#payment_ids').multipleSelect();
+  });
+</script>
         <div class="field">
         <div class="ui horizontal segments">
     <div class="ui blue segment">
@@ -146,6 +153,7 @@
 <% end %>
 </div>
 <script type="text/javascript">
+
   $('select.dropdown')
     .dropdown()
   ;
@@ -371,8 +379,4 @@ $(document).on('change','#typetwo_select', function () {
           });
 });
 </script>
-<script type="text/javascript">
-    $(document).ready(function() {
-        $('#delivery_ids').multiselect();
-    });
-</script>
+
