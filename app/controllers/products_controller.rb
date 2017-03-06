@@ -95,6 +95,7 @@ def new
   end
 
   def create
+    binding.pry
     @product = Product.new(product_params)
     # params.require(:product).permit(:name, :briefdescription,:type_one_id,:brand_id,:point,delivery_ids:[])
 

@@ -226,13 +226,21 @@ $("#cart_del").click(function(){
 
   });
 
-
+  
   $('body').on('click','.btn-minus',function(){
+    var i = 0;
+    if (i==0) 
+    {
+    i = 1;
     var cart_id = $(this).data("id");
     var price = $(this).data("price");
     var sum = Number(document.getElementById("sum"+cart_id).innerHTML);
     if (sum <= 1 )
-      {alert("不得小於1")}
+    {
+        alert("不得小於1");
+        i=0;
+    }
+
     else{
     $.get( "/products/shoppingcart_minus?cart_id="+cart_id, function(html) {
       document.getElementById("get_point"+cart_id).innerHTML = Number(document.getElementById("get_point"+cart_id).innerHTML)/sum*(sum-1)
@@ -243,11 +251,17 @@ $("#cart_del").click(function(){
 
       order_price = Number(document.getElementById("product_price").innerHTML);
       document.getElementById("product_price").innerHTML = order_price-price;
+      i=0;
     }).fail(function() {
 
       alert( "error" );
+      i=0
     });
       }
+    }else
+    {
+      alert("稍候")
+    }
   });
     $('body').on('click','.btn-plus',function(){
     var cart_id = $(this).data("id");
