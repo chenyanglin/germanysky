@@ -11,6 +11,7 @@ class CreateOrders < ActiveRecord::Migration
       t.integer :cash_on_delivery
       t.string :payment_id
       t.string :payment
+      t.integer :payment_price
       t.string :receiver_name
       t.string :receiver_address
       t.string :receiver_phone
@@ -19,6 +20,7 @@ class CreateOrders < ActiveRecord::Migration
       t.string :note
       t.string :use_point
       t.string :lastfivepay
+      t.integer :paidprice
       t.date :pay_date
       t.date :send_date
       t.date :change_date

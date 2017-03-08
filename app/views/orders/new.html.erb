@@ -178,14 +178,18 @@ Body Section
 
         </tr>
       <tr>
-        <td colspan="2" >
+        <td colspan="3" >
   <label>姓名：</label>
   <input placeholder="姓名" type="text" name="order[receiver_name]" id="receiver_name" value="<%=@current_user.name%>"style="width:100%;" />
         </td>
-        <td colspan="2" >
+        <td colspan="3" >
   <label>電話：</label><input placeholder="電話" type="text" name="order[receiver_phone]" id="receiver_phone" onkeyup="return ValidateNumber($(this),value)" value="<%=@current_user.phone1%>"style="width:100%;"/>
         </td>
-        <td colspan="2" >
+        <td colspan="1" >
+        </td>
+        </tr>
+        <tr>
+         <td colspan="7" >
   <label>收貨地址：</label><input placeholder="收貨地址" type="text" name="order[receiver_address]" id="receiver_address" value="<%=@current_user.address%>" style="width:100%;"/>
         </td>
         </tr>
