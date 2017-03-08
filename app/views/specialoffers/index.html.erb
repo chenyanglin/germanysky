@@ -35,7 +35,24 @@ Lower Header Section
 <div class="container">
 <input type="hidden" id="find_newsboard" value="<%= @specialoffer_info %>">
 <%= render "common/header" %>
-<%= render "common/leftmenu" %>
+<%if @current_user.role == 1 %>
+
+<div class="row pull-left">
+<div id="sidebar" class="span3">
+
+<div class="well well-small">
+  <ul class="nav nav-list">
+  <div class="ui center aligned icon header" style="font-size:18px;margin:20px 0 22px 0;">
+  <li> 活動總數： <%= number_with_delimiter(@specialoffers_size, :delimiter => ',') %></li>
+  <li><br></li>
+    <li><button class="ui orange basic button btn_new_offer" id = "btn_new_offer">新增促銷</button></li>
+    </div>
+  </ul>
+</div>
+  </div>
+  <%else%>
+  <%= render "common/leftmenu" %>
+  <%end%>
 <!-- 
 Body Section 
 -->

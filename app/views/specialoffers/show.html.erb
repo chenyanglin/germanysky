@@ -51,13 +51,13 @@ New Products
   <h2 class="ui center aligned icon header" style="font-size:20px;margin:20px 0 22px 0;">
     <div class="content">
       <% if @specialoffer.offertype == "1" %>
-      任選<%=@specialoffer.productcount%>項，每項NT ＄ <%= @specialoffer.saleprice %>元。
+      任選<%=@specialoffer.productcount%>項以上，每項NT ＄ <%= @specialoffer.saleprice %>元。
       <%elsif @specialoffer.offertype == "2" %>
-      任選<%=@specialoffer.productcount%>項，每項打<%= @specialoffer.discount %>折。
+      任選<%=@specialoffer.productcount%>項以上，每項打<%= @specialoffer.discount %>折。
       <%end%>
     </div>
   </h2>
-  <%= form_for @specialoffer , :url => add_to_salecart_specialoffers_path, method: :post do |f| %>
+  <%= form_for @specialoffer , :url => add_to_salecart_specialoffers_path,:html => { :onsubmit => "return ValidateSize();" }, method: :post do |f| %>
     <input type="hidden" name="specialoffer_id" value="<%=@specialoffer.id%>">
       <div class="well alert alert-error">
       已選 <div id="productcount" style="display:inline;">0</div> 樣商品 ｜ 原價 <div id="originalprice" style="display:inline;">0</div> 元 ｜ 折扣價 <div id="saleprice" style="display:inline;">0</div> 元
@@ -156,12 +156,13 @@ function optionclick(id,name,orgprice,saleprice) {
         {
           document.getElementById("fieldsum"+id).innerHTML=Number(document.getElementById("fieldsum"+id).innerHTML)+Number(sum);
           document.getElementById("productcount").innerHTML = Number(document.getElementById("productcount").innerHTML)+Number(sum);
+          document.getElementById("hiddenfieldsum"+id).value=Number(document.getElementById("fieldsum"+id).innerHTML)
         }
         else{
         document.getElementById("productcount").innerHTML = Number(document.getElementById("productcount").innerHTML)+Number(sum);
         var addto = "#select";
         var addRemove = "#field" + (id);
-        var newIn = '<div id="field'+id+' value="1"><tr><td><div style="margin:0 auto;display:inline;" >'+name+'</div></td><td><div id="fieldsum'+id+'" style="display:inline;">'+sum+'</div>件</td><input type="hidden" name="[product][option'+id+'][id]" value="'+id+'"><input type="hidden" name="[product][option'+id+'][sum]" value="'+sum+'"><input type="hidden" name="[product][option'+id+'][saleprice]" value="'+saleprice+'">';
+        var newIn = '<div id="field'+id+' value="1"><tr><td><div style="margin:0 auto;display:inline;" >'+name+'</div></td><td><div id="fieldsum'+id+'" style="display:inline;">'+sum+'</div>件</td><input type="hidden" name="[product][option'+id+'][id]" value="'+id+'"><input type="hidden" name="[product][option'+id+'][sum]" id="hiddenfieldsum'+id+'" value="'+sum+'"><input type="hidden" name="[product][option'+id+'][saleprice]" value="'+saleprice+'">';
         var newInput = $(newIn);
         var removeBtn = '<td><button id="remove' + id + '" class="btn btn-danger remove-me" >-</button></td></tr></div>';
         var removeButton = $(removeBtn);
@@ -178,6 +179,14 @@ function optionclick(id,name,orgprice,saleprice) {
                 $(fieldID).remove();
             });
           }
+}
+function ValidateSize()
+{
+    if (Number(document.getElementById("productcount").innerHTML)<3)
+    {
+        alert("商品數量不符優惠限制");
+        return false;
+    }
 }
  </script>
  <style type="text/css">

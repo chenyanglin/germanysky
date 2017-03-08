@@ -6,6 +6,7 @@ class Product < ActiveRecord::Base
     has_many :deliveries, :through => :product_deliveryships
     has_many :product_specialofferships, :dependent => :destroy
     has_many :specialoffers, :through => :product_specialofferships
+    has_many :shoppingcarts, :dependent => :destroy
     has_many :productimages
     has_many :product_typeships, :dependent => :destroy
     has_many :product_options, :dependent => :destroy

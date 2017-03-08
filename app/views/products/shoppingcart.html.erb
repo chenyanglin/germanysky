@@ -100,7 +100,7 @@ Body Section
 
 <tr>
 <td colspan="7">
-訂購群組
+促銷活動訂單<button class="ui red basic pull-right button" id="sellcart_del" value="<%= carts.id %>">刪除</button>
 </td>
 </tr>
 <tr>
@@ -211,6 +211,23 @@ function ValidateNumber(e, pnumber)
 $("#cart_del").click(function(){
     var cart_id = $('#cart_del').val();
     var request = "/products/shoppingcart_del?id="+cart_id;
+    var aj = $.ajax({
+        url: request,
+        type: 'get',
+        data: $(this).serialize(),
+        dataType: 'text'
+    }).done(function (data) {
+      window.location.replace("http://"+location.host+"/products/shoppingcart");
+         
+    }).fail(function (data) {
+      alert(data);
+         
+    });
+
+  });
+$("#sellcart_del").click(function(){
+    var cart_id = $('#sellcart_del').val();
+    var request = "/products/sellcart_del?id="+cart_id;
     var aj = $.ajax({
         url: request,
         type: 'get',

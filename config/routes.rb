@@ -93,6 +93,7 @@ Rails.application.routes.draw do
       get :shoppingcart_del
       get :shoppingcart_plus
       get :shoppingcart_minus
+      get :sellcart_del
       get :newlist
       get :products_template
       get :shopprocess

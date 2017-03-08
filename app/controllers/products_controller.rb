@@ -289,6 +289,14 @@ cart= Shoppingcart.find(params[:cart_id])
       render :text => "error"
     end
   end
+    def sellcart_del
+    cart = Salecart.find(params[:id])
+    if cart.destroy
+      render :text => "success"
+    else
+      render :text => "error"
+    end
+  end
 
   def copy
     @product = Product.find(params[:id])
