@@ -44,8 +44,9 @@ Lower Header Section
   <div class="ui center aligned icon header" style="font-size:18px;margin:20px 0 22px 0;">
  訂單總數： <%= number_with_delimiter(@orders_size, :delimiter => ',') %>
   <br>
-<button class="ui small orange button" id = "checkorder">建立檢貨單</button>
-
+  <% if @current_user.role == 1 %>
+    <button class="ui small orange button" id = "checkorder">建立檢貨單</button>
+  <% end %>
     </div>
 
 <select id = "p_status" name="p_status" >

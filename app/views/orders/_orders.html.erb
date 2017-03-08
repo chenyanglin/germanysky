@@ -85,16 +85,12 @@
   </td>
  <td>
 
-   <div class="order_detail" data-value="<%= order.id %>"><span class="glyphicons glyphicons-search"></span></div>
+   <div class="ui blue basic button order_detail" data-value="<%= order.id %>">view</div>
  </td>
  <td>
  <%= order.created_at.strftime("%Y-%m-%d") %>
  </td>
   <td class="collapsing">
-	 <% if order.delivery_status == 5 && order.pay_status == 6 %>
-    <% else %>
-    <button class="ui blue basic button order_edit" data-value="<%= order.id %>">修改</button></br>
-    <%end%>
      <% if @current_user.role ==1 %>
      <%= link_to order, class: 'ui orange basic button order_del', method: :delete, data:{id: order.id} do %>
       刪除

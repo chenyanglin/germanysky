@@ -89,6 +89,7 @@ def new
   def update
     @account = Account.find(params[:id])
     @news = NewsletterEmail.find_by_email(@account.email)
+    binding.pry
     @news.update(email: params[:account][:email])
     @account.update(account_params)
     # @account.update(name: params[:account][:name],email: params[:account][:email],password: @account.password,phone1: params[:account][:phone1],address: params[:account][:address])
