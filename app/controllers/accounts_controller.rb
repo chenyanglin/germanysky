@@ -89,8 +89,17 @@ def new
   def update
     @account = Account.find(params[:id])
     @news = NewsletterEmail.find_by_email(@account.email)
-    binding.pry
-    @news.update(email: params[:account][:email])
+    if @news == nil
+      @news = NewsletterEmail.new
+      @news.email = params[:account][:email]
+      @news.account_id = @current_user.id
+      @news.account_name = @current_user.account_name
+      @news.name = @current_user.name
+      @news.status = 0
+      @news.save
+    else
+      @news.update(email: params[:account][:email])
+    end
     @account.update(account_params)
     # @account.update(name: params[:account][:name],email: params[:account][:email],password: @account.password,phone1: params[:account][:phone1],address: params[:account][:address])
     if params[:subscription] == "on"

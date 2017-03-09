@@ -2,15 +2,11 @@ class PaymentsController < ApplicationController
 before_filter :current_user
 before_action :set_payment, only: [:edit, :update, :destroy]
   def index
-
-
         @payments = Payment.all
         @payments = @payments.like(params[:filter]) if params[:filter]
         @payments = @payments.order(updated_at: :desc) if params[:recent]
         @payments_size = @payments.size
         @payments = @payments.page(params[:page]).per(15)
-
-
   end
 def new
     @payment = Payment.new
