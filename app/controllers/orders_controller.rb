@@ -6,18 +6,15 @@ before_action :set_order, only: [:edit, :update, :destroy,
                                  :orderdetail,:confirmpay,:confirmdelivery,
                                  :orderdone,:takeproduct]
   def index
-    
+    # binding.pry
     if @current_user.role ==1
       @orders = Order.all
-      @orders = @orders.like(params[:filter]) if params[:filter]
+      @orders = @orders.like(params[:filter]) if params[:filter]&& params[:filter]!=""
       @orders = @orders.order(updated_at: :desc)
 
-      if params[:p_status].present?
-        @orders = @orders.where("pay_status = ?",params[:p_status])
-      end
-      if params[:d_status].present?
-        @orders = @orders.where("delivery_status = ?",params[:d_status])
-      end
+      @orders = @orders.where("pay_status = ?",params[:p_status]) if params[:p_status] && params[:p_status]!=""
+      @orders = @orders.where("delivery_status = ?",params[:d_status]) if params[:d_status] && params[:d_status]!=""
+
 
       @orders = @orders.page(params[:page]).per(15)
       @orders_size = @orders.size
@@ -184,7 +181,7 @@ def new
     render :layout => false
   end
   def usercheckpay_update
-    if @order.update(pay_status: 2, lastfivepay: params[:lastfivepay],paidprice: params[:paidprice])
+    if @order.update(pay_status: 2, lastfivepay: params[:lastfivepay])
       content_to_user = "感謝您已將訂單編號"+@order.ordernumber.to_s+"之訂單狀態轉變為已付款，我們會儘速確認並處理商品事宜。您可以登入網站查看訂單詳細資訊，謝謝。"
       NewsMailer.normal_email("訂單狀態通知（未付款->已付款未確認）",content_to_user,@current_user.id).deliver_now!
       content = "使用者 "+@current_user.name.to_s+"已將訂單編號"+@order.ordernumber.to_s+"之訂單狀態改變為已付款，請逕行確認"

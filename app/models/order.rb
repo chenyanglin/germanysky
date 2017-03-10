@@ -2,7 +2,8 @@ class Order < ActiveRecord::Base
 	has_many :order_products, :dependent => :destroy
 	belongs_to :account, foreign_key: "account_id"
 	has_many :order_messages, :dependent => :destroy
-
+	scope :like, ->(args) { where("orders.ordernumber like '%#{args}%' OR
+                                   orders.account_name like '%#{args}%' ")}
 	#pay_status 
 	#1:未付款
 	#2:已付款未確認

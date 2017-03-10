@@ -254,7 +254,19 @@ $('.form-check form').on('click','.reply-btn',function(){
             window.location.reload();
           }
         }).fail(function(data) {
-       window.location.reload();
+       $.get( "/orders/orderdetail?id="+order_id, function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $('.ui.dimmer.main').dimmer('hide');
+
+      $('.ui.modal.edit-order').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $('.ui.dimmer.main').dimmer('hide');
+      alert( "error" );
+    });
         });
     return false; // prevents normal behaviour
   });

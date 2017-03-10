@@ -22,10 +22,10 @@
         <label>帳戶末五碼：</label>
         <%= f.text_field :lastfivepay, placeholder: "請輸入帳戶末五碼" ,name: "lastfivepay",onkeyup: "return ValidateNumber($(this),value)"%>
       </div>
-      <div class="required field">
+      <!-- <div class="required field">
         <label>匯款金額：</label>
         <%= f.text_field :paidprice, placeholder: "請輸入匯款金額" ,name: "paidprice", onkeyup: "return ValidateNumber($(this),value)"%>
-      </div>
+      </div> -->
     </div>
     <br>
     <div>
@@ -53,25 +53,26 @@ $('.form-check form')
               prompt : '帳戶末五碼不可為空值'
             }
           ]
-        },
-        paidprice : {
-          identifier: 'paidprice',
-          rules: [
-            {
-              type   : 'empty',
-              prompt : '匯款金額不可為空值'
-            }
-          ]
-        },
-        paidprice : {
-          identifier: 'paidprice',
-          rules: [
-            {
-              type   : 'isExactly['+pay+']',
-              prompt : '匯款金額與應付金額不相符'
-            }
-          ]
         }
+        // ,
+        // paidprice : {
+        //   identifier: 'paidprice',
+        //   rules: [
+        //     {
+        //       type   : 'empty',
+        //       prompt : '匯款金額不可為空值'
+        //     }
+        //   ]
+        // },
+        // paidprice : {
+        //   identifier: 'paidprice',
+        //   rules: [
+        //     {
+        //       type   : 'isExactly['+pay+']',
+        //       prompt : '匯款金額與應付金額不相符'
+        //     }
+        //   ]
+        // }
 
       },
       inline : true,

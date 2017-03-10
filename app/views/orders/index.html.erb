@@ -39,7 +39,7 @@ Lower Header Section
   <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
     <div class="content">訂單管理</div>
   </h1>
-  <div style="width:550px;height:140px;margin:0 auto;">
+  <div style="width:550px;height:80px;margin:0 auto;">
 
   <div class="ui center aligned icon header" style="font-size:18px;margin:20px 0 22px 0;">
  訂單總數： <%= number_with_delimiter(@orders_size, :delimiter => ',') %>
@@ -48,7 +48,8 @@ Lower Header Section
     <button class="ui small orange button" id = "checkorder">建立檢貨單</button>
   <% end %>
     </div>
-
+    </div>
+<div style="width:800px;margin:0px auto;">
 <select id = "p_status" name="p_status" >
   <option value="" disabled selected>付款狀態</option>
   <option value="1">未付款</option>
@@ -66,6 +67,8 @@ Lower Header Section
   <option value="4">逾期未取貨</option>
   <option value="5">訂單完成</option>
 </select>
+or
+<input id="filterbar" type="text" placeholder="搜尋">
 <button id="select_filter" class="ui blue tiny button select_filter">
   <i class="search icon"></i>確定
 </button>
@@ -542,7 +545,8 @@ $(function(){
     $("#select_filter").click(function(){
     d_status = "d_status="+document.getElementById("d_status").value;
     p_status = "p_status="+document.getElementById("p_status").value;
-    window.location.replace("http://"+location.host+"/orders?"+d_status+"&"+p_status);
+    filter = "filter="+$("#filterbar").val();
+    window.location.replace("http://"+location.host+"/orders?"+d_status+"&"+p_status+"&"+filter);
 
   });
   $("#checktest").click(function(){
