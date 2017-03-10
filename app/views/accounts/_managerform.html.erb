@@ -26,7 +26,11 @@
       </div>
        <div class="required field">
         <label>性別 Sex：</label>
-        <%= f.text_field :sex, placeholder: "請輸入性別" %>
+        <% if @account.sex =="女"%>
+        <select name="account[sex]" id="sex" class="ui search dropdown" data-validate="sex"><option value="男" >男</option><option value="女" selected="selected">女</option></select>
+        <%else%>
+        <select name="account[sex]" id="sex" class="ui search dropdown" data-validate="sex"><option value="男" selected="selected">男</option><option value="女" >女</option></select>
+        <%end%>
       </div>
       <div class="required field">
         <label>聯絡電話 Phone：</label>
@@ -44,6 +48,10 @@
         <label>紅利點數 Point：</label>
         <%= f.text_field :point, placeholder: "更新紅利點數" %>
       </div>
+      <div class="field">
+          <label>會員等級：</label>
+          <%= f.select :account_level, options_for_select(AccountLevel.all.pluck(:level_name, :id), @account.account_level_id), {:prompt => '選擇會員等級'}, class: "ui search dropdown", id: 'account_level', :data => {validate:"account_level"} %>
+        </div>
     </div>
     <br>
     <div>
@@ -78,7 +86,7 @@ $(function(){
     }).success(function(upload_result){
         console.log(upload_result);
         if(upload_result == "success" ){
-          window.location.replace("http://"+location.host+"/consoles");
+          window.location.replace("http://"+location.host+"/accounts");
         }
     }).fail(function(e) {
         console.log(e);

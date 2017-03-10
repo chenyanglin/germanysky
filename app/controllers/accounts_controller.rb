@@ -4,14 +4,16 @@ before_filter :setting
 before_action :set_account, only: [:edit, :update,:show, :destroy,:console_edit]
   def index
 
-
+    if @current_user.role == 1
         @accounts = Account.all
         @accounts = @accounts.like(params[:filter]) if params[:filter]
         @accounts = @accounts.order(updated_at: :desc) if params[:recent]
         @accounts_size = @accounts.size
         @accounts = @accounts.page(params[:page]).per(15)
         @account_info = false
-
+    else
+      redirect_to consoles_path
+    end
   end
 
 def new
@@ -101,6 +103,9 @@ def new
       @news.update(email: params[:account][:email])
     end
     @account.update(account_params)
+    if params[:account][:account_level].present?
+      @account.update(account_level_id: params[:account][:account_level])
+    end
     # @account.update(name: params[:account][:name],email: params[:account][:email],password: @account.password,phone1: params[:account][:phone1],address: params[:account][:address])
     if params[:subscription] == "on"
      @news.update(status: 1) 

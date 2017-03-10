@@ -10,15 +10,15 @@
       </div>
       <div class="field">
           <label>商品品牌 Brand：</label>
-          <%= f.select :brand_id, options_for_select(Brand.all.pluck(:name, :id)), {:prompt => '請選擇品牌'}, class: "ui search dropdown", id: 'brand_select', :data => {validate:"brand_select"} %>
+          <%= f.select :brand_id, options_for_select(Brand.all.pluck(:name, :id),@product.brand_id), {:prompt => '請選擇品牌'}, class: "ui search dropdown", id: 'brand_select', :data => {validate:"brand_select"} %>
         </div>
             <div class="field">
           <label>庫存型態：</label>
-          <%= f.select :producttype, options_for_select(Producttype.all.pluck(:name, :id)), {:prompt => '請選擇型態'}, class: "ui search dropdown", id: 'producttype_select', :data => {validate:"producttype_select"} %>
+          <%= f.select :producttype, options_for_select(Producttype.all.pluck(:name, :id),@product.producttype), {:prompt => '請選擇型態'}, class: "ui search dropdown", id: 'producttype_select', :data => {validate:"producttype_select"} %>
         </div>
       <div class="field">
           <label>商品分類：</label>
-          <%= f.select :type_one_id, options_for_select(TypeOne.all.pluck(:name, :id)), {:prompt => '請選擇分類'}, class: "ui search dropdown", id: 'type_select', :data => {validate:"type_select"} %>
+          <%= f.select :type_one_id, options_for_select(TypeOne.all.pluck(:name, :id),@product.type_one_id), {:prompt => '請選擇分類'}, class: "ui search dropdown", id: 'type_select', :data => {validate:"type_select"} %>
           <div id="typetwo_field" class="disabled field">
       <select name="product[type_two_id]" id="typetwo_select" class="ui search dropdown" data-validate="typeone_select"><option value="">請先選擇上層</option><option value="0">無</option></select>
       <select name="product[type_three_id]" id="typethree_select" class="ui search dropdown" data-validate="typetwo_select"><option value="">請先選擇上層</option><option value="0">無</option></select>

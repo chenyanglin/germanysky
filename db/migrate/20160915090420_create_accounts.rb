@@ -14,7 +14,7 @@ class CreateAccounts < ActiveRecord::Migration
       t.integer :role, :default => 2
       t.string :account_level_id
       t.integer :score, :default => 0
-      t.integer :point
+      t.integer :point, :default => 0
       t.string :deleted
       
       t.timestamps null: false

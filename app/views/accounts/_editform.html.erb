@@ -26,7 +26,11 @@
       </div>
       <div class="required field">
         <label>性別 Sex：</label>
-        <%= f.text_field :sex, placeholder: "請輸入電話" %>
+        <% if @account.sex =="女"%>
+        <select name="account[sex]" id="sex" class="ui search dropdown" data-validate="sex"><option value="男" >男</option><option value="女" selected="selected">女</option></select>
+        <%else%>
+        <select name="account[sex]" id="sex" class="ui search dropdown" data-validate="sex"><option value="男" selected="selected">男</option><option value="女" >女</option></select>
+        <%end%>
       </div>
       <div class="required field">
         <label>聯絡電話 Phone：</label>
@@ -39,11 +43,11 @@
       <div class="ui segment">
       
       <% if @current_user.newsletter_email.status == 1 %>
-              <input type="checkbox" id="subscription" name="subscription" checked="checked">
+              <input type="checkbox" id="newssubscription" name="subscription" checked="checked">
               <%else%>
-              <input type="checkbox" id="subscription" name="subscription">
+              <input type="checkbox" id="newssubscription" name="subscription">
               <%end%>
-              <label>是否願意收到電子報</label>
+              是否願意收到電子報
             </div>
     
     </div>
@@ -79,7 +83,7 @@ $(function(){
     }).success(function(upload_result){
         console.log(upload_result);
         if(upload_result == "success" ){
-          window.location.replace("http://"+location.host+"/accounts");
+          window.location.replace("http://"+location.host+"/accounts/myaccount");
         }
     }).fail(function(e) {
         console.log(e);
