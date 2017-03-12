@@ -38,6 +38,10 @@ def new
   def update
     @brand = Brand.find(params[:id])
     if @brand.update(brand_params)
+      if params[:brand][:file]
+        @brand.brandimage.update(:upload => params[:brand][:file])
+        @brand.brandimage.update(:phourl => "brands/uploads/"+@brand.brandimage.id.to_s+"/"+@brand.brandimage.upload_file_name.to_s )
+      end
       render :text => "success"
     else
       render :text => "error"

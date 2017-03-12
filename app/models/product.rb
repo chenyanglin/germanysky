@@ -14,6 +14,8 @@ class Product < ActiveRecord::Base
     has_many :product_register, :dependent => :destroy
     belongs_to :brand,  foreign_key: "brand_id"
     belongs_to :type_one,  foreign_key: "type_one_id"
+    belongs_to :type_two, foreign_key: "type_two_id"
+    belongs_to :type_three, foreign_key: "type_three_id"
     belongs_to :producttype, foreign_key: "producttype_id"
 
 	scope :like, ->(args) { where("products.name like '%#{args}%' OR

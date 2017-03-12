@@ -19,8 +19,14 @@
       <div class="field">
           <label>商品分類：</label>
           <%= f.select :type_one_id, options_for_select(TypeOne.all.pluck(:name, :id),@product.type_one_id), {:prompt => '請選擇分類'}, class: "ui search dropdown", id: 'type_select', :data => {validate:"type_select"} %>
-          <div id="typetwo_field" class="disabled field">
+          
+      <% if @product.type_two_id && @product.type_two_id != ""%>
+      <div id="typetwo_field" class="field">
+      <%= f.select :type_two_id, options_for_select(@product.type_one.type_twos.pluck(:name, :id),@product.type_two_id), {:prompt => '請選擇分類'}, class: "ui search dropdown", id: 'typetwo_select', :data => {validate:"typetwo_select"} %>
+      <%else%>
+      <div id="typetwo_field" class="disabled field">
       <select name="product[type_two_id]" id="typetwo_select" class="ui search dropdown" data-validate="typeone_select"><option value="">請先選擇上層</option><option value="0">無</option></select>
+      <%end%>
       <select name="product[type_three_id]" id="typethree_select" class="ui search dropdown" data-validate="typetwo_select"><option value="">請先選擇上層</option><option value="0">無</option></select>
      </div>
 

@@ -181,17 +181,24 @@ def new
     render :layout => false
   end
   def usercheckpay_update
-    if @order.update(pay_status: 2, lastfivepay: params[:lastfivepay])
-      content_to_user = "感謝您已將訂單編號"+@order.ordernumber.to_s+"之訂單狀態轉變為已付款，我們會儘速確認並處理商品事宜。您可以登入網站查看訂單詳細資訊，謝謝。"
-      NewsMailer.normal_email("訂單狀態通知（未付款->已付款未確認）",content_to_user,@current_user.id).deliver_now!
-      content = "使用者 "+@current_user.name.to_s+"已將訂單編號"+@order.ordernumber.to_s+"之訂單狀態改變為已付款，請逕行確認"
-      NewsMailer.system_email("訂單狀態通知（未付款->已付款未確認）",content).deliver_now!
+    if @order.pay_status == 2
       redirect_to orders_path
     else
-      render :text => "error"
+      if @order.update(pay_status: 2, lastfivepay: params[:lastfivepay])
+        content_to_user = "感謝您已將訂單編號"+@order.ordernumber.to_s+"之訂單狀態轉變為已付款，我們會儘速確認並處理商品事宜。您可以登入網站查看訂單詳細資訊，謝謝。"
+        NewsMailer.normal_email("訂單狀態通知（未付款->已付款未確認）",content_to_user,@current_user.id).deliver_now!
+        content = "使用者 "+@current_user.name.to_s+"已將訂單編號"+@order.ordernumber.to_s+"之訂單狀態改變為已付款，請逕行確認"
+        NewsMailer.system_email("訂單狀態通知（未付款->已付款未確認）",content).deliver_now!
+        redirect_to orders_path
+      else
+        render :text => "error"
+      end
     end
   end
     def confirmpay
+    if @order.pay_status == 3
+      redirect_to orders_path
+    else
     if @order.update(pay_status: 3)
       content_to_user = "訂單編號"+@order.ordernumber.to_s+"之訂單狀態已轉變為確認匯款，我們已經確認您的匯款並會儘速處理商品事宜。您可以登入網站查看訂單詳細資訊，謝謝。"
       NewsMailer.normal_email("訂單狀態通知（已付款未確認->已確認付款）",content_to_user,@order.account_id).deliver_now!
@@ -201,8 +208,12 @@ def new
     else
       render :text => "error"
     end
+    end
   end
   def confirmdelivery
+    if @order.delivery_status == 2
+      redirect_to orders_path
+    else
     if @order.update(delivery_status: 2)
 
       content_to_user = "訂單編號"+@order.ordernumber.to_s+"之訂單狀態已轉變為已出貨，請您取貨後再上系統確認，您可以登入網站查看訂單詳細資訊，謝謝。"
@@ -214,9 +225,13 @@ def new
     else
       render :text => "error"
     end
+    end
   end
   
   def takeproduct
+    if @order.delivery_status == 3
+      redirect_to orders_path
+    else
     if @order.update(delivery_status: 3)
       content_to_user = "感謝您已將訂單編號"+@order.ordernumber.to_s+"之訂單狀態轉變為已取貨，希望您滿意我們的商品，有任何疑問都可以在留言板聯繫我們。您可以登入網站查看訂單詳細資訊，謝謝。"
       NewsMailer.normal_email("訂單狀態通知（已出貨->已取貨）",content_to_user,@current_user.id).deliver_now!
@@ -225,6 +240,7 @@ def new
       redirect_to orders_path
     else
       render :text => "error"
+    end
     end
   end
   def orderdone

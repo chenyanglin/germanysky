@@ -15,6 +15,13 @@
         <label>詳細敘述 Detaildescription</label>
         <%= f.text_field :detaildescription, placeholder: "請輸入詳細敘述" %>
       </div>
+      <% if @brand.brandimage.present? %>
+        <div class="column" >
+          <% if @brand.brandimage.phourl.present? %>
+            <%= image_tag(@brand.brandimage.phourl, size: "200" ,class: "ui centered rounded image") %><br><br>
+          <% end %>
+        </div>
+      <% end %>
         <div class="required field">
             <label for="field1">上傳圖片 Upload Photo</label>
                   <div id="field" class="col-md-7"><input id="field1" name="brand[file]" type="file" /></div>
