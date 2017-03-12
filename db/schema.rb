@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170208071730) do
+ActiveRecord::Schema.define(version: 20170312080751) do
 
   create_table "account_levels", force: :cascade do |t|
     t.string   "level_name",  limit: 255
@@ -33,7 +33,7 @@ ActiveRecord::Schema.define(version: 20170208071730) do
     t.string   "phone1",           limit: 255
     t.string   "phone2",           limit: 255
     t.string   "address",          limit: 255
-    t.integer  "role",             limit: 4,   default: 2, null: false
+    t.integer  "role",             limit: 4,   default: 2
     t.string   "account_level_id", limit: 255
     t.integer  "score",            limit: 4,   default: 0
     t.integer  "point",            limit: 4,   default: 0
@@ -97,9 +97,9 @@ ActiveRecord::Schema.define(version: 20170208071730) do
   create_table "newsboards", force: :cascade do |t|
     t.string   "title",      limit: 255
     t.string   "subtitle",   limit: 255
-    t.string   "content",    limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.string   "content",    limit: 2550
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
   end
 
   create_table "newsletter_emails", force: :cascade do |t|
@@ -107,12 +107,10 @@ ActiveRecord::Schema.define(version: 20170208071730) do
     t.string   "account_id",   limit: 255
     t.string   "account_name", limit: 255
     t.string   "name",         limit: 255
-    t.integer  "status",       limit: 4,   default: 1, null: false
-    t.datetime "created_at",                           null: false
-    t.datetime "updated_at",                           null: false
+    t.integer  "status",       limit: 4
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
   end
-
-  add_index "newsletter_emails", ["email"], name: "email_UNIQUE", unique: true, using: :btree
 
   create_table "newsletters", force: :cascade do |t|
     t.string   "subject",    limit: 255
@@ -159,16 +157,15 @@ ActiveRecord::Schema.define(version: 20170208071730) do
 
   create_table "orders", force: :cascade do |t|
     t.string   "ordernumber",      limit: 255
-    t.string   "account_id",       limit: 255,             null: false
+    t.string   "account_id",       limit: 255
     t.string   "account_name",     limit: 255
-    t.integer  "total_price",      limit: 4,               null: false
-    t.string   "delivery_id",      limit: 255,             null: false
+    t.integer  "total_price",      limit: 4
+    t.string   "delivery_id",      limit: 255
     t.string   "delivery",         limit: 255
-    t.integer  "delivery_price",   limit: 4,               null: false
-    t.boolean  "cash_on_delivery"
-    t.string   "payment_id",       limit: 255,             null: false
+    t.integer  "delivery_price",   limit: 4
+    t.integer  "cash_on_delivery", limit: 4
+    t.string   "payment_id",       limit: 255
     t.string   "payment",          limit: 255
-    t.integer  "payment_price",    limit: 4,               null: false
     t.string   "receiver_name",    limit: 255
     t.string   "receiver_address", limit: 255
     t.string   "receiver_phone",   limit: 255
@@ -177,24 +174,23 @@ ActiveRecord::Schema.define(version: 20170208071730) do
     t.string   "note",             limit: 255
     t.string   "use_point",        limit: 255
     t.string   "lastfivepay",      limit: 255
-    t.integer  "paidprice",        limit: 4
     t.date     "pay_date"
     t.date     "send_date"
     t.date     "change_date"
     t.datetime "created_at",                               null: false
     t.datetime "updated_at",                               null: false
     t.integer  "get_point",        limit: 4
+    t.integer  "paidprice",        limit: 4
+    t.integer  "payment_price",    limit: 4,               null: false
   end
-
-  add_index "orders", ["ordernumber"], name: "ordernumber_UNIQUE", unique: true, using: :btree
 
   create_table "payments", force: :cascade do |t|
     t.string   "name",        limit: 255
     t.string   "description", limit: 255
     t.integer  "dayline",     limit: 4
-    t.integer  "price",       limit: 4,   default: 0
-    t.datetime "created_at",                          null: false
-    t.datetime "updated_at",                          null: false
+    t.integer  "price",       limit: 4
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
   end
 
   create_table "pays", force: :cascade do |t|
@@ -302,10 +298,10 @@ ActiveRecord::Schema.define(version: 20170208071730) do
     t.string   "type_two_id",       limit: 255
     t.string   "type_three_id",     limit: 255
     t.string   "producttype_id",    limit: 255
+    t.string   "brand_id",          limit: 255
     t.datetime "created_at",                                  null: false
     t.datetime "updated_at",                                  null: false
     t.text     "content",           limit: 65535
-    t.string   "brand_id",          limit: 255
     t.integer  "point",             limit: 4,     default: 0
   end
 
@@ -383,6 +379,15 @@ ActiveRecord::Schema.define(version: 20170208071730) do
     t.string   "status",       limit: 255
     t.datetime "created_at",               null: false
     t.datetime "updated_at",               null: false
+  end
+
+  create_table "system_settings", force: :cascade do |t|
+    t.integer  "free_shipping_switch", limit: 4
+    t.integer  "free_shipping_limit",  limit: 4
+    t.integer  "point_switch",         limit: 4
+    t.string   "notice",               limit: 5000
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
   end
 
   create_table "type_ones", force: :cascade do |t|

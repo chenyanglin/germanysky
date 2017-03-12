@@ -1,6 +1,6 @@
 <% @products.each do |product| %>
 <tr>
-  <td class="product_info not-icon"  style= "word-break:break-all;" data-value="<%= product.id %>"><%= product.name %></td>
+  <td class="not-icon"  style= "word-break:break-all;" data-value="<%= product.id %>"><div id="productname<%=product.id%>" onClick="name_click('<%=product.id%>','<%=product.name%>');"><%= product.name %></div><input id="productname_input<%=product.id%>" type="text" style="display:none;width:100px" value="<%=product.name%>" onfocusout="changenamedata('<%=product.id%>',this.value);" ></td>
   <td><div class="item">
   
 <%begin%>
@@ -54,3 +54,32 @@
   </td>
 </tr>
 <% end %>
+<script type="text/javascript">
+function name_click(id,name) {
+  document.getElementById('productname'+id).style.display = 'none';
+  document.getElementById('productname_input'+id).style.display = '';
+  
+}
+function changenamedata(id,name) {
+  if (document.getElementById('productname_input'+id).value != "")
+  {
+    $.get( "/products/edit_productname?id="+id+"&name="+name, function(html) {
+      document.getElementById('productname'+id).innerHTML = name;
+      document.getElementById('productname'+id).style.display = '';
+      document.getElementById('productname_input'+id).style.display = 'none';
+    }).fail(function() {
+      document.getElementById('productname'+id).style.display = '';
+      document.getElementById('productname_input'+id).style.display = 'none';
+      document.getElementById('productname_input'+id).value = document.getElementById('productname').innerHTML; 
+    });
+}
+  else
+  {
+    document.getElementById('productname'+id).style.display = '';
+    document.getElementById('productname_input'+id).style.display = 'none';
+    document.getElementById('productname_input'+id).value = document.getElementById('productname').innerHTML;
+  }
+  
+}
+
+</script>

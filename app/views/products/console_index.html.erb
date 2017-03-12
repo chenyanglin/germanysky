@@ -32,8 +32,10 @@
 <!--
 Lower Header Section 
 -->
+
 <div class="container">
 <%= render "common/header" %>
+
 <div class="row pull-left">
 <div id="sidebar" class="span3">
 
@@ -142,57 +144,7 @@ Footer
 
 <script type="text/javascript">
 $(function(){
-  $('.ui.sticky.control-menu')
-  .sticky({
-    offset            : 81,
-    observeChanges    : true,
-    context: '#content_part'
-  });
 
-// search functions
-  var search_msg = $('#filter')
-    .popup({
-      inline   : true,
-      hoverable: false,
-      position : 'top center',
-      delay: {
-        show: 100,
-        hide: 800
-      },
-      on: 'manual'
-    })
-  ;
-
-  $("#search_go").click(function(){
-    start_search();
-  });
-
-  $(document).on('keypress', function(e) {
-    if(e.which == 13) {
-      start_search();
-    }
-  });
-
-  $( "#filter" ).focus(function() {
-    search_msg.popup('hide');
-  });
-
-  function start_search(){
-    var search_string = $("#filter").val();
-    if(search_string == ""){
-      search_msg.popup('toggle');
-    }else{
-      var target_url = "";
-      if(window.location.href == "http://"+location.host+"/products"){
-        target_url = window.location.href+"?filter="+search_string;
-      }else if(window.location.href.indexOf('filter') > -1){
-        target_url = "http://"+location.host+"/products?filter="+search_string;
-      }else{
-        target_url = window.location.href+"&filter="+search_string;
-      }
-      window.location.replace(target_url);
-    }
-  }
 // search functions
 
   $('#products_table').tablesort();

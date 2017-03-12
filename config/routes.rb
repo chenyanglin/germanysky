@@ -98,6 +98,7 @@ Rails.application.routes.draw do
       get :products_template
       get :shopprocess
       get :register
+      get :edit_productname
       post :product_register
     end
   end

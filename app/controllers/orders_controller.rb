@@ -158,10 +158,15 @@ def new
   end
 
   def edit
+
     render :layout => false
   end
- def update
-
+  def update
+    if @order.update(note: params[:order][:note])
+      render :text => "success"
+    else
+      render :text => "error"
+    end
   end
   def show
   

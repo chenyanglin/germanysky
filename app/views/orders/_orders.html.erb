@@ -33,7 +33,7 @@
         未付款
       	<br></br>
         <% if @current_user.role == 1 %>
-        <button class="ui blue tiny basic button usercheckpay" data-value="<%= order.id %>">通知匯款</button>
+        <button class="ui red tiny basic button usercheckpay" data-value="<%= order.id %>">通知匯款</button>
         <% end %>
       	<% if @current_user.role == 2 %>
         <button class="ui blue tiny basic button usercheckpay" data-value="<%= order.id %>">通知匯款</button>
@@ -70,7 +70,7 @@
         已出貨
       	<br></br>
         <% if @current_user.role == 1 %>
-         <button class="ui blue tiny basic button takeproduct" data-value="<%= order.id %>">確認取貨</button>
+         <button class="ui red tiny basic button takeproduct" data-value="<%= order.id %>">確認取貨</button>
          <% end %>
       	<% if @current_user.role == 2 %>
       	 <button class="ui blue tiny basic button takeproduct" data-value="<%= order.id %>">確認取貨</button>
@@ -85,13 +85,15 @@
   </td>
  <td>
 
-   <div class="ui blue basic button order_detail" data-value="<%= order.id %>">view</div>
+   <div style="text-align: center;"></br><div class="ui blue basic button order_detail"  data-value="<%= order.id %>">資料</div></br></div>
  </td>
  <td>
  <%= order.created_at.strftime("%Y-%m-%d") %>
  </td>
   <td class="collapsing">
      <% if @current_user.role ==1 %>
+       <button class="ui blue basic button order_edit" data-value="<%= order.id %>">修改</button>
+       </br>
      <%= link_to order, class: 'ui orange basic button order_del', method: :delete, data:{id: order.id} do %>
       刪除
     <% end %>

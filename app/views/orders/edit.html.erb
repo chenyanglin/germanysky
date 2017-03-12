@@ -1,0 +1,72 @@
+<div class="ui container">
+  <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
+ 
+    <div class="content">
+      修改訂單
+    </div>
+  </h1>
+<div class="ui horizontal divider">Order Edit</div>
+
+<%= form_for(@order) do |f| %>
+<div class="ui stackable one column centered grid">
+  <div class="fourteen wide column">
+    <div class="ui large form" style="text-align:left;">
+      
+      <div class="required field">
+        <label>備註 Note：</label>
+        <%= f.text_area :note, placeholder: "增加備註" %>
+      </div>
+    </div>
+    <br>
+    <div>
+
+
+    <div class="ui divider"></div>
+    <button id="order_form_submit" class="ui teal basic button">
+      <i class="write icon"></i>送出
+    </button>
+
+  </div>
+</div>
+
+
+
+<% end %>
+<script type="text/javascript">
+$(function(){
+  $('select.dropdown')
+    .dropdown()
+  ;
+  $('form').submit(function() {
+    var valuesToSubmit = $(this).serialize();
+    $("#order_form_submit").addClass("loading");
+    console.log($(this).attr('action'));
+    $.ajax({
+        url: $(this).attr('action'), //sumbits it to the given url of the form
+        type: 'POST',
+        processData: false,
+        contentType: false,
+        data: new FormData(this)
+    }).success(function(upload_result){
+        console.log(upload_result);
+        if(upload_result == "success" ){
+          window.location.replace("http://"+location.host+"/orders?recent=true");
+        }
+    }).fail(function(e) {
+        console.log(e);
+    }).done(function(){
+      $("#payment_form_submit").removeClass("loading");
+    });
+    return false; // prevents normal behaviour
+  });
+});
+
+function ValidateNumber(e, pnumber)
+{
+    if (!/^\d+$/.test(pnumber))
+    {
+        $(e).val(/^\d+/.exec($(e).val()));
+    }
+    return false;
+}
+</script>

@@ -189,8 +189,16 @@ def destroy
     @product.destroy
 
     redirect_to products_path
-  end
-  def add_to_shoppingcart
+end
+def edit_productname
+  @product = Product.find(params[:id])
+  if @product.update(name: params[:name])
+      render :text => "success"
+    else
+      render :text => "error"
+    end
+end
+def add_to_shoppingcart
     product_id = params[:product_id]
     option_id = params[:option_id]
     @product = Product.find(product_id)
