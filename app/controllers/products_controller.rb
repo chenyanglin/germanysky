@@ -169,6 +169,7 @@ def new
     render :layout => false
   end
  def update
+  # binding.pry
     if @product.update(product_params)
       render :text => "success"
     else
@@ -392,7 +393,7 @@ cart= Shoppingcart.find(params[:cart_id])
     params.require(:product_register).permit(:product_id,:product_option_id,:quantity)
   end
   def product_params
-    params.require(:product).permit(:name, :briefdescription,:point,:type_one_id,:brand_id,delivery_ids:[],payment_ids:[])
+    params.require(:product).permit(:name, :briefdescription,:point,:type_one_id,:type_two_id,:type_three_id,:brand_id,delivery_ids:[],payment_ids:[])
   end
   def photo_params
       params.require(:product).permit(:upload)

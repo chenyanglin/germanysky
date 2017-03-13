@@ -36,37 +36,44 @@ Lower Header Section
 <div class="container">
 <%= render "common/header" %>
 
-<div class="row pull-left">
-<div id="sidebar" class="span3">
 
-<div class="well well-small">
-  <ul class="nav nav-list">
-  <div class="ui center aligned icon header" style="font-size:18px;margin:20px 0 22px 0;">
-  <li> 商品總數： <%= number_with_delimiter(@products_size, :delimiter => ',') %></li>
-  <li><br></li>
-    <li><button class="ui orange basic button" id = "btn_new_product">新增商品</button></li>
-    </div>
-  </ul>
-  <ul class="nav nav-list">
-    <li><h4>分類</h4></li>
-    <% @type_ones.each do |t| %>
-    <li><a href="/products/console_index?type=<%=t.id%>" style="padding-left:50px;">．<%= t.name %></a></li>
-    <% end %>
-    <li><h4>品牌</h4></li>
-    <% @brands.each do |b| %>
-    <li><a href="/products/console_index?brand=<%=b.id%>" style="padding-left:50px;">．<%= b.name %></a></li>
-    <% end %>
-  </ul>
-</div>
-
-  </div>
 <!-- 
 Body Section 
 -->
-<div class="span9">
+
   <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
     <div class="content">商品管理</div>
   </h1>
+
+<div style="width:550px;height:80px;margin:0 auto;">
+
+  <div class="ui center aligned icon header" style="font-size:18px;margin:20px 0 22px 0;">
+ 商品總數： <%= number_with_delimiter(@products_size, :delimiter => ',') %>
+  <br>
+  <% if @current_user.role == 1 %>
+    <button class="ui orange button" id = "btn_new_product">新增商品</button>
+  <% end %>
+    </div>
+    </div>
+<div style="width:800px;margin:0px auto;">
+<select id = "type" name="type" >
+  <option value="" disabled selected>分類</option>
+  <% @type_ones.each do |t| %>
+  <option value="<%=t.id%>"><%=t.name%></option>
+  <%end%>
+</select>
+  <select id="brand" name="brand" >
+  <option value="" disabled selected>品牌</option>
+ <% @brands.each do |b| %>
+  <option value="<%=b.id%>"><%=b.name%></option>
+  <%end%>
+</select>
+or
+<input id="filterbar" type="text" placeholder="搜尋">
+<button id="select_filter" class="ui blue tiny button select_filter">
+  <i class="search icon"></i>確定
+</button>
+</div>
 
 <% if @products.present? %>
       <% if @products.size != 0 %>
@@ -76,8 +83,8 @@ Body Section
               <tr>
                 <th class="AutoNewline" style="width:100px;" >名稱</th>
                 <th>圖片</th>
-                <th class="AutoNewline">庫存分類</th>
-                <th class="AutoNewline">商品分類</th>
+                <th class="AutoNewline">分類資訊</th>
+                <th class="AutoNewline">運送/付款</th>
                 <th class="AutoNewline">規格</th>
                 <th>售價</th>
                 <th>庫存</th>
@@ -99,7 +106,7 @@ Body Section
     <% end %>
     
 </div>
-</div>
+
 <!-- 
 Clients 
 -->
@@ -254,7 +261,13 @@ window.location="http://"+location.host+"/products/"+product_id;
 
 
 });
+    $("#select_filter").click(function(){
+    type = "type="+document.getElementById("type").value;
+    brand = "brand="+document.getElementById("brand").value;
+    filter = "filter="+$("#filterbar").val();
+    window.location.replace("http://"+location.host+"/products/console_index?"+type+"&"+brand+"&"+filter);
 
+  });
 </script>
 <style type="text/css">
 .AutoNewline

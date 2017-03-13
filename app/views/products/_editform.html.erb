@@ -22,14 +22,23 @@
           
       <% if @product.type_two_id && @product.type_two_id != ""%>
       <div id="typetwo_field" class="field">
-      <%= f.select :type_two_id, options_for_select(@product.type_one.type_twos.pluck(:name, :id),@product.type_two_id), {:prompt => '請選擇分類'}, class: "ui search dropdown", id: 'typetwo_select', :data => {validate:"typetwo_select"} %>
+      <%= f.select :type_two_id, options_for_select(@product.type_one.type_twos.pluck(:name, :id),@product.type_two_id), {:prompt => '請先選擇上層'}, class: "ui search dropdown", id: 'typetwo_select', :data => {validate:"typetwo_select"} %>
+      </div>
       <%else%>
       <div id="typetwo_field" class="disabled field">
       <select name="product[type_two_id]" id="typetwo_select" class="ui search dropdown" data-validate="typeone_select"><option value="">請先選擇上層</option><option value="0">無</option></select>
+      </div>
       <%end%>
-      <select name="product[type_three_id]" id="typethree_select" class="ui search dropdown" data-validate="typetwo_select"><option value="">請先選擇上層</option><option value="0">無</option></select>
+      <% if @product.type_three_id && @product.type_three_id != ""%>
+      <div id="typethree_field" class="field">
+        <%= f.select :type_three_id, options_for_select(@product.type_two.type_threes.pluck(:name, :id),@product.type_three_id), {:prompt => '請先選擇上層'}, class: "ui search dropdown", id: 'typethree_select', :data => {validate:"typethree_select"} %>
+      </div>
+      <%else%>
+       <div id="typethree_field" class="field">
+      <select name="product[type_three_id]" id="typethree_select" class="ui search dropdown" data-validate="typethree_select"><option value="">請先選擇上層</option><option value="0">無</option></select>
      </div>
-
+     <%end%>
+      
         </div>
 
 
@@ -83,7 +92,15 @@
             <%= f.file_field :upload, :id => 'image_file' %>
           </div>
           </div> -->
-  
+  <% if @product.productimages.present? %>
+       <% @product.productimages.each do |i| %>
+        <div class="column" >
+          <% if i.phourl.present? %>
+            <%= image_tag(i.phourl, size: "200" ,class: "ui centered rounded image") %><br><br>
+          <% end %>
+        </div>
+        <%end%>
+      <% end %>
     <input type="hidden" name="count" value="1" />
         <div class="control-group" id="fields">
         <div class="required field">
@@ -99,12 +116,19 @@
   </div>
       <div class="required field">
       <label>可用運送方式：</label>
-        <%= f.select :delivery_ids, Delivery.all.collect {|x| [x.name, x.id]}, {}, :class => "ui search selection dropdown", :multiple => true %>
+        <%= f.select :delivery_ids, Delivery.all.collect {|x| [x.name, x.id]}, {},  :multiple => true, :id =>"delivery_ids",:data => {validate:"delivery_ids"} %>
       </div>
+
       <div class="required field">
-      <label>可用運送方式：</label>
-        <%= f.select :payment_ids, Payment.all.collect {|x| [x.name, x.id]}, {}, :class => "ui search selection dropdown", :multiple => true ,:data => {validate:"payment_id"}%>
+      <label>可用付款方式：</label>
+        <%= f.select :payment_ids, Payment.all.collect {|x| [x.name, x.id]}, {}, :multiple => true , :id =>"payment_ids",:data => {validate:"payment_ids"}%>
       </div>
+      <script type="text/javascript">
+$(document).ready(function() {
+  $('#delivery_ids').multipleSelect();
+  $('#payment_ids').multipleSelect();
+  });
+</script>
 
         <div class="field">
         <div class="ui horizontal segments">
