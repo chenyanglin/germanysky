@@ -34,7 +34,7 @@
         <%= f.select :type_three_id, options_for_select(@product.type_two.type_threes.pluck(:name, :id),@product.type_three_id), {:prompt => '請先選擇上層'}, class: "ui search dropdown", id: 'typethree_select', :data => {validate:"typethree_select"} %>
       </div>
       <%else%>
-       <div id="typethree_field" class="field">
+       <div id="typethree_field" class="disabled field">
       <select name="product[type_three_id]" id="typethree_select" class="ui search dropdown" data-validate="typethree_select"><option value="">請先選擇上層</option><option value="0">無</option></select>
      </div>
      <%end%>

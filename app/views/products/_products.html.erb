@@ -9,7 +9,22 @@
      <img class="ui centered tiny image" src="<%= asset_path '100px.png' %>">
      <%end%>
     </div></td>
-  <td class="product_info not-icon" style= "word-break:break-all; " data-value="<%= product.id %>">「<%= product.producttype.name %>」</br>「<%= product.type_one.name %>」</br>「<%=product.brand.name%>」</td>
+  <td class="product_info not-icon" style= "word-break:break-all; " data-value="<%= product.id %>">
+  <%begin%>
+  「<%= product.producttype.name %>」</br>
+  <%rescue%>
+  無」</br>
+  <%end%>
+   <%begin%>
+  「<%= product.type_one.name %>」</br>
+  <%rescue%>
+  無」</br>
+  <%end%>
+  <%begin%>
+  「<%=product.brand.name%>」</td>
+  <%rescue%>
+  無」</br>
+  <%end%>
   <td class="collapsing product_info not-icon" data-value="<%= product.id %>">
   <運送></br>
   <% product.deliveries.each_with_index do |d,index|%>
@@ -24,13 +39,13 @@
  <% if product.product_options.size > 1 %>
  <table border="0" width="100%">
  <% product.product_options.each_with_index do |o,index| %>
- <tr><td><%=index%>.<%= o.option1 %></br></td></tr>
+ <tr><td><%=index+1%>.<%= o.option1 %></br></td></tr>
 <%end%>
 </table>
  </td>
  <% else %>
   </br>
-  1.<%= product.product_options.first.option1 %></td>
+  <%= product.product_options.first.option1 %></td>
  <% end %>
  <td>
  <% if product.product_options.size > 1 %>
