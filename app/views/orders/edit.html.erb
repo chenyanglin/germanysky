@@ -2,7 +2,7 @@
   <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
  
     <div class="content">
-      修改訂單
+      強制修改訂單
     </div>
   </h1>
 <div class="ui horizontal divider">Order Edit</div>
@@ -11,10 +11,68 @@
 <div class="ui stackable one column centered grid">
   <div class="fourteen wide column">
     <div class="ui large form" style="text-align:left;">
-      
+    <div class="ui alert message">
+            <div class="site-font header">注意</div>
+            <ul class="list">
+              <li>此修改將強制變更訂單內容。</li>
+            </ul>
+          </div>
+    <table id="payments_table" class="site-font ui sortable selectable blue table">
+            <thead>
+              <tr>
+                <th>商品名稱</th>
+                <th>規格</th>
+                <th>數量</th>
+                <th>價格</th>
+              </tr>
+            </thead>
+            <tbody>
+
+<% @order.order_products.each do |p| %>
+<tr>
+  <td><%= p.product_name %></td>
+  <td><%= p.option_name %></td>
+  <td><input name="[product][product<%=p.id%>][sum]" size="4" type="text" value="<%= p.sum %>" onkeyup="return ValidateNumberAndChange($(this),value,<%=p.id%>,<%=p.single_price%>)">
+  <input type="hidden" name="[product][product<%=p.id%>][id]" value="<%= p.id %>">
+  </td>
+  <td><div id="productsum<%=p.id%>"><%= p.sum_price%></div></td>
+</tr>
+<% end %>
+      </tbody>
+          </table>
+      <div class="required field">
+        <label>運送方式：</label>
+        <table class="site-font ui sortable red table">
+        <tr>
+        <td class="AutoNewline" style="width:300px;">
+        <%=@order.delivery%>
+        </td>
+        <td>
+        <%= f.text_field :delivery_price, onkeyup: "return ValidateNumber($(this),value)", size: "2",value: @order.delivery_price %>
+        </td>
+        </tr>
+        </table>
+      </div>
+      <div class="required field">
+        <label>付款方式：</label>
+        <table class="site-font ui sortable red table">
+        <tr>
+        <td class="AutoNewline" style="width:300px;">
+        <%=@order.payment%>
+        </td>
+        <td>
+        <%= f.text_field :payment_price, onkeyup: "return ValidateNumber($(this),value)", size: "2",value: @order.payment_price %>
+        </td>
+        </tr>
+        </table>
+      </div>
+      <div class="required field">
+        <label>總價：</label>
+        <%= f.text_field :total_price,onkeyup: "return ValidateNumber($(this),value)", value: @order.total_price %>
+      </div>
       <div class="required field">
         <label>備註 Note：</label>
-        <%= f.text_area :note, placeholder: "增加備註" %>
+        <%= f.text_area :note,value: @order.note, placeholder: "增加備註" %>
       </div>
     </div>
     <br>
@@ -61,11 +119,22 @@ $(function(){
   });
 });
 
-function ValidateNumber(e, pnumber)
+function ValidateNumber(e, value)
 {
-    if (!/^\d+$/.test(pnumber))
+    if (!/^\d+$/.test(value))
     {
         $(e).val(/^\d+/.exec($(e).val()));
+    }
+    return false;
+}
+function ValidateNumberAndChange(e, value,id,single_price)
+{
+    if (!/^\d+$/.test(value))
+    {
+        $(e).val(/^\d+/.exec($(e).val()));
+    }else
+    {
+      document.getElementById("productsum"+id).innerHTML=single_price*value;
     }
     return false;
 }

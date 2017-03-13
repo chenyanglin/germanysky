@@ -63,11 +63,15 @@ New Products
       已選 <div id="productcount" style="display:inline;">0</div> 樣商品 ｜ 原價 <div id="originalprice" style="display:inline;">0</div> 元 ｜ 折扣價 <div id="saleprice" style="display:inline;">0</div> 元
           <p>多種促銷組合優惠！！ <br></p>
                <table>
-               <div id="select" style="display:inline;">您已選擇：</div>
+               <div id="select">您已選擇：</div>
               </table>
+                <% if @current_user%>
                 <button id="select_form_submit" class="ui red button" style="float:right">
                 <i class="shopping basket icon"></i>訂購
                 </button>
+                <%else%>
+                <a class="ui red button" style="float:right"  href="/consoles/login">登入會員</a>
+                <%end%>
               <br>
               <br>
     </div>
@@ -161,18 +165,16 @@ function optionclick(id,name,orgprice,saleprice) {
         else{
         document.getElementById("productcount").innerHTML = Number(document.getElementById("productcount").innerHTML)+Number(sum);
         var addto = "#select";
-        var addRemove = "#field" + (id);
-        var newIn = '<div id="field'+id+' value="1"><tr><td><div style="margin:0 auto;display:inline;" >'+name+'</div></td><td><div id="fieldsum'+id+'" style="display:inline;">'+sum+'</div>件</td><input type="hidden" name="[product][option'+id+'][id]" value="'+id+'"><input type="hidden" name="[product][option'+id+'][sum]" id="hiddenfieldsum'+id+'" value="'+sum+'"><input type="hidden" name="[product][option'+id+'][saleprice]" value="'+saleprice+'">';
+        var addRemove = "#field"+(id);
+        var newIn = '<div id="field'+id+'" style="display:inline; value="1"><tr><td><div style="margin:0 auto;display:inline;" >'+name+'</div></td><td><div id="fieldsum'+id+'" style="display:inline;">'+sum+'</div>件</td><input type="hidden" name="[product][option'+id+'][id]" value="'+id+'"><input type="hidden" name="[product][option'+id+'][sum]" id="hiddenfieldsum'+id+'" value="'+sum+'"><input type="hidden" name="[product][option'+id+'][saleprice]" value="'+saleprice+'">';
         var newInput = $(newIn);
-        var removeBtn = '<td><button id="remove' + id + '" class="btn btn-danger remove-me" >-</button></td></tr></div>';
+        var removeBtn = '<button id="remove' + id + '" class="btn btn-danger remove-me" >-</button></tr></div></br>';
         var removeButton = $(removeBtn);
         $(addto).after(newInput);
         $(addRemove).after(removeButton);
         $("#select").attr('data-source',$(addto).attr('data-source'));
         
             $('.remove-me').click(function(e){
-              alert(this.id);
-              alert(this.id.length-1);
                 var fieldNum = this.id.charAt(this.id.length-1);
                 var fieldID = "#field" + fieldNum;
                 $(this).remove();

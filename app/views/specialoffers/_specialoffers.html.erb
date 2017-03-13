@@ -10,9 +10,9 @@
       <%end%>
   </td>
   <td class="collapsing specialoffer_info not-icon" data-value="<%= specialoffer.id %>"><%if specialoffer.offertype == "1" %>
-      任選<%= specialoffer.productcount %>件，一件<%=specialoffer.saleprice%>元
+      任選<%= specialoffer.productcount %>件以上，一件<%=specialoffer.saleprice%>元
       <% elsif specialoffer.offertype =="2"%>
-      任選<%= specialoffer.productcount %>件，一件打<%=specialoffer.discount%>折
+      任選<%= specialoffer.productcount %>件以上，一件打<%=specialoffer.discount%>折
       <%end%>
 
       </td>

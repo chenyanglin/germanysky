@@ -162,7 +162,15 @@ def new
     render :layout => false
   end
   def update
-    if @order.update(note: params[:order][:note])
+
+    if params[:product].present?
+      params[:product].each do |p|
+        @orderproduct = OrderProduct.find(p[1][:id])
+        @orderproduct.update(sum: p[1][:sum])
+        @orderproduct.update(sum_price: p[1][:sum].to_i*@orderproduct.single_price)
+      end
+    end
+    if @order.update(update_params)
       render :text => "success"
     else
       render :text => "error"
@@ -274,8 +282,11 @@ def new
     render :layout => false
   end
 
-    def order_params
+  def order_params
     params.require(:order).permit(:receiver_name, :receiver_phone,:receiver_address,:total_price,:note)
+  end
+  def update_params
+    params.require(:order).permit(:total_price,:note,:delivery_price,:payment_price)
   end
   def set_order
     @order = Order.find(params[:id])
