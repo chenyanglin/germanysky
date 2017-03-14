@@ -1,6 +1,11 @@
 <% @products.each do |product| %>
 <tr>
-  <td class="not-icon"  style= "word-break:break-all;" data-value="<%= product.id %>"><div id="productname<%=product.id%>" onClick="name_click('<%=product.id%>','<%=product.name%>');"><%= product.name %></div><input id="productname_input<%=product.id%>" type="text" style="display:none;width:100px" value="<%=product.name%>" onfocusout="changenamedata('<%=product.id%>',this.value);" ></td>
+  <td class="not-icon"  style= "word-break:break-all;" data-value="<%= product.id %>">
+  <div id="productname<%=product.id%>" onClick="name_click('<%=product.id%>','<%=product.name%>');">
+  <%= product.name %>
+  </div>
+  <input id="productname_input<%=product.id%>" type="text" style="display:none;width:100px" value="<%=product.name%>" onfocusout="changenamedata('<%=product.id%>',this.value);" >
+  </td>
   <td><div class="item">
   
 <%begin%>
@@ -35,40 +40,69 @@
   <%= index+1%>.<%=p.name%></br>
   <%end%>
   </td>
-   <td class="product_info not-icon" style= "word-break:break-all;" data-value="<%= product.id %>">
+   <td class="not-icon" style= "word-break:break-all;" data-value="<%= product.id %>">
  <% if product.product_options.size > 1 %>
  <table border="0" width="100%">
  <% product.product_options.each_with_index do |o,index| %>
- <tr><td><%=index+1%>.<%= o.option1 %></br></td></tr>
+ <tr><td><%=index+1%>.<div id="option_name<%=o.id%>" onClick="option_name_click('<%=o.id%>','<%=o.option1%>');">
+  <%= o.option1 %>
+  </div>
+  <input id="option_name_input<%=o.id%>" type="text" style="display:none;width:80px" value="<%=o.option1%>" onfocusout="changeoptionnamedata('<%=o.id%>',this.value);" ></br></td></tr>
 <%end%>
 </table>
  </td>
  <% else %>
   </br>
-  <%= product.product_options.first.option1 %></td>
+   <div id="option_name<%=product.product_options.first.id%>" onClick="option_name_click('<%=product.product_options.first.id%>','<%=product.product_options.first.option1%>');">
+  <%= product.product_options.first.option1 %>
+  </div>
+  <input id="option_name_input<%=product.product_options.first.id%>" type="text" style="display:none;width:80px" value="<%=product.product_options.first.option1%>" onfocusout="changeoptionnamedata('<%=product.product_options.first.id%>',this.value);" >
+  </td>
  <% end %>
  <td>
  <% if product.product_options.size > 1 %>
  <table border="0" width="100%">
  <% product.product_options.each do |o| %>
- <tr><td><%= o.price %></br></td></tr>
+ <tr><td>
+ <div id="option_price<%=o.id%>" onClick="option_price_click('<%=o.id%>','<%=o.price%>');">
+  <%= o.price %>
+  </div>
+  <input id="option_price_input<%=o.id%>" type="text" style="display:none;width:40px" value="<%=o.price%>" onfocusout="changepricedata('<%=o.id%>',this.value);" >
+ </br></td></tr>
 <%end%>
 </table>
  </td>
  <% else %>
   </br>
- <%= product.product_options.first.price %></td>
+  <div id="option_price<%=product.product_options.first.id%>" onClick="option_price_click('<%=product.product_options.first.id%>','<%=product.product_options.first.price%>');">
+  <%= product.product_options.first.price %>
+  </div>
+  <input id="option_price_input<%=product.product_options.first.id%>" type="text" style="display:none;width:40px" value="<%=product.product_options.first.price%>" onfocusout="changepricedata('<%=product.product_options.first.id%>',this.value);" >
+ </td>
  <% end %>
- <td> <% if product.product_options.size > 1 %>
+ <td> 
+ <% if product.product_options.size > 1 %>
   <table border="0" width="100%">
- <% product.product_options.each do |o| %>
- <tr><td><%= o.surplus %></br></td></tr>
-<%end%>
-</table>
+    <% product.product_options.each do |o| %>
+    <tr>
+      <td>
+      <div id="option_surplus<%=o.id%>" onClick="option_surplus_click('<%=o.id%>','<%=o.surplus%>');">
+  <%= o.surplus %>
+  </div>
+  <input id="option_surplus_input<%=o.id%>" type="text" style="display:none;width:40px" value="<%=o.surplus%>" onfocusout="changesurplusdata('<%=o.id%>',this.value);" >
+        </br>
+      </td>
+    </tr>
+    <%end%>
+  </table>
  </td>
  <% else %>
  </br>
- <%= product.product_options.first.surplus %></td>
+    <div id="option_surplus<%=product.product_options.first.id%>" onClick="option_surplus_click('<%=product.product_options.first.id%>','<%=product.product_options.first.surplus%>');">
+  <%= product.product_options.first.surplus %>
+  </div>
+  <input id="option_surplus_input<%=product.product_options.first.id%>" type="text" style="display:none;width:40px" value="<%=product.product_options.first.surplus%>" onfocusout="changesurplusdata('<%=product.product_options.first.id%>',this.value);" >
+    </td>
  <% end %>
   <td class="collapsing">
     <button class="ui blue basic button product_edit" data-value="<%= product.id %>">修改</button>
@@ -105,6 +139,87 @@ function changenamedata(id,name) {
     document.getElementById('productname'+id).style.display = '';
     document.getElementById('productname_input'+id).style.display = 'none';
     document.getElementById('productname_input'+id).value = document.getElementById('productname').innerHTML;
+  }
+  
+}
+
+function option_surplus_click(id,name) {
+  document.getElementById('option_surplus'+id).style.display = 'none';
+  document.getElementById('option_surplus_input'+id).style.display = '';
+  
+}
+function changesurplusdata(id,surplus) {
+  if (document.getElementById('option_surplus_input'+id).value != "")
+  {
+    $.get( "/products/edit_option_surplus?id="+id+"&surplus="+surplus, function(html) {
+      document.getElementById('option_surplus'+id).innerHTML = surplus;
+      document.getElementById('option_surplus'+id).style.display = '';
+      document.getElementById('option_surplus_input'+id).style.display = 'none';
+    }).fail(function() {
+      document.getElementById('option_surplus'+id).style.display = '';
+      document.getElementById('option_surplus_input'+id).style.display = 'none';
+      document.getElementById('option_surplus_input'+id).value = document.getElementById('option_surplus').innerHTML; 
+    });
+}
+  else
+  {
+    document.getElementById('option_surplus'+id).style.display = '';
+    document.getElementById('option_surplus_input'+id).style.display = 'none';
+    document.getElementById('option_surplus_input'+id).value = document.getElementById('option_surplus').innerHTML;
+  }
+  
+}
+
+function option_price_click(id,price) {
+  document.getElementById('option_price'+id).style.display = 'none';
+  document.getElementById('option_price_input'+id).style.display = '';
+  
+}
+function changepricedata(id,price) {
+  if (document.getElementById('option_price_input'+id).value != "")
+  {
+    $.get( "/products/edit_option_price?id="+id+"&price="+price, function(html) {
+      document.getElementById('option_price'+id).innerHTML = price;
+      document.getElementById('option_price'+id).style.display = '';
+      document.getElementById('option_price_input'+id).style.display = 'none';
+    }).fail(function() {
+      document.getElementById('option_price'+id).style.display = '';
+      document.getElementById('option_price_input'+id).style.display = 'none';
+      document.getElementById('option_price_input'+id).value = document.getElementById('option_price').innerHTML; 
+    });
+}
+  else
+  {
+    document.getElementById('option_price'+id).style.display = '';
+    document.getElementById('option_price_input'+id).style.display = 'none';
+    document.getElementById('option_price_input'+id).value = document.getElementById('option_price').innerHTML;
+  }
+  
+}
+
+function option_name_click(id,name) {
+  document.getElementById('option_name'+id).style.display = 'none';
+  document.getElementById('option_name_input'+id).style.display = '';
+  
+}
+function changeoptionnamedata(id,name) {
+  if (document.getElementById('option_name_input'+id).value != "")
+  {
+    $.get( "/products/edit_option_name?id="+id+"&optionname="+name, function(html) {
+      document.getElementById('option_name'+id).innerHTML = name;
+      document.getElementById('option_name'+id).style.display = '';
+      document.getElementById('option_name_input'+id).style.display = 'none';
+    }).fail(function() {
+      document.getElementById('option_name'+id).style.display = '';
+      document.getElementById('option_name_input'+id).style.display = 'none';
+      document.getElementById('option_name_input'+id).value = document.getElementById('option_name').innerHTML; 
+    });
+}
+  else
+  {
+    document.getElementById('option_name'+id).style.display = '';
+    document.getElementById('option_name_input'+id).style.display = 'none';
+    document.getElementById('option_name_input'+id).value = document.getElementById('option_name').innerHTML;
   }
   
 }

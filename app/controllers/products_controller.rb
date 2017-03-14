@@ -170,6 +170,16 @@ def new
   end
  def update
   # binding.pry
+  if params[:product][:files].present?
+        params[:product][:files].each do |a|
+        @photo = Productimage.new(:upload => a[1])
+        @photo.product_id = @product.id
+        @photo.save
+        @photo.update(:phourl => "products/uploads/"+@photo.id.to_s+"/"+@photo.upload_file_name.to_s )
+        # @photo.update(:phourl =>"100px.png")
+      end
+  end
+  @product.update(content: params[:content])
     if @product.update(product_params)
       render :text => "success"
     else
@@ -199,6 +209,31 @@ def edit_productname
       render :text => "error"
     end
 end
+def edit_option_name
+  @product = ProductOption.find(params[:id])
+  if @product.update(option1: params[:optionname])
+      render :text => "success"
+    else
+      render :text => "error"
+    end
+end
+def edit_option_surplus
+  @product = ProductOption.find(params[:id])
+  if @product.update(surplus: params[:surplus])
+      render :text => "success"
+    else
+      render :text => "error"
+    end
+end
+def edit_option_price
+  @product = ProductOption.find(params[:id])
+  if @product.update(price: params[:price])
+      render :text => "success"
+    else
+      render :text => "error"
+    end
+end
+
 def add_to_shoppingcart
     product_id = params[:product_id]
     option_id = params[:option_id]

@@ -155,7 +155,7 @@ $(document).ready(function() {
  <div class="redactor_box">
   
 </div>
-<div><%= text_area_tag :content, "", :class => "redactor", :rows => 40, :cols => 120 %></div>
+<div><%= text_area_tag :content, @product.content, :class => "redactor", :rows => 20, :cols => 120 %></div>
     </div>
     </div>
 
@@ -251,7 +251,7 @@ $(document).ready(function() {
           data: new FormData(this)
       }).success(function(upload_result){
           if(upload_result == "success" ){
-            window.location.replace("//"+location.host+"/products?recent=true");
+            window.location.replace("//"+location.host+"/products/console_index");
           }
       }).fail(function(e) {
           console.log(e);

@@ -99,6 +99,9 @@ Rails.application.routes.draw do
       get :shopprocess
       get :register
       get :edit_productname
+      get :edit_option_surplus
+      get :edit_option_price
+      get :edit_option_name
       post :product_register
     end
   end
