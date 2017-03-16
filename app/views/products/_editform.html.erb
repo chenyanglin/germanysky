@@ -93,13 +93,18 @@
           </div>
           </div> -->
   <% if @product.productimages.present? %>
+  <div class="ui four column centered grid" >
+   <div class="row" style="padding-left:5px; padding-right:5px;">
        <% @product.productimages.each do |i| %>
-        <div class="column" >
           <% if i.phourl.present? %>
-            <%= image_tag(i.phourl, size: "200" ,class: "ui centered rounded image") %><br><br>
+          <div class="column" id="image<%= i.id %>">
+          <i class="close icon ins-del" data-value="<%= i.id %>"></i>
+            <%= image_tag(i.phourl, size: "100" ,class: "ui centered rounded image") %>
+            </div>
           <% end %>
-        </div>
         <%end%>
+        </div>
+        </div>
       <% end %>
     <input type="hidden" name="count" value="1" />
         <div class="control-group" id="fields">
@@ -401,4 +406,21 @@ $(document).on('change','#typetwo_select', function () {
            
           });
 });
+
+
+  $('body').on('click','.ins-del',function(){
+    var this_image_id = $(this).data("value");
+
+
+    $.post( "/products/upload_images_del", { "args": {image_id: this_image_id }})
+    .success(function(data){
+      $('#image'+this_image_id).empty();
+    })
+    .fail(function (xhr) {
+      alert("圖片刪除失敗");
+      console.log('AJAX request has FAILED');
+    });
+
+    return false;
+  });
 </script>

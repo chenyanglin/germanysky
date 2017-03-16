@@ -14,7 +14,7 @@
 	 -->
 
 <% @orders.each do |order| %>
-<tr>
+<tr >
   <td><%= order.ordernumber %></td>
   <td><%= order.total_price%></td>
   <!-- 付款tag -->
@@ -90,5 +90,44 @@
  <td>
  <%= order.created_at.strftime("%Y-%m-%d") %>
  </td>
+</tr>
+<tr>
+<td colspan="2">
+</td>
+<th colspan="2">
+商品名稱
+</th>
+<th colspan="2">
+商品規格
+</th>
+<th colspan="2">
+商品數量
+</th>
+<th colspan="1">
+商品總價
+</th>
+</tr>
+<% order.order_products.each do |p|%>
+<tr>
+<td colspan="2">
+</td>
+<td colspan="2">
+<%= p.product_name %>
+</td>
+<td colspan="2">
+<%= p.option_name %>
+</td>
+<td colspan="2">
+<%= p.sum %>
+</td>
+<td colspan="1">
+<%= p.sum_price %>
+</td>
+</tr>
+<%end%>
+<tr>
+<td colspan="9">
+ &nbsp;
+</td>
 </tr>
 <% end %>

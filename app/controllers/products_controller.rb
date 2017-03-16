@@ -201,6 +201,21 @@ def destroy
 
     redirect_to products_path
 end
+
+  def upload_images_del
+    image_id = params[:args][:image_id]
+    image = Productimage.find(image_id)
+    if image.present?
+        image.destroy
+        render :json => {
+      'result_content' => 'success' }
+    else
+        render :json => {
+      'result_content' => 'error' }
+    end
+  end
+
+
 def edit_productname
   @product = Product.find(params[:id])
   if @product.update(name: params[:name])

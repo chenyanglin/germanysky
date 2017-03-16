@@ -103,6 +103,7 @@ Rails.application.routes.draw do
       get :edit_option_price
       get :edit_option_name
       post :product_register
+      post :upload_images_del
     end
   end
     resources :type_ones do
