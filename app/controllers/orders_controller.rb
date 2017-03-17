@@ -162,7 +162,6 @@ def new
     render :layout => false
   end
   def update
-
     if params[:product].present?
       params[:product].each do |p|
         @orderproduct = OrderProduct.find(p[1][:id])

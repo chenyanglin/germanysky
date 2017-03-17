@@ -104,6 +104,7 @@ Rails.application.routes.draw do
       get :edit_option_name
       post :product_register
       post :upload_images_del
+      post :option_del
     end
   end
     resources :type_ones do

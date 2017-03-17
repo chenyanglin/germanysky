@@ -1,5 +1,6 @@
 <div class="form-check">
 <%= form_for @product,authenticity_token: true do |f| %>
+<input id="option_size" type="hidden" value="<%= @product.product_options.size %>"/>
 <div class="ui stackable one column centered grid">
   <div class="fourteen wide column">
     <div class="ui large form" style="text-align:left;">
@@ -40,44 +41,37 @@
      <%end%>
       
         </div>
+            <table id="option_table" class="site-font ui sortable selectable blue table">
+            <thead>
+              <tr>
+                <th>規格</th>
+                <th>價格</th>
+                <th>數量</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
 
-
-    <div class="required field">
-    <button id="option_style" class="ui teal button" type="button" style='display:'>
-      <i class="plus icon"></i>切換商品選項模式
+<% @product.product_options.each_with_index do |o,index| %>
+<tr id="row<%=index+1%>">
+  <td><input id="optionname<%=index+1%>" name="product[options][option<%=index+1%>][optionname<%=index+1%>]" placeholder="名稱" type="text" value="<%= o.option1 %>" /></td>
+  <td><input id="optionprice<%=index+1%>" name="product[options][option<%=index+1%>][optionprice<%=index+1%>]" placeholder="價錢" type="text" value="<%= o.price %>" /></td>
+  <td><input id="optionsurplus<%=index+1%>" name="product[options][option<%=index+1%>][optionsurplus<%=index+1%>]" placeholder="庫存" type="text" value="<%= o.surplus %>"/></td>
+  <td style="width:10px;">
+  <input id="optionid<%=index+1%>" name="product[options][option<%=index+1%>][optionid]" type="hidden" value="<%= o.id %>"/>
+  <% if index == 0 %>
+  <%else%>
+  <i class="close icon option-del" data-value="<%= o.id %>" data-rowid="<%=index+1%>"></i>
+  <%end%>
+  </td>
+</tr>
+<% end %>
+      </tbody>
+          </table>
+<button id="addrow" type="button" class="ui basic red pull-right button">
+      新增規格＋
     </button>
-    <button id="normal_style" class="ui teal button" type="button" style='display:none'>
-      <i class="plus icon"></i>切換一般模式
-    </button>
-    <input type="hidden" id="productstyle" name="productstyle" value="normal" />
-      </div>
-    <div class="normal_field" id="normal_field" style='display:'>
-      <div class="required field">
-        <label>價錢 Price：</label>
-         <input placeholder="請輸入價錢(台幣數字)" onkeyup="return ValidateNumber($(this),value)" type="text" name="product[price]" id="product_price" value ="<%=@product.product_options.first.price%>" />
-      </div>
-        <div class="required field">
-        <label>庫存 Surplus：</label>
-        <input placeholder="請輸入庫存量(數字)" onkeyup="return ValidateNumber($(this),value)" type="text" name="product[surplus]" id="product_surplus"  value ="<%=@product.product_options.first.surplus%>"/>
-      </div>
 
-      </div>
-
-    <div class="row" type="hidden" id="option_field" style='display:none'>
-    <input type="hidden" name="optioncount" value="1" />
-        <div class="control-group" id="options"> 
-            <div class="controls" id="profs"> 
-                <form class="input-append">
-                <div class="required field" >
-                <label for="option1">商品選項1</label>
-                    <div id="option" class="col-md-7"><input id="optionname1" name="product[options][option1][optionname1]" placeholder="名稱" type="text" /><input id="optionprice1" name="product[options][option1][optionprice1]" placeholder="價錢" type="text" />
-                    <input id="optionsurplus1" name="product[options][option1][optionsurplus1]" placeholder="庫存" type="text" /><button id="add-option" class="btn" type="button">+</button></div>
-                </form>
-            <br>
-            </div>
-            </div>
-        </div>
-  </div>
       <div class="required field">
         <label>紅利點數 point：</label>
         <%= f.text_field :point, placeholder: "請輸入可得紅利點數(單筆)" ,onkeyup: "return ValidateNumber($(this),value)"%>
@@ -272,84 +266,7 @@ $(document).ready(function() {
     }
     return false;
 }
-$(document).ready(function(){
-    var nextfile = 1;
-    var nextoption = 1;
-    $("#add-more").click(function(e){
-        e.preventDefault();
-        var addto = "#field" + nextfile;
-        var addRemove = "#field" + (nextfile);
-        nextfile = nextfile + 1;
-        var newIn = '<input id="field'+nextfile+'" name="product[files][file'+nextfile+']" type="file" />';
-        var newInput = $(newIn);
-        var removeBtn = '<button id="remove' + (nextfile - 1) + '" class="btn btn-danger remove-me" >-</button></div><div id="field">';
-        var removeButton = $(removeBtn);
-        $(addto).after(newInput);
-        $(addRemove).after(removeButton);
-        $("#field" + nextfile).attr('data-source',$(addto).attr('data-source'));
-        $("#count").val(nextfile);  
-        
-            $('.remove-me').click(function(e){
-                e.preventDefault();
-                var fieldNum = this.id.charAt(this.id.length-1);
-                var fieldID = "#field" + fieldNum;
-                $(this).remove();
-                $(fieldID).remove();
-            });
-    });
-        $("#option_style").click(function(e){
-          var i =document.getElementById('option_style');
-            i.style.display='none';
-            var j =document.getElementById('normal_style');
-            j.style.display='';
-          document.getElementById("normal_field").style.display = 'none';
-          document.getElementById('option_field').style.display = '';
-          document.getElementById('productstyle').value = 'option';
-           });
-        $("#normal_style").click(function(e){
-          // document.getElementById("testclass").add();
-            var i =document.getElementById('normal_style');
-            i.style.display='none';
-            var j =document.getElementById('option_style');
-            j.style.display='';
-            document.getElementById('option_field').style.display = 'none';
-            document.getElementById("normal_field").style.display = '';
-            document.getElementById( 'productstyle' ).value = 'normal';
-           });
-        $("#add-option").click(function(e){
-          e.preventDefault();
-        var addto = "#optionsurplus" + nextoption;
-        var addRemove = "#optionsurplus" + (nextoption);
-        nextoption = nextoption + 1;
-        var newIn = '<div class="required field"><label id = "label'+nextoption+'" for="option'+nextoption+'">商品選項'+nextoption+'</label><input id="optionname'+nextoption+'" name="product[options][option'+nextoption+'][optionname'+nextoption+']" placeholder="名稱" type="text" /><input id="optionprice'+nextoption+'" name="product[options][option'+nextoption+'][optionprice'+nextoption+']" placeholder="價錢" type="text" /><input id="optionsurplus'+nextoption+'" name="product[options][option'+nextoption+'][optionsurplus'+nextoption+']" placeholder="庫存" type="text" /></div>';
-        var newInput = $(newIn);
-        var removeBtn = '<button id="remove' + (nextoption - 1) + '" class="btn btn-danger remove-yo" >-</button></div><div id="option">';
-        var removeButton = $(removeBtn);
-        $(addto).after(newInput);
-        $(addRemove).after(removeButton);
-        $("#option" + nextoption).attr('data',$(addto).attr('data'));
-        $("#optioncount").val(nextoption);  
-        
-            $('.remove-yo').click(function(e){
-                e.preventDefault();
-                var optionNum = this.id.charAt(this.id.length-1);
-                var optionname = "#optionname" + optionNum;
-                var optionprice= "#optionprice" + optionNum;
-                var optionsurplus= "#optionsurplus" + optionNum;
-                var o = parseInt(optionNum)+1;
-                var label = "#label"+o;
-                $(this).remove();
-                $(optionname).remove();
-                $(optionprice).remove();
-                $(optionsurplus).remove();
-                $(label).remove();
-            });
- 
-    });
-    
 
-    
-});
 //商品分類選擇
  $("#type_select").change(function(){
     console.log($(this).val());
@@ -379,7 +296,6 @@ $(document).on('change','#type_select', function () {
            $("#typetwo_select").append(//add in an option for each major
                 $("<option></option>").attr("value", data[i].id).text(data[i].name)
             );
-          
           }
     }
            
@@ -418,6 +334,37 @@ $(document).on('change','#typetwo_select', function () {
     })
     .fail(function (xhr) {
       alert("圖片刪除失敗");
+      console.log('AJAX request has FAILED');
+    });
+
+    return false;
+  });
+var id = document.getElementById("option_size").value;
+  $("#addrow").click(function(){
+   id +=1;
+
+   var TabObj=document.all.option_table;
+   var NewRow=option_table.insertRow();
+   NewRow.id = "row"+id;
+   var NewCell=NewRow.insertCell();
+   NewCell.innerHTML='<input id="optionname'+id+'" name="product[options][option'+id+'][optionname'+id+']" placeholder="名稱" type="text" />';
+   NewCell=NewRow.insertCell();
+   NewCell.innerHTML='<input id="optionprice'+id+'" name="product[options][option'+id+'][optionprice'+id+']" placeholder="價錢" type="text" />';
+   NewCell=NewRow.insertCell();
+   NewCell.innerHTML='<input id="optionsurplus'+id+'" name="product[options][option'+id+'][optionsurplus'+id+']" placeholder="庫存" type="text" />';
+   NewCell=NewRow.insertCell();
+   NewCell.innerHTML='<i class="close icon option-del" data-value="" data-rowid="'+id+'"></i>';
+   });
+
+  $('body').on('click','.option-del',function(){
+    var option_id = $(this).data("value");
+    var rowid = $(this).data("rowid");
+    $.post( "/products/option_del", { "args": {option_id: option_id }})
+    .success(function(data){
+      $('table#option_table tr#row'+rowid+'').remove();
+    })
+    .fail(function (xhr) {
+      $('table#option_table tr#row'+rowid+'').remove();
       console.log('AJAX request has FAILED');
     });
 

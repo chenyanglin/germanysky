@@ -93,7 +93,7 @@ New Products
 				<div class="thumbnail">
 					<a class="zoomTool" href="/products/<%=p.id%>" title="add to cart"><i class="search icon"></i>前往商品</a>
 					<a href="#" class="tag" style ="background:url('<%= asset_path("new.png") %>') no-repeat 0 0;"></a>
-					<a href="/products/<%=p.id%>"><img style='height: 200px; width: 150px; object-fit: contain' src="<%= asset_path p.productimages.first.phourl %>" alt="bootstrap-ring"></a>
+					<a href="/products/<%=p.id%>"><img style='height: 200px; width: 150px; object-fit: contain' src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt="bootstrap-ring"></a>
 				</div>
 				</li>
 				<%end%>
@@ -106,7 +106,7 @@ New Products
 			<li class="span3">
 			  <div class="thumbnail">
 				<a class="zoomTool" href="/products/<%=p.id%>" title="add to cart"><i class="search icon"></i>前往商品</a>
-				<a  href="/products/<%=p.id%>"><img style='height: 200px; width: 150px; object-fit: contain' src="<%= asset_path p.productimages.first.phourl %>" alt=""></a>
+				<a  href="/products/<%=p.id%>"><img style='height: 200px; width: 150px; object-fit: contain' src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt=""></a>
 			  </div>
 			</li>
 			<%end%>

@@ -169,7 +169,43 @@ def new
     render :layout => false
   end
  def update
-  # binding.pry
+
+
+  params[:product][:options].each do |a|
+      if a[1].size ==4
+        @option = ProductOption.find(a[1][:optionid])
+          i = 1
+          a[1].each do |b|
+            if i == 1
+              @option.update(option1: b[1])
+            end
+            if i == 2
+              @option.update(price: b[1])
+            end
+            if i == 3
+              @option.update(surplus: b[1])
+            end
+            i += 1
+          end
+      else
+          @option = ProductOption.new
+          @option.product_id = @product.id
+          i = 1
+          a[1].each do |b|
+            if i == 1
+              @option.option1 = b[1]
+            end
+            if i == 2
+              @option.price = b[1]
+            end
+            if i == 3
+              @option.surplus = b[1]
+            end
+            i += 1
+          end
+          @option.save
+      end 
+  end
   if params[:product][:files].present?
         params[:product][:files].each do |a|
         @photo = Productimage.new(:upload => a[1])
@@ -215,6 +251,18 @@ end
     end
   end
 
+  def option_del
+    option_id = params[:args][:option_id]
+    @option = ProductOption.find(option_id)
+    if @option.present?
+        @option.destroy
+        render :json => {
+      'result_content' => 'success' }
+    else
+        render :json => {
+      'result_content' => 'error' }
+    end
+  end
 
 def edit_productname
   @product = Product.find(params[:id])

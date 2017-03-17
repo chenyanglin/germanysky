@@ -109,7 +109,7 @@ New Products
 				<a class="zoomTool" href="/products/<%= p.id %>" title="add to cart"><i class="search icon"></i>前往商品</a>
 				<a href="/products/<%= p.id %>">
 
-  <img class="ui centered small image" src="<%= asset_path p.productimages.first.phourl %>" style='height: 180px; width: 100%; object-fit: contain'>
+  <img class="ui centered small image" src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" style='height: 180px; width: 100%; object-fit: contain'>
 </a>
 				<div class="caption cntr">
 					<p><strong><%= p.name %></strong></p>

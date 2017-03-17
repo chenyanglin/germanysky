@@ -44,7 +44,7 @@
  <% if product.product_options.size > 1 %>
  <table border="0" width="100%">
  <% product.product_options.each_with_index do |o,index| %>
- <tr><td><%=index+1%>.<div id="option_name<%=o.id%>" onClick="option_name_click('<%=o.id%>','<%=o.option1%>');">
+ <tr><td><div id="option_name<%=o.id%>" onClick="option_name_click('<%=o.id%>','<%=o.option1%>');">
   <%= o.option1 %>
   </div>
   <input id="option_name_input<%=o.id%>" type="text" style="display:none;width:80px" value="<%=o.option1%>" onfocusout="changeoptionnamedata('<%=o.id%>',this.value);" ></br></td></tr>
