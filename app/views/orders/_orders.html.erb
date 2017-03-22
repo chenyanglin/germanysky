@@ -84,8 +84,8 @@
     <% end %>
   </td>
  <td>
-
-   <div style="text-align: center;"></br><div class="ui blue basic button order_detail"  data-value="<%= order.id %>">資料</div></br></div>
+  <% msgsize = order.order_messages.where("account_id != ? && user_read = 0 ",@current_user.id).size %>
+   <div style="text-align: center;"></br><div class="ui blue basic button order_detail"  data-value="<%= order.id %>">資料</div><%if msgsize>0 %>(新留言)<%end%></br></div>
  </td>
  <td>
  <%= order.created_at.strftime("%Y-%m-%d") %>

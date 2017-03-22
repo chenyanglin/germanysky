@@ -143,6 +143,7 @@ Rails.application.routes.draw do
   resources :order_messages do
     collection do
       post :reply
+      get :read
     end
   end
   # The priority is based upon order of creation: first created -> highest priority.

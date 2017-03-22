@@ -67,7 +67,13 @@ def new
       render :text => "error"
     end
   end
-
+  def read
+    @msgs = OrderMessage.where('order_id = ? && account_id != ?',params[:id],@current_user.id)
+    @msgs.each do |m|
+      m.update(user_read: 1)
+    end
+    render :text => "success"
+  end
   def message_params
     params.require(:message).permit(:content)
   end
