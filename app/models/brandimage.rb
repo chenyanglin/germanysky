@@ -1,5 +1,5 @@
 class Brandimage < ActiveRecord::Base
-   belongs_to :brand, foreign_key: "brand_id", :dependent => :destroy
+   belongs_to :brand, foreign_key: "brand_id"
    has_attached_file :upload,
   :styles => 
   { 

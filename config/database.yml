@@ -20,19 +20,19 @@ development:
   # username: root
   # password: "iii"
 
-  # #chenyang local
-  # database: germanysky
-  # host: localhost
-  # username: root
-  # password: "iii"
-
-  #Linode
-  adapter: mysql2
-  encoding: utf8mb4
+  #chenyang local
   database: germanysky
   host: localhost
   username: root
-  password: 771205
+  password: "iii"
+
+  # #Linode
+  # adapter: mysql2
+  # encoding: utf8mb4
+  # database: germanysky
+  # host: localhost
+  # username: root
+  # password: 771205
 
 production:
   <<: *default

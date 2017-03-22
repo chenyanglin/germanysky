@@ -39,7 +39,8 @@ def new
     @brand = Brand.find(params[:id])
     if @brand.update(brand_params)
       if params[:brand][:file]
-      @brand.brandimage.destroy
+      @brandimage = Brandimage.find(@brand.brandimage.id)
+      @brandimage.destroy
       @photo = Brandimage.new(:upload => params[:brand][:file])
       @photo.brand_id = @brand.id
       @photo.save
@@ -53,6 +54,7 @@ def new
   end
 
 def destroy
+    @brand.brandimage.destroy
     @brand.destroy
 
     redirect_to brands_path
