@@ -18,8 +18,8 @@ gem 'sdoc', '0.4.1', group: :docs
 gem 'autoprefixer-rails'
 # gem 'less-rails-semantic_ui'
 gem 'therubyracer'
-gem 'sprockets', '3.6.3'
-
+# gem 'sprockets', '3.6.3'
+gem 'sprockets-rails', '2.3.3'
 
 gem 'activeadmin', github: "gregbell/active_admin"
 gem "redactor-rails"
