@@ -16,7 +16,7 @@
 <% @orders.each do |order| %>
 <tr>
 <% if @current_user.role == 1 %>
-  <td class="center aligned collapsing order-setting">
+  <td >
     <div class="ui child checkbox">
       <input type="checkbox" name="<%= order.id %>" value="<%= order.id %>">
       <label></label>
