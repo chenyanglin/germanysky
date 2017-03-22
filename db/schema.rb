@@ -141,6 +141,7 @@ ActiveRecord::Schema.define(version: 20170312080751) do
     t.string   "reply",        limit: 255
     t.integer  "status",       limit: 4
     t.string   "account_name", limit: 255
+    t.integer  "user_read",    limit: 1
   end
 
   create_table "order_products", force: :cascade do |t|
