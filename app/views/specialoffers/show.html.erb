@@ -115,9 +115,9 @@ New Products
                 <div class="redShopBtn" style='cursor: pointer;'>已售完</div>
                 <%else%>
             <% if @specialoffer.offertype == "1" %>
-              <div class="shopBtn" style='cursor: pointer;' onClick="optionclick('<%=p.id%>','<%=p.product.name%>','<%=p.price%>','<%=@specialoffer.saleprice%>')">選購</div>
+              <div class="shopBtn" style='cursor: pointer;' onClick="optionclick('<%=p.id%>','<%=p.product.name%>','<%=p.option1%>','<%=p.price%>','<%=@specialoffer.saleprice%>',<%=p.surplus%>)">選購</div>
             <%elsif @specialoffer.offertype == "2" %>
-               <div class="shopBtn" style='cursor: pointer;' onClick="optionclick('<%=p.id%>','<%=p.product.name%>','<%=p.price%>','<%if @specialoffer.discount>10%><%=(p.price*@specialoffer.discount/100.00).round%><%else%><%=(p.price*@specialoffer.discount/10.00).round%><%end%>')">選購</div>
+               <div class="shopBtn" style='cursor: pointer;' onClick="optionclick('<%=p.id%>','<%=p.product.name%>','<%=p.option1%>','<%=p.price%>','<%if @specialoffer.discount>10%><%=(p.price*@specialoffer.discount/100.00).round%><%else%><%=(p.price*@specialoffer.discount/10.00).round%><%end%>',<%=p.surplus%>)">選購</div>
             <%end%>
             <%end%>
 				</div>
@@ -154,30 +154,37 @@ Footer
 <script type="text/javascript">
 
       count=1;
-function optionclick(id,name,orgprice,saleprice) {
+function optionclick(id,name,optionname,orgprice,saleprice,surplus) {
         sum = document.getElementById("sum"+id).value;
         document.getElementById("originalprice").innerHTML=Number(document.getElementById("originalprice").innerHTML)+orgprice*sum;
         document.getElementById("saleprice").innerHTML=Number(document.getElementById("saleprice").innerHTML)+saleprice*sum;
         if (document.getElementById("fieldsum"+id)!=null)
         {
+           if (Number(document.getElementById("fieldsum"+id).innerHTML)+Number(sum)>surplus)
+          {alert("不得大於庫存");}
+          else
+          {
           document.getElementById("fieldsum"+id).innerHTML=Number(document.getElementById("fieldsum"+id).innerHTML)+Number(sum);
           document.getElementById("productcount").innerHTML = Number(document.getElementById("productcount").innerHTML)+Number(sum);
           document.getElementById("hiddenfieldsum"+id).value=Number(document.getElementById("fieldsum"+id).innerHTML)
+           }
         }
         else{
+         
         document.getElementById("productcount").innerHTML = Number(document.getElementById("productcount").innerHTML)+Number(sum);
         var addto = "#select";
         var addRemove = "#field"+(id);
-        var newIn = '<div id="field'+id+'" style="display:inline; value="1"><tr><td><div style="margin:0 auto;display:inline;" >'+name+'</div></td><td><div id="fieldsum'+id+'" style="display:inline;">'+sum+'</div>件</td><input type="hidden" name="[product][option'+id+'][id]" value="'+id+'"><input type="hidden" name="[product][option'+id+'][sum]" id="hiddenfieldsum'+id+'" value="'+sum+'"><input type="hidden" name="[product][option'+id+'][saleprice]" value="'+saleprice+'">';
+        var newIn = '<div id="field'+id+'" style="display:inline; value="1"><tr><td><div style="margin:0 auto;display:inline;" >'+name+'( '+optionname+' ) </div></td><td><div id="fieldsum'+id+'" style="display:inline;">'+sum+'</div>件</td><input type="hidden" name="[product][option'+id+'][id]" value="'+id+'"><input type="hidden" name="[product][option'+id+'][sum]" id="hiddenfieldsum'+id+'" value="'+sum+'"><input type="hidden" name="[product][option'+id+'][saleprice]" value="'+saleprice+'">';
         var newInput = $(newIn);
-        var removeBtn = '<button id="remove' + id + '" class="btn btn-danger remove-me" >-</button></tr></br></div>';
+        var removeBtn = '<button id="remove' + id + '" data-idvalue="'+id+'" class="btn btn-danger remove-me" >-</button></tr><br></div>';
         var removeButton = $(removeBtn);
         $(addto).after(newInput);
         $(addRemove).after(removeButton);
         $("#select").attr('data-source',$(addto).attr('data-source'));
         
             $('.remove-me').click(function(e){
-                var fieldNum = this.id.charAt(this.id.length-1);
+                var fieldNum = $(this).data("idvalue");
+                // var fieldNum = this.id.charAt(this.id.length-1);
                 var fieldID = "#field" + fieldNum;
                 $(this).remove();
                 $(fieldID).remove();

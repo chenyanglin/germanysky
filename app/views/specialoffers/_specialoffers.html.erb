@@ -19,9 +19,9 @@
   <td class="collapsing specialoffer_info not-icon" data-value="<%= specialoffer.id %>"><%= specialoffer.products.size %></td>
  <% if @current_user.present? && @current_user.role == 1 %>
   <td class="collapsing">
-  <button class="ui blue basic button product_edit" data-value="<%= specialoffer.id %>">商品</button>
-    <button class="ui blue basic button specialoffer_edit" data-value="<%= specialoffer.id %>">修改</button>
-    <%= link_to specialoffer, class: 'ui orange basic button specialoffer_del', method: :delete, data:{name: specialoffer.name} do %>
+  <button class="ui orange basic button product_edit" data-value="<%= specialoffer.id %>">商品</button></br>
+    <button class="ui blue basic button specialoffer_edit" data-value="<%= specialoffer.id %>">修改</button></br>
+    <%= link_to specialoffer, class: 'ui red basic button specialoffer_del', method: :delete, data:{name: specialoffer.name} do %>
       刪除
     <% end %>
   </td>
