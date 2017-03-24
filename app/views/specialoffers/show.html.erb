@@ -168,7 +168,7 @@ function optionclick(id,name,orgprice,saleprice) {
         var addRemove = "#field"+(id);
         var newIn = '<div id="field'+id+'" style="display:inline; value="1"><tr><td><div style="margin:0 auto;display:inline;" >'+name+'</div></td><td><div id="fieldsum'+id+'" style="display:inline;">'+sum+'</div>件</td><input type="hidden" name="[product][option'+id+'][id]" value="'+id+'"><input type="hidden" name="[product][option'+id+'][sum]" id="hiddenfieldsum'+id+'" value="'+sum+'"><input type="hidden" name="[product][option'+id+'][saleprice]" value="'+saleprice+'">';
         var newInput = $(newIn);
-        var removeBtn = '<button id="remove' + id + '" class="btn btn-danger remove-me" >-</button></tr></div></br>';
+        var removeBtn = '<button id="remove' + id + '" class="btn btn-danger remove-me" >-</button></tr></br></div>';
         var removeButton = $(removeBtn);
         $(addto).after(newInput);
         $(addRemove).after(removeButton);

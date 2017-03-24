@@ -139,6 +139,7 @@ Footer
         選擇商品
       </div>
     </h1>
+    <input type="hidden" id="offer_id" name="offer_id" value="">
       <div class="ui horizontal divider">Select Product</div>
     <div class="ui stackable one column centered grid">
     <div class="fourteen wide column">
@@ -219,9 +220,10 @@ Footer
 
     function loadProductForm(){
     var selected_type = $("#product_type_select").val();
+    var row_id = document.getElementById("offer_id").value;
     console.log(selected_type);
     $("#product_type_select").addClass("loading");
-    $.get( "/specialoffers/select_product?type="+selected_type, function(html) {
+    $.get( "/specialoffers/select_product?id="+row_id+"&&type="+selected_type, function(html) {
       $("#product_from").empty();
       $("#product_from").append(html);
       $("#product_type_select").removeClass("loading");
@@ -277,7 +279,7 @@ $(function(){
   });
   function show_info(specialoffer_id){
     
-window.location.replace("http://"+location.host+"/specialoffers/"+newsboard_id);
+window.location.replace("http://"+location.host+"/specialoffers/"+specialoffer_id);
   }
   function start_search(){
     var search_string = $("#filter").val();
@@ -319,11 +321,12 @@ window.location.replace("http://"+location.host+"/specialoffers/"+newsboard_id);
     });
   });
 
-    $('body').on('click','.product_edit',function(){
+  $('body').on('click','.product_edit',function(){
     $('.ui.dimmer.main').dimmer('show');
 
     var row_id = $(this).data("value");
     $.get( "/specialoffers/select_product?id="+row_id, function(html) {
+      document.getElementById("offer_id").value = row_id;
       $("#product_from").empty();
       $("#product_from").append(html);
       $('.ui.dimmer.main').dimmer('hide');
