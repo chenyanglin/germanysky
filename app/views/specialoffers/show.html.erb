@@ -48,6 +48,7 @@ New Products
       <%= @specialoffer.name %>
     </div>
   </h1>
+  <input type="hidden" id = "productcount_limit" name="productcount_limit" value="<%=@specialoffer.productcount%>">
   <h2 class="ui center aligned icon header" style="font-size:20px;margin:20px 0 22px 0;">
     <div class="content">
       <% if @specialoffer.offertype == "1" %>
@@ -94,6 +95,7 @@ New Products
 </a>
 				<div class="caption cntr">
 					<p><strong><%= p.product.name %></strong></p>
+          <p><%= p.option1%></p>
 					<p>
 					庫存：<%= p.surplus %></br> 
         	<s>NT ＄ <%= p.price %></s></br>
@@ -115,7 +117,7 @@ New Products
             <% if @specialoffer.offertype == "1" %>
               <div class="shopBtn" style='cursor: pointer;' onClick="optionclick('<%=p.id%>','<%=p.product.name%>','<%=p.price%>','<%=@specialoffer.saleprice%>')">選購</div>
             <%elsif @specialoffer.offertype == "2" %>
-               <div class="shopBtn" style='cursor: pointer;' onClick="optionclick('<%=p.id%>','<%=p.product.name%>','<%=p.price%>','<%=p.price*@specialoffer.discount/10%>')">選購</div>
+               <div class="shopBtn" style='cursor: pointer;' onClick="optionclick('<%=p.id%>','<%=p.product.name%>','<%=p.price%>','<%if @specialoffer.discount>10%><%=p.price*@specialoffer.discount/100%><%else%><%=p.price*@specialoffer.discount/10%><%end%>')">選購</div>
             <%end%>
             <%end%>
 				</div>
@@ -184,7 +186,7 @@ function optionclick(id,name,orgprice,saleprice) {
 }
 function ValidateSize()
 {
-    if (Number(document.getElementById("productcount").innerHTML)<3)
+    if (Number(document.getElementById("productcount").innerHTML)<Number(document.getElementById("productcount_limit").value))
     {
         alert("商品數量不符優惠限制");
         return false;
