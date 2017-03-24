@@ -102,7 +102,7 @@ New Products
           <% if @specialoffer.offertype == "1" %>
           <font color="red"><b>NT ＄ <%= @specialoffer.saleprice %></b></font>
           <%elsif @specialoffer.offertype == "2" %>
-          <font color="red"><b>NT ＄ <%= p.price*@specialoffer.discount/10 %></b></font>
+          <font color="red"><b>NT ＄ <%if @specialoffer.discount>10%><%=(p.price*@specialoffer.discount/100.00).round%><%else%><%=(p.price*@specialoffer.discount/10.00).round%><%end%></b></font>
 					<%end%>
           </p>
 				<select id="sum<%=p.id%>" style="width:100%;">
@@ -117,7 +117,7 @@ New Products
             <% if @specialoffer.offertype == "1" %>
               <div class="shopBtn" style='cursor: pointer;' onClick="optionclick('<%=p.id%>','<%=p.product.name%>','<%=p.price%>','<%=@specialoffer.saleprice%>')">選購</div>
             <%elsif @specialoffer.offertype == "2" %>
-               <div class="shopBtn" style='cursor: pointer;' onClick="optionclick('<%=p.id%>','<%=p.product.name%>','<%=p.price%>','<%if @specialoffer.discount>10%><%=p.price*@specialoffer.discount/100%><%else%><%=p.price*@specialoffer.discount/10%><%end%>')">選購</div>
+               <div class="shopBtn" style='cursor: pointer;' onClick="optionclick('<%=p.id%>','<%=p.product.name%>','<%=p.price%>','<%if @specialoffer.discount>10%><%=(p.price*@specialoffer.discount/100.00).round%><%else%><%=(p.price*@specialoffer.discount/10.00).round%><%end%>')">選購</div>
             <%end%>
             <%end%>
 				</div>
