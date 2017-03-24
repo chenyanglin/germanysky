@@ -224,6 +224,7 @@ def new
   end
 def show
   @product = Product.find(params[:id])#.includes(:product_options)
+
   @messages = @product.product_messages
   @message = ProductMessage.new
   @new_products = Product.includes(:productimages).where(on_store: true).limit(3)

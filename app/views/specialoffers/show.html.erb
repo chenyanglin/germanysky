@@ -61,7 +61,7 @@ New Products
   <%= form_for @specialoffer , :url => add_to_salecart_specialoffers_path,:html => { :onsubmit => "return ValidateSize();" }, method: :post do |f| %>
     <input type="hidden" name="specialoffer_id" value="<%=@specialoffer.id%>">
       <div class="well alert alert-error">
-      已選 <div id="productcount" style="display:inline;">0</div> 樣商品 ｜ 原價 <div id="originalprice" style="display:inline;">0</div> 元 ｜ 折扣價 <div id="saleprice" style="display:inline;">0</div> 元
+      已選 <div id="productcount" style="display:inline;">0</div> 樣商品 ｜ 原價 <div id="originalprice" style="display:inline;text-decoration:line-through;">0</div> 元 ｜ 折扣價 <div id="saleprice" style="display:inline;">0</div> 元
           <p>多種促銷組合優惠！！ <br></p>
                <table>
                <div id="select">您已選擇：</div>
@@ -156,8 +156,10 @@ Footer
       count=1;
 function optionclick(id,name,optionname,orgprice,saleprice,surplus) {
         sum = document.getElementById("sum"+id).value;
-        document.getElementById("originalprice").innerHTML=Number(document.getElementById("originalprice").innerHTML)+orgprice*sum;
-        document.getElementById("saleprice").innerHTML=Number(document.getElementById("saleprice").innerHTML)+saleprice*sum;
+        var total_originalprice = Number(document.getElementById("originalprice").innerHTML)+orgprice*sum;
+        var total_saleprice = Number(document.getElementById("saleprice").innerHTML)+saleprice*sum;
+        document.getElementById("originalprice").innerHTML = total_originalprice;
+        document.getElementById("saleprice").innerHTML = total_saleprice;
         if (document.getElementById("fieldsum"+id)!=null)
         {
            if (Number(document.getElementById("fieldsum"+id).innerHTML)+Number(sum)>surplus)
@@ -174,15 +176,22 @@ function optionclick(id,name,optionname,orgprice,saleprice,surplus) {
         document.getElementById("productcount").innerHTML = Number(document.getElementById("productcount").innerHTML)+Number(sum);
         var addto = "#select";
         var addRemove = "#field"+(id);
-        var newIn = '<div id="field'+id+'" style="display:inline; value="1"><tr><td><div style="margin:0 auto;display:inline;" >'+name+'( '+optionname+' ) </div></td><td><div id="fieldsum'+id+'" style="display:inline;">'+sum+'</div>件</td><input type="hidden" name="[product][option'+id+'][id]" value="'+id+'"><input type="hidden" name="[product][option'+id+'][sum]" id="hiddenfieldsum'+id+'" value="'+sum+'"><input type="hidden" name="[product][option'+id+'][saleprice]" value="'+saleprice+'">';
+        var newIn = '<div id="field'+id+'" style="display:inline; value="1"><tr><td><div style="margin:0 auto;display:inline;" >'+name+'( '+optionname+' ) </div></td><td><div id="fieldsum'+id+'" style="display:inline;">'+sum+'</div>件</td><input type="hidden" name="[product][option'+id+'][id]" value="'+id+'"><input type="hidden" name="[product][option'+id+'][sum]" id="hiddenfieldsum'+id+'" value="'+sum+'"><input id = "saleprice'+id+'" type="hidden" name="[product][option'+id+'][saleprice]" value="'+saleprice+'"><input id = "orgprice'+id+'" type="hidden" value="'+orgprice+'">';
         var newInput = $(newIn);
-        var removeBtn = '<button id="remove' + id + '" data-idvalue="'+id+'" class="btn btn-danger remove-me" >-</button></tr><br></div>';
+        var removeBtn = '<button id="remove' + id + '" data-idvalue="'+id+'" type="button" class="btn btn-danger remove-me" >-</button></tr><br></div>';
         var removeButton = $(removeBtn);
         $(addto).after(newInput);
         $(addRemove).after(removeButton);
         $("#select").attr('data-source',$(addto).attr('data-source'));
         
             $('.remove-me').click(function(e){
+              var fieldNum = $(this).data("idvalue");
+              var count = Number(document.getElementById("fieldsum" + fieldNum).innerHTML);
+              var orgprice = Number(document.getElementById("orgprice" + fieldNum).value);
+              var saleprice = Number(document.getElementById("saleprice" + fieldNum).value);
+              document.getElementById("originalprice").innerHTML = Number(document.getElementById("originalprice").innerHTML) - orgprice*count;
+              document.getElementById("saleprice").innerHTML = Number(document.getElementById("saleprice").innerHTML) - saleprice*count;
+              document.getElementById("productcount").innerHTML=Number(document.getElementById("productcount").innerHTML)-count;
                 var fieldNum = $(this).data("idvalue");
                 // var fieldNum = this.id.charAt(this.id.length-1);
                 var fieldID = "#field" + fieldNum;
