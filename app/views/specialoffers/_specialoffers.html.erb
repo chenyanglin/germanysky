@@ -1,5 +1,12 @@
 <% @specialoffers.each do |specialoffer| %>
 <tr>
+<td>
+<% if specialoffer.offer_image%>
+<div class="item">
+      <img class="ui centered small image" src="<%begin%><%= asset_path specialoffer.offer_image.phourl %><%rescue%><%= asset_path '100px.png' %><%end%>">
+    </div>
+<%end%>
+</td>
 <td class="collapsing specialoffer_info not-icon" data-value="<%= specialoffer.id %>">
 <%= specialoffer.name %>
   </td>

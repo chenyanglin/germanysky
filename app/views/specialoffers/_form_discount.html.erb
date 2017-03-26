@@ -9,12 +9,26 @@
         			<div ><%= f.text_field :name, placeholder: "請輸入優惠名稱" %></div>
       		</div>
       	</div>
+
       	<div class="ui segment">
       		<div class="inline fields">
         	<label >優惠內容：</label><div class="three wide field"><label style="margin:0 auto;">此區商品任選</label></div><div class="two wide field"><%= f.text_field :productcount,onkeyup: "return ValidateNumber($(this),value)" %></div><div class="two wide field"><label style="margin:0 auto;">件，一件打</label></div><div class="two wide field"><%= f.text_field :discount,onkeyup: "return ValidateNumber($(this),value)" %></div><div class="one wide field"><label>折！</label></div>
       		</div>
       	</div>
-
+         <% if @specialoffer.offer_image.present? %>
+        <div class="column" >
+          <% if @specialoffer.offer_image.phourl.present? %>
+            <%= image_tag(@specialoffer.offer_image.phourl, size: "200" ,class: "ui centered rounded image") %><br><br>
+          <% end %>
+        </div>
+      <% end %>
+        <div class="ui segment">
+           <div class="inline field">
+            <label for="field1">上傳圖片 Upload Photo</label>
+                  <div id="field" class="col-md-7"><input id="field1" name="specialoffer[file]" type="file" /></div>
+        <br>
+        </div>
+        </div>
       </div>
 	</div>
     <input type="hidden" id="offertype" name="offertype" value="2">

@@ -46,6 +46,10 @@ end
     end
 
     if @specialoffer.save
+    @photo = OfferImage.new(:upload => params[:specialoffer][:file])
+    @photo.specialoffer_id = @specialoffer.id
+    @photo.save
+    @photo.update(:phourl => "specialoffers/uploads/"+@photo.id.to_s+"/"+@photo.upload_file_name.to_s )
       render :text => "success"
     else
       render :text => "error"
@@ -65,10 +69,21 @@ end
   def update
     if @specialoffer.update(specialoffer_params)
 
-      if @specialoffer.offertype == "1"
+    if @specialoffer.offertype == "1"
         @specialoffer.update(saleprice: params[:specialoffer][:saleprice])
     elsif @specialoffer.offertype == "2"
       @specialoffer.update(saleprice: params[:specialoffer][:discount])
+    end
+    if params[:specialoffer][:file]
+      if @specialoffer.offer_image
+      @offerimage = OfferImage.find(@specialoffer.offer_image.id)
+      @offerimage.destroy
+      end
+      @photo = OfferImage.new(:upload => params[:specialoffer][:file])
+      @photo.specialoffer_id = @specialoffer.id
+      @photo.save
+      @photo.update(:phourl => "specialoffers/uploads/"+@photo.id.to_s+"/"+@photo.upload_file_name.to_s )
+
     end
       render :text => "success"
     else

@@ -47,8 +47,8 @@ Body Section
   </h1>
   <div class="ui horizontal divider">New Order</div>
   <%= form_for(@order) do |f| %>
-   <% if @shoppingcarts.present? %>
-      <% if @shoppingcarts.size != 0 %>
+   <% if @shoppingcarts.present? or @salecarts.present? %>
+      <% if @shoppingcarts.size != 0 or @salecarts.size>0%>
         <div class="infinite-table">
           <table id="order_table" class="ui celled table" style="table-layout:fixed">
             <thead>
@@ -86,9 +86,9 @@ Body Section
 <tr>
   <thead>
         <th colspan="7" >
-    <label>
-        促銷活動訂單
-    </label>
+    <h4>
+        ・促銷商品 ↓
+    </h4>
         </th>
         </thead>
 </tr>

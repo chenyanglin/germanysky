@@ -19,7 +19,7 @@ set :tmp_dir, "/home/chenyang/tmp"
 set :log_level, :debug
 set :keep_releases, 5
 # set :linked_files, %w(config/database.yml config/secrets.yml)
-set :linked_dirs, fetch(:linked_dirs, []).push("bin", "log", "tmp/pids", "tmp/cache", "tmp/sockets", "vendor/bundle", "public/system","app/assets/images/brands/uploads","app/assets/images/products/uploads")
+set :linked_dirs, fetch(:linked_dirs, []).push("bin", "log", "tmp/pids", "tmp/cache", "tmp/sockets", "vendor/bundle", "public/system","app/assets/images/brands/uploads","app/assets/images/products/uploads","app/assets/images/specialoffers/uploads")
 # set :default_env, { path: "~/.rbenv/shims:~/.rbenv/bin:$PATH" }
 
 # rbenv 的設定
