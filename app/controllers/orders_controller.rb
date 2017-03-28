@@ -30,6 +30,7 @@ before_action :set_order, only: [:edit, :update, :destroy,
 
 def new
     @order = Order.new
+    @systemsetting = SystemSetting.find(1)
     @shoppingcarts = Shoppingcart.where('account_id = ?',@current_user.id.to_s)
     @order_price = 0
     @payments = []

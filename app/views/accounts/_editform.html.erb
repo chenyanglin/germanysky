@@ -41,15 +41,17 @@
         <%= f.text_field :address, placeholder: "請輸入地址" %>
       </div>
       <div class="ui segment">
-      
-      <% if @current_user.newsletter_email.status == 1 %>
-              <input type="checkbox" id="newssubscription" name="subscription" checked="checked">
-              <%else%>
-              <input type="checkbox" id="newssubscription" name="subscription">
-              <%end%>
-              是否願意收到電子報
+      <% if @current_user.newsletter_email.present? %>
+        <% if @current_user.newsletter_email.status == 1 %>
+            <input type="checkbox" id="newssubscription" name="subscription" checked="checked">
+        <%else%>
+            <input type="checkbox" id="newssubscription" name="subscription">
+        <%end%>
+      <%else%>
+      <input type="checkbox" id="newssubscription" name="subscription">
+      <%end%>
+        是否願意收到電子報
             </div>
-    
     </div>
     <div>
 

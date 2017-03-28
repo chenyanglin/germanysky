@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
 
-    def current_user
+  def current_user
     if session[:user_id] != nil
       @current_user = Account.find(session[:user_id]) if session[:user_id]
       if @current_user.role != 1
@@ -13,6 +13,11 @@ class ApplicationController < ActionController::Base
       @current_user = nil
     end
     #@current_user ||= User.find_by_auth_token!(cookies[:auth_token]) if cookies[:auth_token]
+  end
+  def manager_account
+    if @current_user.role != 1
+      redirect_to consoles_path
+    end
   end
   def setting
     @brands = Brand.all
