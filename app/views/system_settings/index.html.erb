@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>GermanySky 德心應手</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Bootstrap styles -->
+    <!-- <link href="assets/css/bootstrap.css" rel="stylesheet"/> -->
+    <!-- Customize styles -->
+    <!-- <link href="style.css" rel="stylesheet"/> -->
+    <!-- font awesome styles -->
+	<!-- <link href="assets/font-awesome/css/font-awesome.css" rel="stylesheet"> -->
+		<!--[if IE 7]>
+			<link href="css/font-awesome-ie7.min.css" rel="stylesheet">
+		<![endif]-->
+
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+
+	<!-- Favicons -->
+    <link rel="shortcut icon" href="<%= asset_path 'ico/favicon.ico' %>">
+  </head>
+<body style="background:url('<%= asset_path("white_leather.png") %>') repeat 0 0;">
+<!-- 
+	Upper Header Section 
+-->
+<%= render "common/topbar" %>
+
+<!--
+Lower Header Section 
+-->
+<div class="container">
+<%= render "common/header" %>
+
+<!-- 
+Body Section 
+-->
+
+<h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
+ 
+    <div class="content">
+      系統設定
+    </div>
+  </h1>
+  <div class="ui horizontal divider">System Setting</div>
+  <div class="ui segments" >
+
+<div class = "ui segment">
+
+<%= form_for(@systemsetting) do |f| %>
+<div class="ui stackable one column centered grid">
+  <div class="eight wide column">
+    <div class="ui large form" style="text-align:left;">
+      
+        滿額免運開關：
+        <% if @systemsetting.free_shipping_switch == 1 %>
+              <input type="checkbox" id="switch" name="switch" checked="checked">
+              <%= f.text_field :free_shipping_limit, placeholder: "滿額免運金額", value: @systemsetting.free_shipping_limit,id: 'shipping_limit', class: "field" %>
+            <%else%>
+              <input type="checkbox" id="switch" name="switch">
+              <%= f.text_field :free_shipping_limit, placeholder: "滿額免運金額", value: @systemsetting.free_shipping_limit,id: 'shipping_limit', class: "disabled field" %>
+        <%end%>
+        
+    </div>
+    <br>
+    <div>
+
+
+    <div class="ui divider"></div>
+    <button id="setting_submit" class="ui teal basic button">
+      <i class="write icon"></i>送出
+    </button>
+
+  </div>
+</div>
+
+<% end %>
+</div>
+</div>
+</div>
+
+<!-- 
+Clients 
+-->
+<!--
+Footer
+-->
+<%= render "common/footerbar" %>
+
+  </body>
+</html>
+<script type="text/javascript">
+$("#switch").click(function(){
+
+if ($("#switch").prop('checked') )
+{
+  $("#shipping_limit").removeClass("disabled");
+}else
+{
+  $("#shipping_limit").addClass("disabled");
+}
+});
+$(function(){
+
+  $('form').submit(function() {
+    var valuesToSubmit = $(this).serialize();
+    $("#setting_submit").addClass("loading");
+    console.log($(this).attr('action'));
+    $.ajax({
+        url: $(this).attr('action'), //sumbits it to the given url of the form
+        type: 'POST',
+        processData: false,
+        contentType: false,
+        data: new FormData(this)
+    }).success(function(upload_result){
+        console.log(upload_result);
+        if(upload_result == "success" ){
+          window.location.replace("http://"+location.host+"/system_settings");
+        }
+    }).fail(function(e) {
+        console.log(e);
+    }).done(function(){
+      $("#setting_submit").removeClass("loading");
+    });
+    return false; // prevents normal behaviour
+  });
+});
+
+function ValidateNumber(e, pnumber)
+{
+    if (!/^\d+$/.test(pnumber))
+    {
+        $(e).val(/^\d+/.exec($(e).val()));
+    }
+    return false;
+}
+</script>
