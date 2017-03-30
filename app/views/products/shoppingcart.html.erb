@@ -45,7 +45,7 @@ Body Section
       購物車
     </div>
   </h1>
-<% if @shoppingcarts.size > 0 or @salecarts.size > 0%>
+<% if @shoppingcarts.present? or @salecarts.present?%>
         <div class="infinite-table">
           <table id="products_table" class="ui celled table" style="table-layout:fixed">
             <thead>
