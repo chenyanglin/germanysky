@@ -89,34 +89,44 @@ New Products
 			<div class="item active">
 			  <ul class="thumbnails">
 			  <% @new_products.each do |p|%>
+			  		<% surplus = 0%>
+		<% if p.product_options.size > 1 %>
+    		<% price = [] %>
+    		<% p.product_options.each do |o| %>
+    			<% surplus += o.surplus %>
+    			<% price << o.price %>
+      		<%end%>
+       	<% else %>
+    		<% price = p.product_options.first.price %>
+    		<% surplus  = p.product_options.first.surplus %>
+    	<% end %>
 				<li class="span3">
 				<div class="thumbnail">
 					<a class="zoomTool" href="/products/<%=p.id%>" title="add to cart"><i class="search icon"></i>前往商品</a>
 					<a href="#" class="tag" style ="background:url('<%= asset_path("new.png") %>') no-repeat 0 0;"></a>
 					<a href="/products/<%=p.id%>"><img style='height: 200px; width: 150px; object-fit: contain' src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt="bootstrap-ring"></a>
+					<div class="caption cntr">
+					  <div style="font-size:16px;">
+					    <%= p.name %>
+					  </div>
+					<p></p>
+					<p>
+					<% if p.product_options.size>1 %>
+        				NT ＄ <%= price.min %>~<%=price.max %>
+  					<%else%>
+        				NT ＄ <%= price %>
+  					<%end%></strong></p>
+					
+					<br class="clr">
+				</div>
 				</div>
 				</li>
 				<%end%>
 			  </ul>
 			  </div>
-		   <div class="item">
-		  <ul class="thumbnails">
-		  <% if @last_products.present? %>
-		  <% @last_products.each do |p|%>
-			<li class="span3">
-			  <div class="thumbnail">
-				<a class="zoomTool" href="/products/<%=p.id%>" title="add to cart"><i class="search icon"></i>前往商品</a>
-				<a  href="/products/<%=p.id%>"><img style='height: 200px; width: 150px; object-fit: contain' src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt=""></a>
-			  </div>
-			</li>
-			<%end%>
-			<%end%>
-			
-		  </ul>
-		  </div>
+
 		   </div>
-		  <a class="left carousel-control" href="#newProductCar" data-slide="prev">&lsaquo;</a>
-          <a class="right carousel-control" href="#newProductCar" data-slide="next">&rsaquo;</a>
+
 		  </div>
 		  </div>
 		  <h3>熱銷商品</h3>
@@ -171,11 +181,9 @@ New Products
 				<a  href="product_details.html"><img src="<%= asset_path 'a.jpg' %>" alt=""></a>
 				<div class="caption">
 				  <h5>測試商品</h5>
-				  <h4>
-					  <a class="defaultBtn" href="product_details.html" title="Click to view"><span class="icon-zoom-in"></span></a>
-					  <a class="shopBtn" href="#" title="add to cart"><span class="icon-plus"></span></a>
-					  <span class="pull-right">$99</span>
-				  </h4>
+				  <div class="caption">
+				  <h4><a class="defaultBtn" href="product_details.html">VIEW</a> <span class="pull-right">$99</span></h4>
+				</div>
 				</div>
 			  </div>
 			</li>
@@ -185,11 +193,9 @@ New Products
 				<a  href="product_details.html"><img src="<%= asset_path 'a.jpg' %>" alt=""></a>
 				<div class="caption">
 				  <h5>測試商品</h5>
-				  <h4>
-					  <a class="defaultBtn" href="product_details.html" title="Click to view"><span class="icon-zoom-in"></span></a>
-					  <a class="shopBtn" href="#" title="add to cart"><span class="icon-plus"></span></a>
-					  <span class="pull-right">$99</span>
-				  </h4>
+				 <div class="caption">
+				  <h4><a class="defaultBtn" href="product_details.html">VIEW</a> <span class="pull-right">$99</span></h4>
+				</div>
 				</div>
 			  </div>
 			</li>
@@ -199,11 +205,9 @@ New Products
 				<a  href="product_details.html"><img src="<%= asset_path 'a.jpg' %>" alt=""/></a>
 				<div class="caption">
 				  <h5>測試商品</h5>
-				  <h4>
-					  <a class="defaultBtn" href="product_details.html" title="Click to view"><span class="icon-zoom-in"></span></a>
-					  <a class="shopBtn" href="#" title="add to cart"><span class="icon-plus"></span></a>
-					  <span class="pull-right">$22.00</span>
-				  </h4>
+				 <div class="caption">
+				  <h4><a class="defaultBtn" href="product_details.html">VIEW</a> <span class="pull-right">$99</span></h4>
+				</div>
 				</div>
 			  </div>
 			</li>
