@@ -28,7 +28,37 @@
 //= require bootstrap/dropdown
 //= require bootstrap/alert
 
+ $("#search_go").click(function(){
+    start_search();
+  });
 
+  $(document).on('keypress', function(e) {
+    if(e.which == 13) {
+      start_search();
+    }
+  });
+
+  $( "#filter" ).focus(function() {
+    search_msg.popup('hide');
+  });
+
+  function start_search(){
+    var search_string = $("#filter").val();
+    if(search_string == ""){
+      search_msg.popup('toggle');
+    }else{
+      var target_url = "";
+      if(window.location.href == "http://"+location.host+""){
+        target_url = window.location.href+"?filter="+search_string;
+      }else if(window.location.href.indexOf('filter') > -1){
+        target_url = "http://"+location.host+"/accountlevels?filter="+search_string;
+      }else{
+        target_url = window.location.href+"&filter="+search_string;
+      }
+      window.location.replace(target_url);
+    }
+  }
+  
 $(document).ready(function() {
   $('#product_manage').popup({
     inline   : true,

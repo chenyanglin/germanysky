@@ -19,6 +19,8 @@ Rails.application.routes.draw do
       post :fblogin
       post :googlelogin
       post :signin
+      get :index_old
+      get :abc
       get :logout
       get :aboutus
       get :test

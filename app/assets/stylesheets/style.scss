@@ -57,20 +57,20 @@ hr.soften {margin: 8px 0;background: #DDD;}
 .navbar .nav , .marginLess{margin:0}
 .navbar-search .search-query {padding: 4px 14px;-moz-border-radius: 1px;-webkit-border-radius: 1px;border-radius: 1px;line-height: 1.5em; min-width: 200px;}
 .navbar-search{margin-left:6px;}
-.main_menu_area{overflow:visible; background:#0D0E0F; min-height:55px}
+.main_menu_area{overflow:visible; background:#1B1C1D; min-height:55px}
 .main_menu_area ul{margin:0; padding:0; list-style:none}
 .main_menu_area ul li{float:left; position:relative}
 .main_menu_area ul li a{color:#FFF; display:block; font-family:'bebasregular'; font-size:15px; padding:18px 18.7px}
 .main_menu_area ul li a:hover{background:#CF0000}
 #nav li ul{transition:all 0.3s ease 0s; -moz-transition:all 0.3s ease 0s; -webkit-transition:all 0.3s ease 0s; -o-transition:all 0.3s ease 0s; -ms-transition:all 0.3s ease 0s}
 /* dropdown css level one*/
-.main_menu_area ul li ul{background:none repeat scroll 0 0 #0D0E0F; top:100px; position:absolute; width:215px; z-index:99999; right:-99999px}
+.main_menu_area ul li ul{background:none repeat scroll 0 0 #1B1C1D; top:100px; position:absolute; width:215px; z-index:99999; right:-99999px}
 .main_menu_area ul li ul li{float:none; position:relative}
 .main_menu_area ul >li:hover >ul{left:0px; top:49px}
 .main_menu_area ul li ul li a{font-family:arial; font-weight:bold}
 .main_menu_area ul li ul li a:hover{}
 /* dropdown css level two*/
-.main_menu_area ul li ul li ul{background:none repeat scroll 0 0 #0D0E0F; right:215px; position:absolute; width:215px; z-index:99999; right:-99999px}
+.main_menu_area ul li ul li ul{background:none repeat scroll 0 0 #1B1C1D; right:215px; position:absolute; width:215px; z-index:99999; right:-99999px}
 .main_menu_area ul li ul li ul li{float:none}
 .main_menu_area ul li ul li:hover ul{left:215px !important; top:0px}
 .main_menu_area ul li ul li ul li a{font-family:arial; font-weight:bold}

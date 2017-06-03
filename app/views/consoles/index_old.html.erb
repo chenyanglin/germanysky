@@ -2,14 +2,143 @@
 a{text-decoration:none;}
 a:hover{text-decoration:underline;}
 </style>
-<div class="ui container">
-	<h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
- 
+  <script>
+  $(document)
+    .ready(function() {
+
+      // fix menu when passed
+      $('.masthead')
+        .visibility({
+          once: false,
+          onBottomPassed: function() {
+            $('.fixed.menu').transition('fade in');
+          },
+          onBottomPassedReverse: function() {
+            $('.fixed.menu').transition('fade out');
+          }
+        })
+      ;
+
+      // create sidebar and attach to menu open
+      $('.ui.sidebar')
+        .sidebar('attach events', '.toc.item')
+      ;
+
+    })
+  ;
+  </script>
+
+<!-- Sidebar Menu -->
+<div class="ui vertical inverted sidebar menu">
+
+</div>
+<!-- Page Contents -->
+<div class="pusher">
+
+  <div class="ui inverted vertical masthead center aligned segment">
+      	<h1 class="ui right header" style="font-size:26px;margin:10px 1000px 0px 20px;">
 	  <div class="content">
 	    Germanysky 徳心應手
 	  </div>
 	</h1>
-<div class="ui two stackable cards" >
+<div class="alignR" style="margin-right:20px;margin-top:-30px;">
+	<% if @current_user.present? && @current_user.role!=1%>
+    <a class="inline item" href="/products/shoppingcart" data-html="<%if @barcarts.size>0 %>
+    您的購物車商品列表<br>
+    <div class='divider'></div>
+    <table class='striped table'>
+    <%@cartprice=0%>
+    <%@barcarts.each do |b| %>
+    <tr>
+    <tr>
+    <td class='graybg'>
+    <img class='ui centered mini image' src='<%= asset_path '100px.png' %>' style='height: 40px; width: 40px; object-fit: contain'>
+    </td>
+    </tr>
+    <td>
+    <tr class='graybg'>
+    <%=b.product.name%>
+    </tr>
+    <tr class='graybg'>數量：<%=b.sum %></tr>
+    <tr class='graybg'>價格：<%=b.product_option.price*b.sum%>
+    <%@cartprice += b.product_option.price*b.sum%>
+    </tr>
+    </td></tr><br>
+    <%end%>
+    </table>
+    <div class='divider'></div>
+    總價：<%=@cartprice%>
+    <%else%>購物車是空的<%end%>">
+        <a href="/products/shoppingcart"><i class="shipping icon"></i>購物車<span class="badge badge-warning"><%if @catrprice.present? %>$<%=@cartprice%><%end%></span></a>
+      </a>
+      <%end%>
+      <% if @current_user.present? %>
+      <% if @current_user.role==1 %>
+      <button class="ui inverted tiny button"><i class="user icon"></i>購物車</button>
+      <button class="ui inverted tiny button" onclick="location.href='/accounts/myaccount'"><i class="user icon"></i>會員中心</button>
+      <%else%>
+      <button class="ui inverted tiny button" onclick="location.href='/accounts/myaccount'"><i class="user icon"></i>會員中心</button>
+      <%end%>
+      <button class="ui inverted tiny button" onclick="location.href='/consoles/logout'"><i class="user icon"></i>登出</button>
+      <% else %>
+      <button class="ui inverted tiny button" onclick="location.href='/consoles/login'"><i class="user icon"></i>登入/註冊</button>
+      <% end %>
+	</div>
+     <div class="main_menu_area" style="margin:15px 0px -15px 50px;">
+      <ul >
+        <li><a href="/">首頁</a></li>
+        <li><a href="/newsboards">公佈欄設定</a></li>
+        <li><a >商品管理</a>
+          <ul>
+            <li><a href="/products/console_index">商品管理</a></li>
+            <li><a href="/products/outofstock">缺貨管理</a></li>
+            <li><a href='/specialoffers'>促銷管理</a></li>
+          </ul>
+          </li>
+        <li><a>分類與品牌</a>
+          <ul>
+            <li><a href="/type_ones">分類管理</a></li>
+            <li><a href="/brands">品牌管理</a></li>
+          </ul>
+          </li>
+        <li><a>付款與運送</a>
+          <ul>
+            <li><a href="/payments">付款管理</a></li>
+            <li><a href="/deliveries">運送管理</a></li>
+          </ul>
+        </li>
+        <li><a href="/orders">訂單管理</a></li>
+        <li><a >使用者管理</a>
+          <ul>
+            <li><a href="/accounts">會員管理</a></li>
+            <li><a href="/account_levels">等級管理</a></li>
+            <li><a href="/messages">問答管理</a></li>
+          </ul>
+        </li>
+        <li><a href="/newsletters">電子報發送</a></li>
+        <li><a href="/system_settings">系統設定</a></li>
+      </ul>
+  </div>
+<div class="ui item pull-right" style="margin-top:-25px; ">
+              <input id="filter" type="text" placeholder="商品搜尋">
+              <i id="search_go" class="search link icon"></i>
+          </div>
+  </div>
+
+
+ <div class="banner">
+        <ul class="">
+            <li><a href=""><img src="<%= asset_path 'mymytw.png' %>" style='height: 300px; width:100%; object-fit: contain' alt=""></a></li>
+            <li><a href=""><img src="<%= asset_path 'mymytw.png' %>" style='height: 300px; width:100%; object-fit: contain' alt=""></a></li>
+            <li><a href=""><img src="<%= asset_path 'mymytw.png' %>" style='height: 300px; width:100%; object-fit: contain' alt=""></a></li>
+            <li><a href=""><img src="<%= asset_path 'mymytw.png' %>" style='height: 300px; width:100%; object-fit: contain' alt=""></a></li>
+        </ul>
+        <div class="left-btn"></div>
+        <div class="right-btn"></div>
+        <!-- <div class="img-btn-list"></div> -->
+    </div>
+
+<!-- <div class="ui two stackable cards" >
 
 <div class="ui grey card">
   <div class="content">
@@ -34,138 +163,169 @@ a:hover{text-decoration:underline;}
 	</div>
 </div>
 
-</div>
+</div> -->
 
-<% if @product.present? %>
-<div class="ui four stackable link cards" >
-<% if @product.first.present? %>
-	<div id="first_card" class="card">
-			<div class="content" >
+<div class="ui four stackable cards" style="margin:0px 0px 0px 0px;">
+
+	<div id="first_card" class="card" >
+			<div class="extra content" >
 				<div class="header">
-	   				<h2 class="site-font ui blue header"><i class="shopping basket icon"></i><%= @product.first.name %></h2>
+	   				<h3 class="site-font ui header"><i class="announcement icon"></i>最新消息</h3>
 	      		</div>
 	      	<div class="divider"></div>
-			</div>
-		
-	    <div class="content">
-	      <div class="center aligned description">
-		      <div class="ui statistic">
-					  <div class="item">
-					  
-      				<img class="ui centered small image" src="<%= asset_path '100px.png' %>" style='height: 140px; width: 120px; object-fit: contain' >
-    					</div>
-				</div>
-
+	      	</div>
+	   <div class="content" >
+	      <div class="left aligned description">
+		    <div class="ui statistic">
+				<div class="item">
+					<% if @newsboards.present? %>
+  						<% @newsboards.each do |n| %>
+  							<div id="<%= n.id %>">
+   							<i class="browser icon"></i><a href="/newsboards/<%=n.id%>" class="AutoNewline"><%= n.title %></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font size="0.5"><span ><%= n.created_at.strftime("%Y-%m-%d") %></span></font>
+    						</div>
+    					</br>
+    					<div class="divider"></div>
+    					<%end%>
+					<%end%>
+    			</div>
+		</div>
 	      </div>
 	    </div>
-	    <a id="first_btn"  href="/products/<%= @product.first.id %>" class="large ui bottom attached blue button">
-	      <i class="chevron circle right icon"></i>查看商品
-	    </a>
+	 </div>
+
+	<div id="second_card" class="card">
+		<div class="extra content" >
+			<div class="header">
+	   				<h3 class="site-font ui header"><i class="announcement icon"></i>最新商品</h3>
+	      		</div>
+			</div>
+			<div class="divider"></div>
+			
+		<% if @product.present? %>
+<div class="ui two stackable link cards" style="margin:0px 0px 0px 0px;">
+<% if @product.first.present? %>
+	<div id="first_card" class="card">
+
+	      <div class="center aligned description">
+
+      				<img  src="<%= asset_path '100px.png' %>" style='object-fit: contain' ><br>
+      				<%= @product.first.name %>
+    	</div>
+    					
+				
+	    
 	 </div>
 <%end%>
 <% if @product.second.present? %>
-	  <div id="second_card" class="card">
-		  <div class="content">
-		  	<div class="header">
-	      	<h2 class="site-font ui orange header"><i class="shopping basket icon"></i><%= @product.second.name %></h2>
-	      </div>
-	      <div class="divider"></div>
-		  </div>
-	    <div class="content">
-	    
-	      <div class="center aligned description">
-		      <div class="ui statistic">
-					  <div class="item">
-					  
-      <img class="ui centered small image" src="<%= asset_path '100px.png' %>" style='height: 140px; width: 120px; object-fit: contain'>
-    </div>
-					</div>
+	<div id="second_card" class="card">
 
-	      </div>
-	    </div>
-	    <a id="second_btn" href="/products/<%= @product.second.id %>" class="large ui bottom attached orange button">
-	      <i class="chevron circle right icon"></i>
-	      查看商品
-	    </a>
-	  </div>
+	      <div class="center aligned description">
+
+      				<img src="<%= asset_path '100px.png' %>" style='object-fit: contain' ><br><%= @product.second.name %>
+    					</div>
+    			
+	 </div>
 <%end%>
 <% if @product.third.present? %>
-	 <div id="third_card" class="card">
-	  	<div class="content">
-	  		<div class="header">
-	  			<h2 class="site-font ui green header">
-		  			<i class="shopping basket icon"></i>
-			      
-		       		<%= @product.third.name %>
-		      
-       		</h2>
-				</div>
-				<div class="divider"></div>
-	  	</div>
-	    <div class="content">
-	    
+	<div id="third_card" class="card">
 	      <div class="center aligned description">
-		      <div class="ui statistic">
-					   <div class="item">
-					  
-      <img class="ui centered small image" src="<%= asset_path '100px.png' %>" style='height: 140px; width: 120px; object-fit: contain'>
-    </div>
-</div>
-	      </div>
-	    </div>
-	    <a id="third_btn" href="/products/<%= @product.third.id %>" class="large ui bottom attached green button">
-	      <i class="chevron circle right icon"></i>
-	      查看商品
-	    </a>
-	  </div>
-	  <%end%>
+
+      				<img src="<%= asset_path '100px.png' %>" style='object-fit: contain' ><br>
+    					<%= @product.third.name %>
+				</div>
+
+	 </div>
+<%end%>
 	  <% if @product.fourth.present? %>
-	  <div id="fourth_card" class="card">
-	  	<div class="content">
-	  		<div class="header">
-	  			<h2 class="site-font ui yellow header">
-		  			<i class="shopping basket icon"></i>
-			      
-		       		<%= @product.fourth.name %>
-		      
-       		</h2>
-				</div>
-				<div class="divider"></div>
-	  	</div>
-	    <div class="content">
-	    
+	<div id="fourth_card" class="card">
+
 	      <div class="center aligned description">
-		      <div class="ui statistic">
-					   <div class="item">
-					   
-    <img class="ui centered small image" src="<%= asset_path '100px.png' %>" style='height: 140px; width: 120px; object-fit: contain'> 
-    </div>
-</div>
+      				<img src="<%= asset_path '100px.png' %>" style='object-fit: contain' ><br><%= @product.fourth.name %>
+				
 	      </div>
-	    </div>
-	    <a id="fourth_btn" href="/products/<%= @product.fourth.id %>" class="large ui bottom attached yellow button">
-	      <i class="chevron circle right icon"></i>
-	      查看商品
-	    </a>
-	  </div>
-	  <%end%>
+	  
+	 </div>
+<%end%>
 </div>
 <%end%>
-<br></br>
-<div class="ui right labeled left icon input">
-  <i class="tags icon"></i>
-  <input id="newsletter_email" type="text" placeholder="Enter email">
- <button class="ui primary button" id="subscription">
-  訂閱電子報
-</button>
-</div>
+	</div>
+	<div id="third_card" class="card">
+			
+
+  <div class="content">
+  <div class="center aligned header" style="background-color:powderblue;" >
+    <h3 class="site-font ui header">優惠活動</h3>
+    <div class="sub header">多種促銷組合優惠！！</div>
+    <button class="ui tiny red button" onclick="location.href='/specialoffers'" style="margin-top:20px;">Click here</button>
+    </div>
+  </div>
+
+			
+<div class="divider"></div>
+
+
+  <div class="content">
+  <div class="center aligned header">
+    <h3 class="site-font ui header">訂閱電子報</h3>
+    <div class="sub header">接收最新商品與優惠通知</div>
+    <input id="newsletter_email" type="text" placeholder="Enter email"><br>
+ 	<a class="ui primary small button" id="subscription" height="2">訂閱</a>
+ 	</div>
+  </div>
+
 
 </div>
+	<div id="fourth_card" class="card">
+		<div class="extra content" >
+			<div class="header">
+	   				<h3 class="site-font ui header"><i class="announcement icon"></i>關於我們</h3>
+	      		</div>
+			</div>
+			<div class="divider"></div>
+	<div class="content" >
+代購服務秉持的信念是 對客戶認真負責 價格要求平實不浮誇 有跟過我們團的人都知道 所以會介紹親朋好友一起來購買-- 大家能以平時的價格 買到德國的好物 沒有來過的 歡迎也來試試看喔
+</div>
+	</div>
+	</div>
 
 
 <script type="text/javascript">
 
+bannerListFn(
+    $(".banner"),
+    $(".img-btn-list"),
+    $(".left-btn"),
+    $(".right-btn"),
+    3000,
+    true
+);
 
+ $("#search_go").click(function(){
+    start_search();
+  });
+
+  $(document).on('keypress', function(e) {
+    if(e.which == 13) {
+      start_search();
+    }
+  });
+
+  function start_search(){
+    var search_string = $("#filter").val();
+    if(search_string == ""){
+      search_msg.popup('toggle');
+    }else{
+      var target_url = "";
+      if(window.location.href == "http://"+location.host+"/products"){
+        target_url = window.location.href+"?filter="+search_string;
+      }else if(window.location.href.indexOf('filter') > -1){
+        target_url = "http://"+location.host+"/products?filter="+search_string;
+      }else{
+        target_url = "http://"+location.host+"/products?filter="+search_string;
+      }
+      window.location.replace(target_url);
+    }
+  }
 
 $(function(){
 	$("#first_card").click(function(){
@@ -203,7 +363,3 @@ $("#test").click(function(){
   });
 
 </script>
-
-
-
-

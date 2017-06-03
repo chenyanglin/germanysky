@@ -140,6 +140,11 @@ label {
     font-size:85%
 }
 
+.AutoNewline
+{
+word-break: break-all;/*必須*/
+}
+
 //---navbar
 #radioBtn .notActive{
     color: #3276b1;
