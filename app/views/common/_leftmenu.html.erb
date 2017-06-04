@@ -2,7 +2,7 @@
 <div id="sidebar" class="span3">
 
 <div class="well well-small">
-	<ul class="nav nav-list">
+
 		<li><h4>分類</h4></li>
 		<% @type_ones.each do |t| %>
 		<li><a href="/products?type=<%=t.id%>" style="padding-left:50px;">．<%= t.name %></a></li>
@@ -16,7 +16,7 @@
 		<% if @current_user.present? && @current_user.role!=1%>
 		<li> <a class="totalInCart" href="/products/shoppingcart"><strong>購物車金額  <span class="badge badge-warning pull-right" style="line-height:18px;"><%if @cartprice.present? %>$<%=@cartprice%><%else%>沒有商品<%end%></span></strong></a></li>
 		<%end%>
-	</ul>
+	
 </div>
 
 <div class="well well-small alert alert-info" >

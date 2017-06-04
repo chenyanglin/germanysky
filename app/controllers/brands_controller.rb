@@ -1,5 +1,6 @@
 class BrandsController < ApplicationController
 before_filter :current_user
+before_filter :setting
 before_action :set_brand, only: [:edit, :update, :destroy]
 	def index
 		    @brands = Brand.all
