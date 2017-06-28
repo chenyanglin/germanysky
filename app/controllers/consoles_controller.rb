@@ -1,5 +1,5 @@
 class ConsolesController < ApplicationController
-  before_filter :current_user, :only => [:index,:index_old,:notice,:aboutus]
+  before_filter :current_user, :only => [:index,:index_old,:index_new,:notice,:aboutus]
   before_filter :setting
 	def index
 		# @console_user ||= ManagerAccount.find(1)
@@ -11,6 +11,16 @@ class ConsolesController < ApplicationController
     @new_products = @new_products[0..3]
     @hotsale_products = @new_products[0..2]
 	end
+  def index_new
+    # @console_user ||= ManagerAccount.find(1)
+    @product = Product.includes(:productimages).where(on_store: true).limit(4)
+    @product = @product.order("created_at desc")
+    @new_products = Product.includes(:productimages).where(on_store: true).limit(8)
+    @new_products = @new_products.order("created_at desc")
+    @last_products = @new_products[4..8]
+    @new_products = @new_products[0..3]
+    @hotsale_products = @new_products[0..2]
+  end
   def abc
   end
     def index_old

@@ -11,22 +11,27 @@
 // about supported directives.
 //
 
-//= require jquery
-//= require jquery_ujs
 //= require react
 //= require react_ujs
 //= require components
 //= require redactor-rails
-//= require_tree
+//= require base/jquery.js
+//= require base/bootstrap.js
+//= require base/card-payment.js
+//= require base/icheck.js
+//= require base/ionrangeslider.js
+//= require base/jqzoom.js
+//= require base/magnific.js
+//= require base/owl-carousel.js
+//= require base/custom.js
+//= require semantic-ui
+//= require_tree .
 //= require jquery.infinite-pages
 //= require jquery-fileupload
 //= require smart_listing
 //= require js.cookie
-//= require semantic-ui
 //= require clipboard
 //= require shop
-//= require bootstrap/dropdown
-//= require bootstrap/alert
 
  $("#search_go").click(function(){
     start_search();

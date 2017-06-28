@@ -20,6 +20,7 @@ Rails.application.routes.draw do
       post :googlelogin
       post :signin
       get :index_old
+      get :index_new
       get :abc
       get :logout
       get :aboutus
@@ -150,6 +151,11 @@ Rails.application.routes.draw do
   end
     resources :system_settings do
      collection do
+    end
+  end
+    resources :hcolors do
+     collection do
+      get :zhongxiao
     end
   end
   # The priority is based upon order of creation: first created -> highest priority.
