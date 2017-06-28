@@ -24,6 +24,7 @@ gem 'sprockets-rails', '2.3.3'
 gem 'activeadmin', github: "gregbell/active_admin"
 gem "redactor-rails"
 gem "uploader"
+gem "css_splitter" ,'0.4.3'
 
 # gem 'rmagick'
 # gem 'rails_12factor'
