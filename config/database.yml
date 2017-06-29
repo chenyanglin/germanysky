@@ -20,28 +20,7 @@ development:
   # username: root
   # password: "iii"
 
-  # #chenyang local
-  # database: germanysky
-  # host: localhost
-  # username: root
-  # password: "iii"
-
-  # #Linode
-  adapter: mysql2
-  encoding: utf8mb4
-  database: germanysky
-  host: localhost
-  username: root
-  password: 771205
-
-production:
-  <<: *default
-  ##Heroku
-  # adapter: postgresql
-  # encoding: utf8
-  # pool: 5
-
-  # #chenyang local
+  #chenyang local
   database: germanysky
   host: localhost
   username: root
@@ -54,3 +33,24 @@ production:
   # host: localhost
   # username: root
   # password: 771205
+
+production:
+  <<: *default
+  ##Heroku
+  # adapter: postgresql
+  # encoding: utf8
+  # pool: 5
+
+  # #chenyang local
+  # database: germanysky
+  # host: localhost
+  # username: root
+  # password: "iii"
+
+  #Linode
+  adapter: mysql2
+  encoding: utf8mb4
+  database: germanysky
+  host: localhost
+  username: root
+  password: 771205
