@@ -460,7 +460,6 @@ DEPENDENCIES
   redactor-rails
   rmagick (~> 2.15, >= 2.15.2)
   rolify (= 4.1.1)
-  sass-rails
   sdoc (= 0.4.1)
   semantic-ui-sass!
   smart_listing

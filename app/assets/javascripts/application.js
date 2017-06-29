@@ -28,7 +28,6 @@
 //= require_tree .
 //= require jquery.infinite-pages
 //= require jquery-fileupload
-//= require smart_listing
 //= require js.cookie
 //= require clipboard
 //= require shop
