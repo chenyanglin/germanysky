@@ -150,6 +150,7 @@
         <a href="/products/shoppingcart"><i class="shipping icon"></i>購物車<span class="badge badge-warning"><%if @catrprice.present? %>$<%=@cartprice%><%end%></span></a>
       </a>
       <%end%>
+      <% if @current_user.present? && @current_user.role!=1%>
                 <li class="dropdown"><a href="/products/shoppingcart"><span >購物車</span><i class="fa fa-shopping-cart"></i><% @barcarts.size %>件商品</a>
                     <ul class="dropdown-menu dropdown-menu-shipping-cart">
                         <%@cartprice=0%>
@@ -172,6 +173,7 @@
                         </li>
                     </ul>
                 </li>
+                <%end%>
                 <div class="navbar-header">
                     <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-nav-collapse" area_expanded="false"><span class="sr-only">Main Menu</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
                     </button>
