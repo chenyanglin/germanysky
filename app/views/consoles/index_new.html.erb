@@ -117,53 +117,58 @@
                 <a class="fa fa-search navbar-main-search-submit" href="#"></a>
             </form>
             <ul class="nav navbar-nav navbar-right navbar-mob-item-left">
-                <li><a href="#nav-login-dialog" data-effect="mfp-move-from-top" class="popup-text"><span >Hello, Sign in</span>Your Account</a>
+                <li><a href="#nav-login-dialog" data-effect="mfp-move-from-top" class="popup-text"><span >Hello！</span>請登入</a>
                 </li>
-                <li class="dropdown"><a href="shopping-cart.html"><span >Your Cart</span><i class="fa fa-shopping-cart"></i> 3 Items</a>
+
+                <% if @current_user.present? && @current_user.role!=1%>
+    <a class="inline item" href="/products/shoppingcart" data-html="<%if @barcarts.size>0 %>
+    您的購物車商品列表<br>
+    <div class='divider'></div>
+    <table class='striped table'>
+    <%@cartprice=0%>
+    <%@barcarts.each do |b| %>
+    <tr>
+    <tr>
+    <td class='graybg'>
+    <img class='ui centered mini image' src='<%= asset_path '100px.png' %>' style='height: 40px; width: 40px; object-fit: contain'>
+    </td>
+    </tr>
+    <td>
+    <tr class='graybg'>
+    <%=b.product.name%>
+    </tr>
+    <tr class='graybg'>數量：<%=b.sum %></tr>
+    <tr class='graybg'>價格：<%=b.product_option.price*b.sum%>
+    <%@cartprice += b.product_option.price*b.sum%>
+    </tr>
+    </td></tr><br>
+    <%end%>
+    </table>
+    <div class='divider'></div>
+    總價：<%=@cartprice%>
+    <%else%>購物車是空的<%end%>">
+        <a href="/products/shoppingcart"><i class="shipping icon"></i>購物車<span class="badge badge-warning"><%if @catrprice.present? %>$<%=@cartprice%><%end%></span></a>
+      </a>
+      <%end%>
+                <li class="dropdown"><a href="/products/shoppingcart"><span >購物車</span><i class="fa fa-shopping-cart"></i><% @barcarts.size %>件商品</a>
                     <ul class="dropdown-menu dropdown-menu-shipping-cart">
+                        <%@cartprice=0%>
+                            <%@barcarts.each do |b| %>
                         <li>
                             <a class="dropdown-menu-shipping-cart-img" href="#">
-                                <img src="img/100x100.png" alt="Image Alternative text" title="Image Title" />
+                                <img src="<%= asset_path '100px.png' %>" alt="Image Alternative text" title="Image Title" />
                             </a>
                             <div class="dropdown-menu-shipping-cart-inner">
-                                <p class="dropdown-menu-shipping-cart-price">$19</p>
-                                <p class="dropdown-menu-shipping-cart-item"><a href="#">Gucci Patent Leather Open Toe Platform</a>
+                                <p class="dropdown-menu-shipping-cart-price">數量：<%=b.sum %> $<%=b.product_option.price*b.sum%></p>
+                                <p class="dropdown-menu-shipping-cart-item"><a href="#"><%=b.product.name%></a>
                                 </p>
                             </div>
                         </li>
+                               <%@cartprice += b.product_option.price*b.sum%>
+                               <%end%>
                         <li>
-                            <a class="dropdown-menu-shipping-cart-img" href="#">
-                                <img src="img/100x100.png" alt="Image Alternative text" title="Image Title" />
-                            </a>
-                            <div class="dropdown-menu-shipping-cart-inner">
-                                <p class="dropdown-menu-shipping-cart-price">$74</p>
-                                <p class="dropdown-menu-shipping-cart-item"><a href="#">Nikon D5200 24.1 MP Digital SLR Camera</a>
-                                </p>
-                            </div>
-                        </li>
-                        <li>
-                            <a class="dropdown-menu-shipping-cart-img" href="#">
-                                <img src="img/100x100.png" alt="Image Alternative text" title="Image Title" />
-                            </a>
-                            <div class="dropdown-menu-shipping-cart-inner">
-                                <p class="dropdown-menu-shipping-cart-price">$10</p>
-                                <p class="dropdown-menu-shipping-cart-item"><a href="#">Apple 11.6" MacBook Air Notebook </a>
-                                </p>
-                            </div>
-                        </li>
-                        <li>
-                            <a class="dropdown-menu-shipping-cart-img" href="#">
-                                <img src="img/100x100.png" alt="Image Alternative text" title="Image Title" />
-                            </a>
-                            <div class="dropdown-menu-shipping-cart-inner">
-                                <p class="dropdown-menu-shipping-cart-price">$71</p>
-                                <p class="dropdown-menu-shipping-cart-item"><a href="#">Fossil Women's Original Boyfriend</a>
-                                </p>
-                            </div>
-                        </li>
-                        <li>
-                            <p class="dropdown-menu-shipping-cart-total">Total: $150</p>
-                            <button class="dropdown-menu-shipping-cart-checkout btn btn-primary">Checkout</button>
+                            <p class="dropdown-menu-shipping-cart-total">Total: $<%=@cartprice%></p>
+                            <button class="dropdown-menu-shipping-cart-checkout btn btn-primary">結帳</button>
                         </li>
                     </ul>
                 </li>
