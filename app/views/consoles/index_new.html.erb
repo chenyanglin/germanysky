@@ -93,10 +93,11 @@
             <input class="btn btn-primary" type="submit" value="Recover Password" />
         </form>
     </div>
-    <nav class="navbar navbar-default navbar-main-white navbar-pad-top navbar-first" style="margin:0 0 0 0;">
+    <nav class="navbar navbar-defaulta navbar-main-white navbar-pad-top navbar-first" style="margin:0 0 0 0;padding:0;">
         <div class="container">
             <div class="navbar-header">
                 <a class="navbar-brand" href="index.html">
+                <img src="<%= asset_path 'logo.png' %>" alt="Image Alternative text" title="Image Title" />
                 </a>
             </div>
             <form class="navbar-form navbar-left navbar-main-search navbar-main-search-category" role="search">
@@ -120,38 +121,11 @@
                 <li><a href="#nav-login-dialog" data-effect="mfp-move-from-top" class="popup-text"><span >Hello！</span>請登入</a>
                 </li>
 
-                <% if @current_user.present? && @current_user.role!=1%>
-    <a class="inline item" href="/products/shoppingcart" data-html="<%if @barcarts.size>0 %>
-    您的購物車商品列表<br>
-    <div class='divider'></div>
-    <table class='striped table'>
-    <%@cartprice=0%>
-    <%@barcarts.each do |b| %>
-    <tr>
-    <tr>
-    <td class='graybg'>
-    <img class='ui centered mini image' src='<%= asset_path '100px.png' %>' style='height: 40px; width: 40px; object-fit: contain'>
-    </td>
-    </tr>
-    <td>
-    <tr class='graybg'>
-    <%=b.product.name%>
-    </tr>
-    <tr class='graybg'>數量：<%=b.sum %></tr>
-    <tr class='graybg'>價格：<%=b.product_option.price*b.sum%>
-    <%@cartprice += b.product_option.price*b.sum%>
-    </tr>
-    </td></tr><br>
-    <%end%>
-    </table>
-    <div class='divider'></div>
-    總價：<%=@cartprice%>
-    <%else%>購物車是空的<%end%>">
-        <a href="/products/shoppingcart"><i class="shipping icon"></i>購物車<span class="badge badge-warning"><%if @catrprice.present? %>$<%=@cartprice%><%end%></span></a>
-      </a>
-      <%end%>
-      <% if @current_user.present? && @current_user.role!=1%>
-                <li class="dropdown"><a href="/products/shoppingcart"><span >購物車</span><i class="fa fa-shopping-cart"></i><% @barcarts.size %>件商品</a>
+            <% if @current_user.present? && @current_user.role!=1%>
+                <li class="dropdown"><a href="/products/shoppingcart"><span >購物車</span>
+                
+                <i class="fa fa-shopping-cart"></i><% if @barcarts.size > 0 %><% @barcarts.size %><% else %> 0 <%end%>件商品</a>
+                <% if @barcarts.size > 0 %>
                     <ul class="dropdown-menu dropdown-menu-shipping-cart">
                         <%@cartprice=0%>
                             <%@barcarts.each do |b| %>
@@ -172,8 +146,19 @@
                             <button class="dropdown-menu-shipping-cart-checkout btn btn-primary">結帳</button>
                         </li>
                     </ul>
+                <%else%>
+                    <ul class="dropdown-menu dropdown-menu-shipping-cart">
+                            
+                            <li>
+                                <p class="dropdown-menu-shipping-cart-total">Total: $0</p>
+                                <button class="dropdown-menu-shipping-cart-checkout btn btn-primary">立即購物</button>
+                            </li>
+                        </ul>
+                <%end%>
                 </li>
                 <%end%>
+
+
                 <div class="navbar-header">
                     <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-nav-collapse" area_expanded="false"><span class="sr-only">Main Menu</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
                     </button>
@@ -181,43 +166,29 @@
             </ul>
         </div>
     </nav>
-    <nav class="navbar-default navbar-main-white yamm">
+    <nav class="navbar-defaulta navbar-main-white yamm" style="padding:0">
         <div class="container">
             <div class="collapse navbar-collapse navbar-collapse-no-pad" id="main-nav-collapse">
                 <ul class="nav navbar-nav">
                     <li class="dropdown"><a href="#"><span >商品顯示by</span>分類<i class="drop-caret" data-toggle="dropdown"></i></a>
                         <ul class="dropdown-menu dropdown-menu-category">
                            
-                            
-                            <li><a href="#"><i class="fa fa-tags dropdown-menu-category-icon"></i>Clothes & Shoes</a>
+                        <% @type_ones.each do |t| %>
+                            <li><a href="#"><i class="fa fa-tags dropdown-menu-category-icon"></i><%=t.name %></a>
                                 <div class="dropdown-menu-category-section">
                                     <div class="dropdown-menu-category-section-inner">
                                         <div class="dropdown-menu-category-section-content">
                                             <div class="row">
                                                 <div class="col-md-6">
-                                                    <h5 class="dropdown-menu-category-title">TheBox Fashion</h5>
+                                                    <h5 class="dropdown-menu-category-title"><%=t.name %></h5>
                                                     <ul class="dropdown-menu-category-list">
-                                                        <li><a href="#">Woman</a>
-                                                            <p>Fermentum proin feugiat eleifend himenaeos</p>
+                                                    <% if t.type_twos.size>0 %>
+                                                    <% t.type_twos.each do |two| %>
+                                                        <li><a href="#"><%= two.name %></a>
+                                                            <p><%= two.description %></p>
                                                         </li>
-                                                        <li><a href="#">Men</a>
-                                                            <p>Non nunc diam primis feugiat</p>
-                                                        </li>
-                                                        <li><a href="#">Girls</a>
-                                                            <p>Mollis fermentum tellus vulputate et</p>
-                                                        </li>
-                                                        <li><a href="#">Boys</a>
-                                                            <p>Mi quis dis mus conubia</p>
-                                                        </li>
-                                                        <li><a href="#">Baby</a>
-                                                            <p>Suspendisse aenean nisi venenatis cum</p>
-                                                        </li>
-                                                        <li><a href="#">Luggage</a>
-                                                            <p>Bibendum consequat imperdiet class litora</p>
-                                                        </li>
-                                                        <li><a href="#">Accessories</a>
-                                                            <p>Habitant elementum pellentesque purus vulputate</p>
-                                                        </li>
+                                                        <%end%>
+                                                        <%end%>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -225,7 +196,7 @@
                                     </div>
                                 </div>
                             </li>
-                            
+                            <%end%>
                         </ul>
                     </li>
 
@@ -242,40 +213,34 @@
                     <li class="dropdown"><a class="navbar-item-top" href="#">留言版</a>
                     </li>
                 </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#" class="navbar-item-top">Shipping</a>
-                    </li>
-                    <li><a href="#" class="navbar-item-top">Payment</a>
-                    </li>
-                    <li><a href="#" class="navbar-item-top">Customer Support</a>
-                    </li>
-                </ul>
+
             </div>
         </div>
     </nav>
 
     <div class="owl-carousel owl-loaded owl-nav-dots-inner" data-options='{"items":1,"loop":true}'>
         <div class="owl-item">
-            <div class="slider-item" style="background-image:url(img/1400x500.png);">
+            <div class="slider-item" style="background-image:url(<%= asset_path '17.jpg' %>);">
+
                 <div class="container">
                     <div class="slider-item-inner">
                         <div class="slider-item-caption-right slider-item-caption-white">
-                            <h4 class="slider-item-caption-title">Smart Watches</h4>
-                            <p class="slider-item-caption-desc">Get One Just from $99</p><a class="btn btn-lg btn-ghost btn-white" href="#">Shop Now</a>
+                            <h4 class="slider-item-caption-title">GermanySky</h4>
+                            <p class="slider-item-caption-desc">專業德國代購、團購服務</p><a class="btn btn-lg btn-ghost btn-white" href="#">Shop Now</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="owl-item">
-            <div class="slider-item" style="background-image:url(img/1200x500.png);">
+            <div class="slider-item" style="background-image:url(<%= asset_path '1200x500.png' %>);">
                 <div class="container">
                     <div class="slider-item-inner">
                         <div class="slider-item-caption-right slider-item-caption-white">
-                            <h4 class="slider-item-caption-title">World Top Guitars from $350</h4>
-                            <p class="slider-item-caption-desc">Fill It To The Rim With Guitar.</p><a class="btn btn-lg btn-ghost btn-white" href="#">Shop Now</a>
+                            <h4 class="slider-item-caption-title">GermanySky</h4>
+                            <p class="slider-item-caption-desc">德心應手</p><a class="btn btn-lg btn-ghost btn-white" href="#">Shop Now</a>
                         </div>
-                        <img class="slider-item-img-left" src="img/test_slider/2-i.png" alt="Image Alternative text" title="Image Title" style="transform:translateY(-50%) rotate(14deg); width: 55%;" />
+                        <img class="slider-item-img-left" src="<%= asset_path '2-i.png' %>" alt="Image Alternative text" title="Image Title" style="transform:translateY(-50%) rotate(14deg); width: 55%;" />
                     </div>
                 </div>
             </div>
@@ -285,10 +250,10 @@
                 <div class="container">
                     <div class="slider-item-inner">
                         <div class="slider-item-caption-left slider-item-caption-white">
-                            <h4 class="slider-item-caption-title">Run! Run! Run!</h4>
-                            <p class="slider-item-caption-desc">Your Running Shoes, Right Away.</p><a class="btn btn-lg btn-ghost btn-white" href="#">Shop Now</a>
+                            <h4 class="slider-item-caption-title">全新促銷活動</h4>
+                            <p class="slider-item-caption-desc">On Sale！Shop Right Now！</p><a class="btn btn-lg btn-ghost btn-white" href="#">Shop Now</a>
                         </div>
-                        <img class="slider-item-img-right" src="img/test_slider/3-i.png" alt="Image Alternative text" title="Image Title" />
+                        <img class="slider-item-img-right" src="<%= asset_path '3-i.png' %>" alt="text" title="Image Title" />
                     </div>
                 </div>
             </div>
@@ -296,7 +261,7 @@
     </div>
     <div class="row row-full" data-gutter="none">
         <div class="col-md-4">
-            <div class="banner banner-o-hid banner-sqr" style="background-image:url(img/380x220.png);">
+            <div class="banner banner-o-hid banner-sqr" style="background-image:url(<%= asset_path '380x220.png' %>);">
                 <a class="banner-link" href="#"></a>
                 <div class="banner-caption-left">
                     <h5 class="banner-title">Discover The Mountains</h5>
@@ -304,11 +269,11 @@
                     <p class="banner-shop-now">Shop Now <i class="fa fa-caret-right"></i>
                     </p>
                 </div>
-                <img class="banner-img" src="img/test_banner/16-i.png" alt="Image Alternative text" title="Image Title" style="bottom: -68px; right: -32px; width: 200px;" />
+                <img class="banner-img" src="<%= asset_path '16-i.png' %>" alt="Image Alternative text" title="Image Title" style="bottom: -68px; right: -32px; width: 200px;" />
             </div>
         </div>
         <div class="col-md-4">
-            <div class="banner banner-o-hid banner-sqr" style="background-image:url(img/660x500.png);">
+            <div class="banner banner-o-hid banner-sqr" style="background-image:url(<%= asset_path '660x500.png' %>);">
                 <a class="banner-link" href="#"></a>
                 <div class="banner-caption-left">
                     <h5 class="banner-title">iPhone 6s</h5>
@@ -316,11 +281,11 @@
                     <p class="banner-shop-now">Shop Now <i class="fa fa-caret-right"></i>
                     </p>
                 </div>
-                <img class="banner-img" src="img/test_banner/27-i.png" alt="Image Alternative text" title="Image Title" style="top: 10px; right: 20px; width: 120px;" />
+                <img class="banner-img" src="<%= asset_path '27-i.png' %>" alt="Image Alternative text" title="Image Title" style="top: 10px; right: 20px; width: 120px;" />
             </div>
         </div>
         <div class="col-md-4">
-            <div class="banner banner-o-hid banner-sqr" style="background-image:url(img/450x200.png);">
+            <div class="banner banner-o-hid banner-sqr" style="background-image:url(<%= asset_path '450x200.png' %>);">
                 <a class="banner-link" href="#"></a>
                 <div class="banner-caption-left banner-caption-dark">
                     <h5 class="banner-title">Winter is Comming</h5>
@@ -335,49 +300,35 @@
     <div class="container">
         <div class="tabbable category-tabs">
             <ul class="nav nav-pills" id="myTab">
-                <li class="active"><a href="#tab-1" data-toggle="tab">Best Sellers</a>
+                <li class="active"><a href="#tab-1" data-toggle="tab">熱銷商品</a>
                 </li>
-                <li><a href="#tab-2" data-toggle="tab">Trending Now</a>
+                <li><a href="#tab-2" data-toggle="tab">最新上架</a>
                 </li>
-                <li><a href="#tab-3" data-toggle="tab">Newest Products</a>
+                <li><a href="#tab-3" data-toggle="tab">現貨商品</a>
                 </li>
-                <li><a href="#tab-4" data-toggle="tab">Stuff Pick</a>
-                </li>
-                <li><a href="#tab-5" data-toggle="tab">Featured Products</a>
+                <li><a href="#tab-4" data-toggle="tab">推薦分類</a>
                 </li>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane fade in active" id="tab-1">
+                    <% if @new_products.size > 0 %>
                     <div class="row" data-gutter="15">
+                        <% @new_products.each do |p|%>
+                        <% surplus = 0%>
+                        <% if p.product_options.size > 1 %>
+                            <% price = [] %>
+                            <% p.product_options.each do |o| %>
+                            <% surplus += o.surplus %>
+                            <% price << o.price %>
+                            <%end%>
+                        <% else %>
+                            <% price = p.product_options.first.price %>
+                            <% surplus  = p.product_options.first.surplus %>
+                        <% end %>
                         <div class="col-md-2">
                             <div class="product product-sm ">
                                 <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Metal Portable Bar Table w/ Carrying Case - Metal Construction Party</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$150</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
+                                    <img class="product-img" src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt="Shop Now" title="hot sales" />
                                 </div>
                                 <a class="product-link" href="#"></a>
                                 <div class="product-caption">
@@ -393,118 +344,33 @@
                                         <li class="rated"><i class="fa fa-star"></i>
                                         </li>
                                     </ul>
-                                    <h5 class="product-caption-title">Hanes TAGLESS&reg; Nano-T&reg; Men's Long-Sleeve Tee style 498L</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$97</span>
+                                    <h5 class="product-caption-title"><%= p.name %></h5>
+                                    <div class="product-caption-price"><span class="product-caption-price-new"><% if p.product_options.size>1 %>NT ＄ <%= price.min %>~<%=price.max %><%else%>NT ＄ <%= price %><%end%></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">ASICS Women's GEL-Equation 7 Running Shoes T3F6N</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$136</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">New Authentic Gucci Patent Leather Open Toe Platform Pump,Gren, 309984 3125</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$130</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">WENGER WOMEN'S STAINLESS STEEL DATE NEW WATCH 0721.102</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$58</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Nikon D5200 24.1 MP Digital SLR Camera - Black (Kit w/ 18-55 VR Lens)</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$85</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <%end%>
                     </div>
+                    <%end%>
+                    <% if @last_products.size > 0 %>
                     <div class="row" data-gutter="15">
+                        <% @last_products.each do |p|%>
+                        <% surplus = 0%>
+                        <% if p.product_options.size > 1 %>
+                            <% price = [] %>
+                            <% p.product_options.each do |o| %>
+                            <% surplus += o.surplus %>
+                            <% price << o.price %>
+                            <%end%>
+                        <% else %>
+                            <% price = p.product_options.first.price %>
+                            <% surplus  = p.product_options.first.surplus %>
+                        <% end %>
                         <div class="col-md-2">
                             <div class="product product-sm ">
                                 <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
+                                    <img class="product-img" src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt="Image Alternative text" title="Image Title" />
                                 </div>
                                 <a class="product-link" href="#"></a>
                                 <div class="product-caption">
@@ -520,551 +386,36 @@
                                         <li class="rated"><i class="fa fa-star"></i>
                                         </li>
                                     </ul>
-                                    <h5 class="product-caption-title">Ray Ban RB 3025 112/19 Green Flash Lens Unisex 58mm Aviator Sunglasses</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$88</span>
+                                    <h5 class="product-caption-title"><%= p.name %></h5>
+                                    <div class="product-caption-price"><span class="product-caption-price-new"><% if p.product_options.size>1 %>NT ＄ <%= price.min %>~<%=price.max %><%else%>NT ＄ <%= price %><%end%></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Sierra Mission End Medium Oak Table</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$52</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">iRobot BRAAVA 320 Floor Sweeping/Mopping Robot Cleaner - White</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$148</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Modern Parson Dinner Dining Chair High Back Seat Kitchen Living Room Black Brown</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$134</span><span class="product-caption-price-new">$54</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Dooney & Bourke Chevron Large Slim Wristlet</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$118</span><span class="product-caption-price-new">$83</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Mizuno Wave Universe 5 Women's Running Shoes Sneakers</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$91</span><span class="product-caption-price-new">$73</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <%end%>
                     </div>
+                    <%end%>
                 </div>
-                <div class="tab-pane fade" id="tab-2">
-                    <div class="row" data-gutter="15">
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Diesel Not So Basic Brown Leather Analog Mens Watch DZ1206</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$111</span><span class="product-caption-price-new">$45</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">HomCom Leather Rocking Sofa Single Recliner Chair Black Cushion</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$97</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Google Nexus 6 XT1103 4G LTE - 32GB - Blue Factory Unlocked GSM</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$107</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Dooney & Bourke Claremont Dover</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$141</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">New 26" Folding 6 Speed Mountain Bike Bicycle Shimano School Sport Black</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$63</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Nikon COOLPIX L840 Digital Camera, Red - Refurbished by Nikon U.S.A. #26486 B</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$114</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row" data-gutter="15">
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Magnum Precision UltraLite II Waterproof Composite Toe Slip Resistant Work Boots</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$75</span><span class="product-caption-price-new">$23</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Fossil Women's Original Boyfriend ES3380 Rose-Gold Stainless-Steel Quartz Watch</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$127</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Fitbit Flex Black w/ Teal Bands Activity & Sleep Tracker (Teal)</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$113</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">HP EliteBook 8460p 2.7GHz i7 8GB 160GB DVD Win 7 Pro 64 Laptop Computer CAM B</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$117</span><span class="product-caption-price-new">$36</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Hanes Women's Relaxed Fit Jersey ComfortSoft&reg; Crewneck T-Shirt style 5680</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$80</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Ray Ban RB 3025 112/19 Green Flash Lens Unisex 58mm Aviator Sunglasses</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$66</span><span class="product-caption-price-new">$60</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
                 <div class="tab-pane fade" id="tab-3">
+                    <% if @new_products.size > 0 %>
                     <div class="row" data-gutter="15">
+                        <% @new_products.each do |p|%>
+                        <% surplus = 0%>
+                        <% if p.product_options.size > 1 %>
+                            <% price = [] %>
+                            <% p.product_options.each do |o| %>
+                            <% surplus += o.surplus %>
+                            <% price << o.price %>
+                            <%end%>
+                        <% else %>
+                            <% price = p.product_options.first.price %>
+                            <% surplus  = p.product_options.first.surplus %>
+                        <% end %>
                         <div class="col-md-2">
                             <div class="product product-sm ">
                                 <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">TechnoMarine Sea Pearl Women's Quartz Watch 714001</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$92</span><span class="product-caption-price-new">$74</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Dooney & Bourke Claremont Dover</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$130</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">HomCom Leather Rocking Sofa Single Recliner Chair Black Cushion</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$129</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Dooney & Bourke Claremont Field Bag</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$131</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
+                                    <img class="product-img" src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt="Shop Now" title="hot sales" />
                                 </div>
                                 <a class="product-link" href="#"></a>
                                 <div class="product-caption">
@@ -1080,118 +431,33 @@
                                         <li class="rated"><i class="fa fa-star"></i>
                                         </li>
                                     </ul>
-                                    <h5 class="product-caption-title">Ridgid Fuego 9 Amp Compact Orbital Reciprocating Saw R3002 RECON</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$127</span>
+                                    <h5 class="product-caption-title"><%= p.name %></h5>
+                                    <div class="product-caption-price"><span class="product-caption-price-new"><% if p.product_options.size>1 %>NT ＄ <%= price.min %>~<%=price.max %><%else%>NT ＄ <%= price %><%end%></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Dooney & Bourke Chevron Large Slim Wristlet</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$71</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <%end%>
                     </div>
+                    <%end%>
+                    <% if @last_products.size > 0 %>
                     <div class="row" data-gutter="15">
+                        <% @last_products.each do |p|%>
+                        <% surplus = 0%>
+                        <% if p.product_options.size > 1 %>
+                            <% price = [] %>
+                            <% p.product_options.each do |o| %>
+                            <% surplus += o.surplus %>
+                            <% price << o.price %>
+                            <%end%>
+                        <% else %>
+                            <% price = p.product_options.first.price %>
+                            <% surplus  = p.product_options.first.surplus %>
+                        <% end %>
                         <div class="col-md-2">
                             <div class="product product-sm ">
                                 <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Apple iPhone 5s 16GB Factory Unlocked Smartphone Space Gray / Silver / Gold</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$140</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">HomCom 24" Modern Adjustable Hydraulic Indoor / Outdoor Bistro Bar Table Stand</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$70</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/2100x2100.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Easy Spirit Dobey Low Heel Wedges</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$116</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
+                                    <img class="product-img" src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt="Image Alternative text" title="Image Title" />
                                 </div>
                                 <a class="product-link" href="#"></a>
                                 <div class="product-caption">
@@ -1207,95 +473,35 @@
                                         <li class="rated"><i class="fa fa-star"></i>
                                         </li>
                                     </ul>
-                                    <h5 class="product-caption-title">Jessica Simpson Women's Single Breasted Belted Peacoat Jacket Coat</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$141</span>
+                                    <h5 class="product-caption-title"><%= p.name %></h5>
+                                    <div class="product-caption-price"><span class="product-caption-price-new"><% if p.product_options.size>1 %>NT ＄ <%= price.min %>~<%=price.max %><%else%>NT ＄ <%= price %><%end%></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Diesel Not So Basic Brown Leather Analog Mens Watch DZ1206</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$126</span><span class="product-caption-price-new">$38</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Alpine Swiss Beck Mens Suede Chukka Desert Boots Lace Up Shoes Crepe Sole Oxford</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$84</span><span class="product-caption-price-new">$26</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <%end%>
                     </div>
+                    <%end%>
                 </div>
                 <div class="tab-pane fade" id="tab-4">
+                    <% if @new_products.size > 0 %>
                     <div class="row" data-gutter="15">
+                        <% @new_products.each do |p|%>
+                        <% surplus = 0%>
+                        <% if p.product_options.size > 1 %>
+                            <% price = [] %>
+                            <% p.product_options.each do |o| %>
+                            <% surplus += o.surplus %>
+                            <% price << o.price %>
+                            <%end%>
+                        <% else %>
+                            <% price = p.product_options.first.price %>
+                            <% surplus  = p.product_options.first.surplus %>
+                        <% end %>
                         <div class="col-md-2">
                             <div class="product product-sm ">
                                 <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">RK7241S Table Saw with Laser by Rockwell</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$137</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
+                                    <img class="product-img" src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt="Shop Now" title="hot sales" />
                                 </div>
                                 <a class="product-link" href="#"></a>
                                 <div class="product-caption">
@@ -1311,143 +517,33 @@
                                         <li class="rated"><i class="fa fa-star"></i>
                                         </li>
                                     </ul>
-                                    <h5 class="product-caption-title">RK4246K Random Orbital Sander 2.8-Amp Cyclonic Dust/Air Separator by Rockwell</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$89</span>
+                                    <h5 class="product-caption-title"><%= p.name %></h5>
+                                    <div class="product-caption-price"><span class="product-caption-price-new"><% if p.product_options.size>1 %>NT ＄ <%= price.min %>~<%=price.max %><%else%>NT ＄ <%= price %><%end%></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Barnett 78649 Recruit Youth 100# Crossbow Package With Red Dot Sight Pink</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$76</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Apple iPhone 5s 16GB Factory Unlocked Smartphone Space Gray / Silver / Gold</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$66</span><span class="product-caption-price-new">$20</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Dooney & Bourke Pebble Grain Hobo</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$108</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Apple iPhone 4S 16GB Factory Unlocked Black and White Smartphone</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$144</span><span class="product-caption-price-new">$72</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <%end%>
                     </div>
+                    <%end%>
+                    <% if @last_products.size > 0 %>
                     <div class="row" data-gutter="15">
+                        <% @last_products.each do |p|%>
+                        <% surplus = 0%>
+                        <% if p.product_options.size > 1 %>
+                            <% price = [] %>
+                            <% p.product_options.each do |o| %>
+                            <% surplus += o.surplus %>
+                            <% price << o.price %>
+                            <%end%>
+                        <% else %>
+                            <% price = p.product_options.first.price %>
+                            <% surplus  = p.product_options.first.surplus %>
+                        <% end %>
                         <div class="col-md-2">
                             <div class="product product-sm ">
                                 <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Motorola XT1096 Moto X 2nd Generation 16GB Verizon Wireless gsm unlocked</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$95</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
+                                    <img class="product-img" src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt="Image Alternative text" title="Image Title" />
                                 </div>
                                 <a class="product-link" href="#"></a>
                                 <div class="product-caption">
@@ -1463,120 +559,35 @@
                                         <li class="rated"><i class="fa fa-star"></i>
                                         </li>
                                     </ul>
-                                    <h5 class="product-caption-title">HTC One M8 32GB Factory Unlocked Smartphone  Gold / Silver Gray</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$95</span>
+                                    <h5 class="product-caption-title"><%= p.name %></h5>
+                                    <div class="product-caption-price"><span class="product-caption-price-new"><% if p.product_options.size>1 %>NT ＄ <%= price.min %>~<%=price.max %><%else%>NT ＄ <%= price %><%end%></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Hamilton Beach 49996 FlexBrew Single-Serve Coffeemaker with Removable Reservoir</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$137</span><span class="product-caption-price-new">$42</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">ASICS Women's 2015 LAM 33-DFA Running Shoes T55AQ</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$141</span><span class="product-caption-price-new">$57</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Lady's Women's Golden Band Dial Bracelet Style Quartz Analog Wrist Watch</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$64</span><span class="product-caption-price-new">$39</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">TechnoMarine Sea Pearl Women's Quartz Watch 714001</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$92</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <%end%>
                     </div>
+                    <%end%>
                 </div>
-                <div class="tab-pane fade" id="tab-5">
+                <div class="tab-pane fade" id="tab-2">
+                    <% if @new_products.size > 0 %>
                     <div class="row" data-gutter="15">
+                        <% @new_products.each do |p|%>
+                        <% surplus = 0%>
+                        <% if p.product_options.size > 1 %>
+                            <% price = [] %>
+                            <% p.product_options.each do |o| %>
+                            <% surplus += o.surplus %>
+                            <% price << o.price %>
+                            <%end%>
+                        <% else %>
+                            <% price = p.product_options.first.price %>
+                            <% surplus  = p.product_options.first.surplus %>
+                        <% end %>
                         <div class="col-md-2">
                             <div class="product product-sm ">
                                 <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
+                                    <img class="product-img" src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt="Shop Now" title="hot sales" />
                                 </div>
                                 <a class="product-link" href="#"></a>
                                 <div class="product-caption">
@@ -1592,168 +603,33 @@
                                         <li class="rated"><i class="fa fa-star"></i>
                                         </li>
                                     </ul>
-                                    <h5 class="product-caption-title">Hanes Ultimate Cotton&reg; Fleece Full-Zip Adult Hoodie style F280</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$142</span>
+                                    <h5 class="product-caption-title"><%= p.name %></h5>
+                                    <div class="product-caption-price"><span class="product-caption-price-new"><% if p.product_options.size>1 %>NT ＄ <%= price.min %>~<%=price.max %><%else%>NT ＄ <%= price %><%end%></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Metal Portable Bar Table w/ Carrying Case - Metal Construction Party</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$89</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Black 1000-Watt 6-Quart Electric Pressure Cooker Brushed Stainless and Matte 603</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$103</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Apple iPhone 5c - 16GB - GSM Factory Unlocked White Blue Green Pink Yellow</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$142</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">WENGER WOMEN'S STAINLESS STEEL DATE NEW WATCH 0721.102</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$81</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Gas Welding Cutting Kit Oxy Acetylene Oxygen Torch Brazing Fits VICTOR W/Hose</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$122</span><span class="product-caption-price-new">$110</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <%end%>
                     </div>
+                    <%end%>
+                    <% if @last_products.size > 0 %>
                     <div class="row" data-gutter="15">
+                        <% @last_products.each do |p|%>
+                        <% surplus = 0%>
+                        <% if p.product_options.size > 1 %>
+                            <% price = [] %>
+                            <% p.product_options.each do |o| %>
+                            <% surplus += o.surplus %>
+                            <% price << o.price %>
+                            <%end%>
+                        <% else %>
+                            <% price = p.product_options.first.price %>
+                            <% surplus  = p.product_options.first.surplus %>
+                        <% end %>
                         <div class="col-md-2">
                             <div class="product product-sm ">
                                 <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">ASICS Women's Gel-Noosa Tri 9 Running Shoe Black/Neon Coral/Green</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$142</span><span class="product-caption-price-new">$100</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
+                                    <img class="product-img" src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt="Image Alternative text" title="Image Title" />
                                 </div>
                                 <a class="product-link" href="#"></a>
                                 <div class="product-caption">
@@ -1769,113 +645,15 @@
                                         <li class="rated"><i class="fa fa-star"></i>
                                         </li>
                                     </ul>
-                                    <h5 class="product-caption-title">Hanes Women's Relaxed Fit Jersey ComfortSoft&reg; Crewneck T-Shirt style 5680</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$70</span>
+                                    <h5 class="product-caption-title"><%= p.name %></h5>
+                                    <div class="product-caption-price"><span class="product-caption-price-new"><% if p.product_options.size>1 %>NT ＄ <%= price.min %>~<%=price.max %><%else%>NT ＄ <%= price %><%end%></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Dooney & Bourke Pebble Grain Hobo</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$66</span><span class="product-caption-price-new">$47</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">T-Tech by Tumi Men's Softshell Jacket</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$94</span><span class="product-caption-price-new">$57</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Timex Women's | Elevated Classics Swarovski Crystals Black Strap | Watch T2N450</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$84</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">ASICS Women's 2015 LAM 33-DFA Running Shoes T55AQ</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$99</span><span class="product-caption-price-new">$60</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <%end%>
                     </div>
+                    <%end%>
                 </div>
             </div>
         </div>
@@ -1885,333 +663,59 @@
                 <div class="banner banner-o-hid" style="background-color:#D2D2D2;">
                     <a class="banner-link" href="#"></a>
                     <div class="banner-caption-left banner-caption-dark">
-                        <h5 class="banner-title">Playstation 4</h5>
-                        <p class="banner-desc">Be First</p>
-                        <p class="banner-shop-now">Shop Now <i class="fa fa-caret-right"></i>
+                        <h5 class="banner-title">最新消息</h5>
+                         <% if @newsboards.present? %>
+                            <% @newsboards.each do |n| %>
+                            <div id="<%= n.id %>">
+                            <p class="banner-desc"><i class="browser icon"></i><a href="/newsboards/<%=n.id%>"><%= n.title %></a>
+                                <font size="0.1" ><%= n.created_at.strftime("%Y-%m-%d") %></font></p>
+                            </div>
+                            <div id="<%= n.id %>">
+                            <p class="banner-desc"><i class="browser icon"></i><a href="/newsboards/<%=n.id%>"><%= n.title %></a>
+                                <font size="0.1" ><%= n.created_at.strftime("%Y-%m-%d") %></font></p>
+                            </div>
+                            <div id="<%= n.id %>">
+                            <p class="banner-desc"><i class="browser icon"></i><a href="/newsboards/<%=n.id%>"><%= n.title %></a>
+                                <font size="0.1" ><%= n.created_at.strftime("%Y-%m-%d") %></font></p>
+                            </div>
+    </br>
+    <%end%>
+<%end%>
+                        <p class="banner-shop-now">查看更多 <i class="fa fa-caret-right"></i>
                         </p>
                     </div>
-                    <img class="banner-img" src="img/test_banner/28-i.png" alt="Image Alternative text" title="Image Title" style="bottom: 0px; right: 0px; width: 240px;" />
+                    <img class="banner-img" src="<%=asset_path '28-i.png' %>" alt="Image Alternative text" title="Image Title" style="bottom: 0px; right: 0px; width: 240px;" />
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="banner banner-o-hid" style="background-color:#0290C7;">
                     <a class="banner-link" href="#"></a>
                     <div class="banner-caption-left">
-                        <h5 class="banner-title">Cooking Equipment from Top Chiefs</h5>
-                        <p class="banner-desc">The Human Friendly Kitchen.</p>
-                        <p class="banner-shop-now">Shop Now <i class="fa fa-caret-right"></i>
+                        <h5 class="banner-title">促銷活動放送中</h5>
+                        <p class="banner-desc">多種促銷優惠組合買越多賺越多</p>
+                        <p class="banner-shop-now">前往查看 <i class="fa fa-caret-right"></i>
                         </p>
                     </div>
-                    <img class="banner-img" src="img/test_banner/13-i.png" alt="Image Alternative text" title="Image Title" style="bottom: -76px; right: 0; width: 238px;" />
+                    <img class="banner-img" src="<%=asset_path '13-i.png' %>" alt="Image Alternative text" title="Image Title" style="bottom: -76px; right: 0; width: 238px;" />
                 </div>
             </div>
         </div>
+  
+        
         <div class="gap"></div>
-        <h3 class="widget-title">Inspired by Your Browsing History</h3>
+        <h3 class="widget-title">強打分類商品</h3>
         <div class="owl-carousel owl-loaded owl-nav-out" data-options='{"items":7,"loop":true,"nav":true}'>
-            <div class="owl-item">
-                <div class="product product-sm owl-item-slide">
-                    <div class="product-img-wrap">
-                        <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                    </div>
-                    <a class="product-link" href="#"></a>
-                    <div class="product-caption">
-                        <ul class="product-caption-rating">
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li><i class="fa fa-star"></i>
-                            </li>
-                            <li><i class="fa fa-star"></i>
-                            </li>
-                        </ul>
-                        <h5 class="product-caption-title">Dooney & Bourke Pebble Grain Lexington</h5>
-                        <div class="product-caption-price"><span class="product-caption-price-new">$58</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="owl-item">
-                <div class="product product-sm owl-item-slide">
-                    <div class="product-img-wrap">
-                        <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                    </div>
-                    <a class="product-link" href="#"></a>
-                    <div class="product-caption">
-                        <ul class="product-caption-rating">
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                        </ul>
-                        <h5 class="product-caption-title">Jessica Simpson Women's Single Breasted Belted Peacoat Jacket Coat</h5>
-                        <div class="product-caption-price"><span class="product-caption-price-new">$118</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="owl-item">
-                <div class="product product-sm owl-item-slide">
-                    <div class="product-img-wrap">
-                        <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                    </div>
-                    <a class="product-link" href="#"></a>
-                    <div class="product-caption">
-                        <ul class="product-caption-rating">
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li><i class="fa fa-star"></i>
-                            </li>
-                        </ul>
-                        <h5 class="product-caption-title">RK3441K 4-1/2" Compact Circular Saw by Rockwell</h5>
-                        <div class="product-caption-price"><span class="product-caption-price-new">$102</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="owl-item">
-                <div class="product product-sm owl-item-slide">
-                    <div class="product-img-wrap">
-                        <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                    </div>
-                    <a class="product-link" href="#"></a>
-                    <div class="product-caption">
-                        <ul class="product-caption-rating">
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li><i class="fa fa-star"></i>
-                            </li>
-                        </ul>
-                        <h5 class="product-caption-title">Fossil Women's Original Boyfriend ES3380 Rose-Gold Stainless-Steel Quartz Watch</h5>
-                        <div class="product-caption-price"><span class="product-caption-price-new">$52</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="owl-item">
-                <div class="product product-sm owl-item-slide">
-                    <div class="product-img-wrap">
-                        <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                    </div>
-                    <a class="product-link" href="#"></a>
-                    <div class="product-caption">
-                        <ul class="product-caption-rating">
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                        </ul>
-                        <h5 class="product-caption-title">TechnoMarine Sea Pearl Women's Quartz Watch 714001</h5>
-                        <div class="product-caption-price"><span class="product-caption-price-new">$109</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="owl-item">
-                <div class="product product-sm owl-item-slide">
-                    <div class="product-img-wrap">
-                        <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                    </div>
-                    <a class="product-link" href="#"></a>
-                    <div class="product-caption">
-                        <ul class="product-caption-rating">
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li><i class="fa fa-star"></i>
-                            </li>
-                            <li><i class="fa fa-star"></i>
-                            </li>
-                        </ul>
-                        <h5 class="product-caption-title">Military Shoulder Tactical Backpack Rucksacks Sport Travel Hiking Trekking Bag</h5>
-                        <div class="product-caption-price"><span class="product-caption-price-old">$77</span><span class="product-caption-price-new">$70</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="owl-item">
-                <div class="product product-sm owl-item-slide">
-                    <div class="product-img-wrap">
-                        <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                    </div>
-                    <a class="product-link" href="#"></a>
-                    <div class="product-caption">
-                        <ul class="product-caption-rating">
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li><i class="fa fa-star"></i>
-                            </li>
-                            <li><i class="fa fa-star"></i>
-                            </li>
-                        </ul>
-                        <h5 class="product-caption-title">Bowflex PR1000 Home Gym</h5>
-                        <div class="product-caption-price"><span class="product-caption-price-new">$103</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="owl-item">
-                <div class="product product-sm owl-item-slide">
-                    <div class="product-img-wrap">
-                        <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                    </div>
-                    <a class="product-link" href="#"></a>
-                    <div class="product-caption">
-                        <ul class="product-caption-rating">
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li><i class="fa fa-star"></i>
-                            </li>
-                        </ul>
-                        <h5 class="product-caption-title">Hanes TAGLESS&reg; Nano-T&reg; Men's Long-Sleeve Tee style 498L</h5>
-                        <div class="product-caption-price"><span class="product-caption-price-old">$87</span><span class="product-caption-price-new">$61</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="owl-item">
-                <div class="product product-sm owl-item-slide">
-                    <div class="product-img-wrap">
-                        <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                    </div>
-                    <a class="product-link" href="#"></a>
-                    <div class="product-caption">
-                        <ul class="product-caption-rating">
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li><i class="fa fa-star"></i>
-                            </li>
-                            <li><i class="fa fa-star"></i>
-                            </li>
-                        </ul>
-                        <h5 class="product-caption-title">Hamilton Beach 49996 FlexBrew Single-Serve Coffeemaker with Removable Reservoir</h5>
-                        <div class="product-caption-price"><span class="product-caption-price-new">$114</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="owl-item">
-                <div class="product product-sm owl-item-slide">
-                    <div class="product-img-wrap">
-                        <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                    </div>
-                    <a class="product-link" href="#"></a>
-                    <div class="product-caption">
-                        <ul class="product-caption-rating">
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li><i class="fa fa-star"></i>
-                            </li>
-                        </ul>
-                        <h5 class="product-caption-title">Hanes Women's Relaxed Fit Jersey ComfortSoft&reg; Crewneck T-Shirt style 5680</h5>
-                        <div class="product-caption-price"><span class="product-caption-price-new">$91</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="gap"></div>
-        <h3 class="widget-title">Popular Categories</h3>
-        <div class="owl-carousel owl-loaded owl-nav-out" data-options='{"items":7,"loop":true,"nav":true}'>
+        <% if @type_ones.size > 0 %>
+        <% @type_ones.each do |t| %>
             <div class="owl-item">
                 <a class="banner-category owl-item-slide" href="#">
-                    <img class="banner-category-img-full" src="img/650x650.png" alt="Image Alternative text" title="Image Title" />
-                    <h5 class="banner-category-title">Military Man's Boots</h5>
-                    <p class="banner-category-desc">629 products</p>
+                    <img class="banner-category-img-full" src="<%=asset_path '100px.png' %>" alt="Image Alternative text" title="Image Title" />
+                    <h5 class="banner-category-title"><%= t.name%></h5>
+                    <p class="banner-category-desc"><%= t.products.size%> products</p>
                 </a>
             </div>
-            <div class="owl-item">
-                <a class="banner-category owl-item-slide" href="#">
-                    <img class="banner-category-img-full" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                    <h5 class="banner-category-title">Waterproof Jackets</h5>
-                    <p class="banner-category-desc">508 products</p>
-                </a>
-            </div>
-            <div class="owl-item">
-                <a class="banner-category owl-item-slide" href="#">
-                    <img class="banner-category-img-full" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                    <h5 class="banner-category-title">Luxury Watches</h5>
-                    <p class="banner-category-desc">654 products</p>
-                </a>
-            </div>
-            <div class="owl-item">
-                <a class="banner-category owl-item-slide" href="#">
-                    <img class="banner-category-img-full" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                    <h5 class="banner-category-title">Smart Full HD TV</h5>
-                    <p class="banner-category-desc">389 products</p>
-                </a>
-            </div>
-            <div class="owl-item">
-                <a class="banner-category owl-item-slide" href="#">
-                    <img class="banner-category-img-full" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                    <h5 class="banner-category-title">External Hard Drives</h5>
-                    <p class="banner-category-desc">527 products</p>
-                </a>
-            </div>
-            <div class="owl-item">
-                <a class="banner-category owl-item-slide" href="#">
-                    <img class="banner-category-img-full" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                    <h5 class="banner-category-title">Camping & Travel Bags</h5>
-                    <p class="banner-category-desc">426 products</p>
-                </a>
-            </div>
-            <div class="owl-item">
-                <a class="banner-category owl-item-slide" href="#">
-                    <img class="banner-category-img-full" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                    <h5 class="banner-category-title">Unlocked Smartphones</h5>
-                    <p class="banner-category-desc">285 products</p>
-                </a>
-            </div>
+        <%end%>
+        <%end%>
         </div>
     </div>
     <div class="gap"></div>
@@ -2220,28 +724,19 @@
         <div class="container">
             <div class="row row-col-gap" data-gutter="60">
                 <div class="col-md-3">
-                    <h4 class="widget-title-sm">TheBox Shop</h4>
-                    <p>Senectus turpis rhoncus eget taciti habitasse pellentesque litora curae sociosqu nibh nibh</p>
+                    <h4 class="widget-title-sm">Germanysky</h4>
+                    <p>代購服務秉持的信念是   對客戶認真負責   價格要求平實不浮誇 
+有跟過我們團的人都知道 
+所以會介紹親朋好友一起來購買-- 大家能以平時的價格  買到德國的好物
+沒有來過的  歡迎也來試試看喔</p>
                     <ul class="main-footer-social-list">
                         <li>
                             <a class="fa fa-facebook" href="#"></a>
                         </li>
-                        <li>
-                            <a class="fa fa-twitter" href="#"></a>
-                        </li>
-                        <li>
-                            <a class="fa fa-pinterest" href="#"></a>
-                        </li>
-                        <li>
-                            <a class="fa fa-instagram" href="#"></a>
-                        </li>
-                        <li>
-                            <a class="fa fa-google-plus" href="#"></a>
-                        </li>
                     </ul>
                 </div>
                 <div class="col-md-3">
-                    <h4 class="widget-title-sm">Popular Tags</h4>
+                    <h4 class="widget-title-sm">商品標籤</h4>
                     <ul class="main-footer-tag-list">
                         <li><a href="#">New Season</a>
                         </li>
@@ -2268,39 +763,17 @@
                     </ul>
                 </div>
                 <div class="col-md-3">
-                    <h4 class="widget-title-sm">Newsletter</h4>
+                    <h4 class="widget-title-sm">電子報</h4>
                     <form>
                         <div class="form-group">
-                            <label>Sign up to the newsletter</label>
+                            <label>輸入您的電子郵件以收到最新商品</label>
                             <input class="newsletter-input form-control" placeholder="Your e-mail address" type="text" />
                         </div>
                         <input class="btn btn-primary" type="submit" value="Sign up" />
                     </form>
                 </div>
             </div>
-            <ul class="main-footer-links-list">
-                <li><a href="#">About Us</a>
-                </li>
-                <li><a href="#">Jobs</a>
-                </li>
-                <li><a href="#">Legal</a>
-                </li>
-                <li><a href="#">Support & Customer Service</a>
-                </li>
-                <li><a href="#">Blog</a>
-                </li>
-                <li><a href="#">Privacy</a>
-                </li>
-                <li><a href="#">Terms</a>
-                </li>
-                <li><a href="#">Press</a>
-                </li>
-                <li><a href="#">Shipping</a>
-                </li>
-                <li><a href="#">Payments & Refunds</a>
-                </li>
-            </ul>
-            <img class="main-footer-img" src="img/test_footer2-i.png" alt="Image Alternative text" title="Image Title" />
+
         </div>
     </footer>
     <div class="copyright-area">
@@ -2308,28 +781,6 @@
             <div class="row">
                 <div class="col-md-6">
                     <p class="copyright-text">Copyright &copy; <a href="#">TheBox</a> 2014. Designed my remtsoy. All rights reseved</p>
-                </div>
-                <div class="col-md-6">
-                    <ul class="payment-icons-list">
-                        <li>
-                            <img src="img/payment/visa-straight-32px.png" alt="Image Alternative text" title="Pay with Visa" />
-                        </li>
-                        <li>
-                            <img src="img/payment/mastercard-straight-32px.png" alt="Image Alternative text" title="Pay with Mastercard" />
-                        </li>
-                        <li>
-                            <img src="img/payment/paypal-straight-32px.png" alt="Image Alternative text" title="Pay with Paypal" />
-                        </li>
-                        <li>
-                            <img src="img/payment/visa-electron-straight-32px.png" alt="Image Alternative text" title="Pay with Visa-electron" />
-                        </li>
-                        <li>
-                            <img src="img/payment/maestro-straight-32px.png" alt="Image Alternative text" title="Pay with Maestro" />
-                        </li>
-                        <li>
-                            <img src="img/payment/discover-straight-32px.png" alt="Image Alternative text" title="Pay with Discover" />
-                        </li>
-                    </ul>
                 </div>
             </div>
         </div>

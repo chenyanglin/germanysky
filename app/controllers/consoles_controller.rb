@@ -15,10 +15,10 @@ class ConsolesController < ApplicationController
     # @console_user ||= ManagerAccount.find(1)
     @product = Product.includes(:productimages).where(on_store: true).limit(4)
     @product = @product.order("created_at desc")
-    @new_products = Product.includes(:productimages).where(on_store: true).limit(8)
-    @new_products = @new_products.order("created_at desc")
-    @last_products = @new_products[4..8]
-    @new_products = @new_products[0..3]
+    @list_products = Product.includes(:productimages).where(on_store: true).limit(12)
+    @list_products = @list_products.order("created_at desc")
+    @last_products = @list_products[6..12]
+    @new_products = @list_products[0..5]
     @hotsale_products = @new_products[0..2]
   end
   def abc
