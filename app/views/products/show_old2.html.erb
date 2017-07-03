@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>GermanySky 德心應手</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Bootstrap styles -->
+    <!-- <link href="assets/css/bootstrap.css" rel="stylesheet"/> -->
+    <!-- Customize styles -->
+    <!-- <link href="style.css" rel="stylesheet"/> -->
+    <!-- font awesome styles -->
+	<!-- <link href="assets/font-awesome/css/font-awesome.css" rel="stylesheet"> -->
+		<!--[if IE 7]>
+			<link href="css/font-awesome-ie7.min.css" rel="stylesheet">
+		<![endif]-->
+
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+
+	<!-- Favicons -->
+    <link rel="shortcut icon" href="<%= asset_path 'ico/favicon.ico' %>">
+  </head>
+<body style="background:url('<%= asset_path("white_leather.png") %>') repeat 0 0;">
+<input type="hidden" id="product_id" value="<%=@product.id%>">
+<input type="hidden" id="option_size" value="<%=@product.product_options.size%>">
+<!-- 
+	Upper Header Section 
+-->
+<%= render "common/topbar" %>
+
+<!--
+Lower Header Section 
+-->
+<div class="container">
+<%= render "common/header" %>
+<%= render "common/leftmenu" %>
+<!-- 
+Body Section 
+-->
+
+	<div class="span9">
+
+	<div class="well well-small">
+	<div class="row-fluid">
+
+			<div class="span5">
+			<div style="height:50px"></div>
+      <ul class="list">
+			<div id="myCarousel" class="carousel slide cntr">
+             <div class="carousel-inner">
+                <% countimage = 1 %>
+                <% @product.productimages.each do |photo| %>
+                <% if countimage ==1 %>
+                  <div class="item active" >
+                 <% else %>
+                  <div class="item" >
+                 <% end%>
+                   <img  style="width:100%;vertical-align:text-bottom;" id="productimage" src="<%= asset_path photo.phourl %>" alt="germanysky shop" >
+                  </div>
+                 	<% countimage+=1 %>
+                 <% end %>
+                </div>
+            </div>
+            <% i = 1 %>
+     <div style="height:20px"></div>
+     <div class="ui grid">
+     <% @product.productimages.each do |photo| %>
+     
+      <div class="four wide column"><div class="ui card"  style='height: 50px; width: 90px; object-fit: contain' >
+      <%begin %>
+      <img class="ui tiny image" id="<%= asset_path photo.phourl %>"  style="display:block; margin:auto;" src="<%= asset_path photo.phourl %>" onclick="changephoto(this.id)"></img>
+      <% rescue %>
+      <img class="ui tiny image" id="<%= asset_path '100px.png' %>"  style="display:block; margin:auto;" src="<%= asset_path '100px.png' %>" onclick="changephoto(this.id)">
+      <%end%>
+      </div>
+       <% i +=1 %></div>
+     <% end %>
+     </div>
+			</div>
+			
+			<div class="span7">
+				<h3><%= @product.name %></h3>
+				<form class="form-horizontal qtyFrm">
+				 <div class="ui segments">
+  <div class="ui segment">
+    <p>簡介：<%= @product.briefdescription %></p>
+  </div>
+  <div class="ui segment">
+    <p>分類：<%= @product.type_one.name %></p>
+  </div>
+  <% if @product.brand.present?%>
+    <div class="ui segment">
+    <p>品牌：<%= @product.brand.name %></p>
+  </div>
+  <%end%>
+  <div class="ui segment">
+    <p>單件可得點數：<%= @product.point %></p>
+  </div>
+    <% if @product.product_options.size > 1 %>
+    <div class="ui segment">
+    <input type="hidden" id="option_id" value="">
+    選擇規格：
+    <% @product.product_options.each do |o| %>
+    <a  class="ui blue basic button to_position" tabindex="0" style="margin-left:10px;" onClick="optionclick('<%=o.price%>','<%=o.surplus%>','<%=o.id%>')">
+          <div class="visible content"><%= o.option1 %></div>
+        </a>
+    <% end %>
+    </div>
+  
+  <div class="ui segment">
+    <div style="display:none" id="optionprice" value="<%=@product.price%>">售價：NT$<%= @product.price %></div>
+  </div>
+  <div class="ui segment">
+    <div style="display:none" id="optionsurplus" value="<%=@product.surplus %>">庫存：<%= @product.surplus %></div>
+  </div>
+  <div class="ui segment">
+    <div style="display:none" id="selectsum">
+      選擇數量：
+       <span class="input-group-btn"><button id ="minus" type="button" class="btn btn-default btn-add">－</button>  <d id = "sum" size="2" value ="1">1</d>  <span class="input-group-btn"><button id = "plus" type="button" class="btn btn-default btn-add">＋</button>
+      </div>
+  </div>
+</div>
+    <% else %>
+    <input type="hidden" id="option_id" value="<%= @product.product_options.first.id %>">
+    <input type="hidden" id="optionsurplus" value="<%= @product.product_options.first.surplus %>">
+
+  <div class="ui segment">
+    <p>售價：NT$<%= @product.product_options.first.price %></p>
+  </div>
+  <div class="ui segment">
+    <p>庫存：<%= @product.product_options.first.surplus %></p>
+  </div>
+  <div class="ui segment">
+  <% if @product.product_options.first.surplus == 0%>
+  <p>選擇數量：無庫存，請進行<a id ="product_register" href="javascript: return false;" onclick="productregister(<%=@product.id%>,<%=@product.product_options.first.id%>);" class = "registerbtn" >缺貨登記</a></p>
+  <%else%>
+        <div id="selectsum">
+      選擇數量：
+       <span class="input-group-btn"><button id ="minus" type="button" class="btn btn-default btn-add">－</button>  <d id = "sum" size="2" value ="1" >1</d> <span class="input-group-btn"><button id = "plus" type="button" class="btn btn-default btn-add">＋</button>
+      </div>
+      <%end%>
+  </div>
+</div>
+
+      <% end %>
+				    <% if @current_user.present? %>
+     <% if @product.available == true %>
+      <div id = "command-btn"class="ui two buttons">
+      <a id="add_cart"  class="small ui bottom attached green button">
+        <i class="chevron circle right icon"></i>
+        加入購物車
+      </a>
+        <a id="buy_btn"  class="small ui bottom attached red button">
+        <i class="chevron circle right icon"></i>
+        直接購買
+      </a></div>
+      <% else %>
+      <div id = "command-btn">
+      <div class="ui grey inverted stacked segment" style="text-align:center;">
+      <label>此商品目前無法購買，如有意願請至留言版留言</label>
+      </div>
+      </div>
+      <%end%>
+  <%else%>
+    <div class="ui grey inverted stacked segment" style="text-align:center;">
+      <label>請先登入會員</label>
+      </div>
+  <%end%>
+				</form>
+			</div>
+			</div>
+			<div class="ui top attached tabular menu">
+  				<a class="item active" data-tab="first">商品敘述</a>
+  				<a class="item" data-tab="second">商品留言</a>
+  			</div>
+  			<div class="ui bottom attached tab segment active" data-tab="first">
+    			<%= @product.content.html_safe %>
+  			</div>
+  			<div class="ui bottom attached tab segment" data-tab="second">
+  			<!--留言-->
+  			<% if @messages.size > 0 %>
+  				<div class="comment">
+    			<% @messages.each do |r| %>
+    			<div class="ui graybg segment">
+      				<a class="author">
+      				<%if r.account.role == 1 %>
+      					管理員<%= r.account_name %>：
+      				<%else%>
+      					<%= r.account_name %>：
+      				<%end%>
+      				</a>
+      			<div class="text"><%= r.content %></div>
+            <div class="date"><%= r.created_at.strftime("%Y-%m-%d") %></div>
+            <% if r.reply != nil %>
+            <a class="author">
+            回覆：
+            </a>
+            <div class="text"><%= r.reply %></div>
+            <div class="date"><%= r.updated_at.strftime("%Y-%m-%d") %></div>
+            <%end%>
+    			</div>
+    		<% end %>
+  				</div>
+  			<% end %>
+  			<br></br>
+  			<div class="divider"></div>
+			<div class="form-check">
+  			<%= form_for @message ,:html =>{:class => "ui reply form"}, :url => new_product_message_path, method: :post do |f| %>
+    		<div class="field">
+      			<textarea id="content" name = "content" rows= '4'></textarea>
+    		</div>
+    		<div id="reply-btn" class="ui primary labeled icon button reply-btn">
+      			<i class="icon edit"></i> 留言
+    		</div>
+			<% end %>
+			</div>
+			<!-- 留言done -->
+			</div>
+			<!-- tab2 done -->
+</div>
+		<div class="well well-small">
+		  <h3> 您可能也喜歡...  </h3>
+		  <hr class="soften"/>
+		  <div class="row-fluid">
+		  <ul class="thumbnails">
+		  	<% @new_products.each do |p|%>
+				<% surplus = 0%>
+			<% if p.product_options.size > 1 %>
+    		<% price = [] %>
+    		<% p.product_options.each do |o| %>
+    			<% surplus += o.surplus %>
+    			<% price << o.price %>
+      		<%end%>
+       		<% else %>
+    		<% price = p.product_options.first.price %>
+    		<% surplus  = p.product_options.first.surplus %>
+    		<% end %>
+			<li class="span4">
+			  <div class="thumbnail">
+				<a href="product_details.html" class="overlay"></a>
+				<a class="zoomTool" href="/products/<%= p.id %>" title="add to cart"><span class="icon-search"></span> QUICK VIEW</a>
+				<a href="/products/<%= p.id %>">
+  				<img class="ui centered small image" src="<%= asset_path p.productimages.first.phourl %>" style='height: 180px; width: 100%; object-fit: contain'>
+				</a>
+				<div class="caption cntr">
+					<p><strong><%= p.name %></strong></p>
+					<p>
+					
+					庫存：<%= surplus %></br> 
+					<% if p.product_options.size>1 %>
+        				NT ＄ <%= price.min %>~<%=price.max %>
+  					<%else%>
+        				NT ＄ <%= price %>
+  					<%end%>
+					</p>			
+				</div>
+			  </div>
+			</li>
+			<%end%>
+		  	</ul>	
+			</div>
+		</div>
+</div>
+</div>
+<!-- 
+Clients 
+-->
+<!--
+Footer
+-->
+<%= render "common/footerbar" %>
+<div class="ui small modal product-register" style="padding-top:0px;">
+  <i class="close icon"></i>
+  <div id="edit_from" style="padding:10px;">
+  </div>
+</div>
+  </body>
+</html>
+ <style type="text/css">
+.box1{                           
+ position:absolute;    
+ bottom: 0px;              
+}
+.box2{                            
+ height: 480px;               
+ position: relative;
+}
+</style>
+<script type="text/javascript">
+$('.menu .item')
+  .tab()
+;
+var on =false;
+function optionclick(price,surplus,id) {
+  product_id = document.getElementById('optionprice').value;
+  $("#selectsum").empty();
+   if (on == false){
+   $("#selectsum").on("click",".btn-add",function(){ 
+    var sum = Number(document.getElementById("sum").innerHTML);
+    var surplus = document.getElementById("optionsurplus").value;
+    if (sum+1 > surplus)
+      {alert("不得大於庫存量");}
+    else
+    {document.getElementById("sum").innerHTML = sum +1;}
+  });
+  $("#selectsum").on("click",".btn-minus",function(){ 
+  var sum = Number(document.getElementById("sum").innerHTML);
+  if (sum == 1)
+    {alert("無法低於1");}
+  else
+    {document.getElementById("sum").innerHTML = sum - 1;}
+  });
+  $("#selectsum").on("click",".registerbtn",function(){ 
+    productregister(product_id,id);
+  });
+  on = true;
+  }
+
+  document.getElementById('optionprice').style.display = '';
+  document.getElementById("optionsurplus").style.display = '';
+  
+  document.getElementById('optionprice').innerHTML = '售價：NT$'+price;
+  document.getElementById("optionprice").value = price;
+  document.getElementById('optionsurplus').innerHTML = '庫存：'+surplus;
+  document.getElementById("optionsurplus").value = surplus;
+  document.getElementById("option_id").value = id;
+  if(surplus>0){
+  $("#selectsum").append('選擇數量：<span class="input-group-btn"><button id ="minus" type="button" class="btn btn-default btn-minus">－</button>  <d id = "sum" size="2" value ="1">1</d>  <span class="input-group-btn"><button id = "plus" type="button" class="btn btn-default btn-add">＋</button>');
+    document.getElementById("sum").innerHTML =1;
+}
+  else{
+    $("#selectsum").append('選擇數量：此規格無庫存，請進行<a id ="product_register" href="javascript: product_register(); return false;" class = "registerbtn" >缺貨登記</a>');
+  }
+  document.getElementById('selectsum').style.display = '';
+}
+$(function(){
+  $('.ui.sticky.control-menu')
+  .sticky({
+    offset            : 81,
+    observeChanges    : true,
+    context: '#content_part'
+  });
+
+
+
+// search functions
+  var search_msg = $('#filter')
+    .popup({
+      inline   : true,
+      hoverable: false,
+      position : 'top center',
+      delay: {
+        show: 100,
+        hide: 800
+      },
+      on: 'manual'
+    })
+  ;
+
+  $("#search_go").click(function(){
+    start_search();
+  });
+
+  $(document).on('keypress', function(e) {
+    if(e.which == 13) {
+      start_search();
+    }
+  });
+
+  $( "#filter" ).focus(function() {
+    search_msg.popup('hide');
+  });
+
+  function start_search(){
+    var search_string = $("#filter").val();
+    if(search_string == ""){
+      search_msg.popup('toggle');
+    }else{
+      var target_url = "";
+      if(window.location.href == "http://"+location.host+"/products"){
+        target_url = window.location.href+"?filter="+search_string;
+      }else if(window.location.href.indexOf('filter') > -1){
+        target_url = "http://"+location.host+"/products?filter="+search_string;
+      }else{
+        target_url = window.location.href+"&filter="+search_string;
+      }
+      window.location.replace(target_url);
+    }
+  }
+// search functions
+
+  $('#products_table').tablesort();
+
+function ValidateSurplus(e, point)
+{
+    var surplus = document.getElementById("optionsurplus").value;
+    if (!/^\d+$/.test(point))
+    {
+        $(e).val(/^\d+/.exec($(e).val('1')));
+        return false;
+    }
+    if(Number(point)>surplus)
+    {
+       $(e).val('1');
+       {alert("不得大於庫存量");}
+    }
+    return false;
+}
+
+
+$("#plus").click(function(){
+var sum = Number(document.getElementById("sum").innerHTML);
+
+var surplus = document.getElementById("optionsurplus").value;
+
+if (sum+1 > surplus)
+  {alert("不得大於庫存量");}
+else
+{document.getElementById("sum").innerHTML = sum +1;}
+  });
+
+$("#minus").click(function(){
+  var sum = Number(document.getElementById("sum").innerHTML);
+  if (sum == 1)
+    {alert("無法低於1");}
+  else
+{document.getElementById("sum").innerHTML = sum - 1;}
+  });
+
+
+});
+function changephoto(click_id) {
+  
+　document.getElementById("productimage").src= click_id;
+}
+
+function productregister(product_id,option_id)
+{
+    $('.ui.dimmer.main').dimmer('show');
+    $.get( "/products/register?product_id="+product_id+"&product_option_id="+option_id, function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $('.ui.dimmer.main').dimmer('hide');
+
+      $('.ui.modal.product-register').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $('.ui.dimmer.main').dimmer('hide');
+      alert( "error" );
+    });
+}
+
+$("#add_cart").click(function(){
+    var product_id = document.getElementById("product_id").value;
+    var option_id = document.getElementById("option_id").value;
+    if (option_id =="")
+      alert("請先選擇規格");
+    else
+    {
+    var sum = Number(document.getElementById("sum").innerHTML);
+    var surplus = document.getElementById("optionsurplus").value;
+    if (sum > surplus)
+    {alert("不得大於庫存量");}
+    else
+    {
+    var request = "/products/add_to_shoppingcart";
+    var aj = $.ajax({
+          url: request,
+          type: 'post',
+          data:{
+             product_id: product_id,
+             option_id: option_id,
+             sum: sum,
+           },
+          dataType: 'text'
+        }).success(function (upload_result) {
+          if(upload_result == "success" ){
+          alert( "已加入購物車" );
+        }else{alert(upload_result);}
+          
+        }).fail(function (e) {
+            alert( "尚未登入" );
+        });
+      }
+    }
+  });
+$("#buy_btn").click(function(){
+    var product_id = document.getElementById("product_id").value;
+    var option_id = document.getElementById("option_id").value;
+    if (option_id =="")
+      alert("請先選擇規格");
+    else
+    {
+    var sum = Number(document.getElementById("sum").innerHTML);
+    var surplus = document.getElementById("optionsurplus").value;
+    if (sum > surplus)
+    {alert("不得大於庫存量");}
+    else
+    {
+    var request = "/products/add_to_shoppingcart";
+    var aj = $.ajax({
+          url: request,
+          type: 'post',
+          data:{
+             product_id: product_id,
+             option_id: option_id,
+             sum: sum,
+           },
+          dataType: 'text'
+        }).success(function (upload_result) {
+          if(upload_result == "success" ){
+          window.location.replace("http://"+location.host+"/products/shoppingcart");
+        }else{alert(upload_result);}
+          
+        }).fail(function (e) {
+            alert( "尚未登入" );
+        });
+      }
+    }
+  });
+$('.form-check form').on('click','.reply-btn',function(){
+    var product_id = document.getElementById("product_id").value;
+    var replycontent = document.getElementById("content").value;
+    var request = "/product_messages";
+
+      var aj = $.ajax({
+          url: request,
+          type: 'post',
+          data:{
+             product_id: product_id,
+             replycontent: replycontent
+           },
+          dataType: 'json'
+        }).success(function(upload_result) {
+          if(upload_result == "success" ){
+            window.location.reload();
+          }
+        }).fail(function(data) {
+       window.location.reload();
+        });
+    return false; // prevents normal behaviour
+  });
+</script>
+<script type="text/javascript">
+  $(function(){
+    // 先取得必要的元素並用 jQuery 包裝
+    // 再來取得 $block 的高度及設定動畫時間
+    var $block = $('#abgneBlock'),
+      $slides = $('ul.list', $block),
+      _width = $block.width(),
+      $li = $('li', $slides),
+      _animateSpeed = 600, 
+      // 加入計時器, 輪播時間及控制開關
+      timer, _showSpeed = 2500, _stop = false;
+
+    // 產生 li 選項
+    var _str = '';
+    for(var i=0, j=$li.length;i<j;i++){
+      // 每一個 li 都有自己的 className = playerControl_號碼
+      _str += '<li class="playerControl_' + (i+1) + '"></li>';
+    }
+
+    // 產生 ul 並把 li 選項加到其中
+    var $playerControl = $('<ul class="playerControl"></ul>').html(_str).appendTo($slides.parent()).css('left', function(){
+      // 把 .playerControl 移到置中的位置
+      // return (_width - $(this).width()) / 2;
+      return
+    });
+    
+    // 幫 li 加上 click 事件
+    var $playerControlLi = $playerControl.find('li').click(function(){
+      var $this = $(this);
+      $this.addClass('current').siblings('.current').removeClass('current');
+
+      clearTimeout(timer);
+      // 移動位置到相對應的號碼
+      $slides.stop().animate({
+        left: _width * $this.index() * -1
+      }, _animateSpeed, function(){
+        // 當廣告移動到正確位置後, 依判斷來啟動計時器
+        if(!_stop) timer = setTimeout(move, _showSpeed);
+      });
+
+      return false;
+    }).eq(0).click().end();
+
+    // 如果滑鼠移入 $block 時
+    $block.hover(function(){
+      // 關閉開關及計時器
+      _stop = true;
+      clearTimeout(timer);
+    }, function(){
+      // 如果滑鼠移出 $block 時
+      // 開啟開關及計時器
+      _stop = false;
+      timer = setTimeout(move, _showSpeed);
+    });
+    
+    // 計時器使用
+    function move(){
+      var _index = $('.current').index();
+      $playerControlLi.eq((_index + 1) % $playerControlLi.length).click();
+    }
+  });
+</script>
