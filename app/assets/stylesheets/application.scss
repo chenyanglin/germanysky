@@ -10,20 +10,16 @@
  * defined in the other CSS/SCSS files in this directory. It is generally better to create a new
  * file per style scope.
  *
- *= require redactor-rails
  *= require_tree .
  *= require_tree ./base
  *= require_self
  *= require jquery.fileupload
  *= require jquery.fileupload-ui
  *= require jquery-ui
- *= require redactor-rails
- *= redactor-rails/plugins
  *= require font-awesome
+
  */
 @import "semantic-ui";
-@import "bootstrap-sprockets";
-@import "bootstrap";
 
 
 // @font-face {

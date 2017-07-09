@@ -6,6 +6,7 @@
 
 .btn-default,
 .btn-primary,
+.red-btn-primary,
 .btn-success,
 .btn-info,
 .btn-warning,
@@ -16,12 +17,14 @@
 }
 .btn-default:active,
 .btn-primary:active,
+.red-btn-primary:active,
 .btn-success:active,
 .btn-info:active,
 .btn-warning:active,
 .btn-danger:active,
 .btn-default.active,
 .btn-primary.active,
+.red-btn-primary.active,
 .btn-success.active,
 .btn-info.active,
 .btn-warning.active,
@@ -31,6 +34,7 @@
 }
 .btn-default .badge,
 .btn-primary .badge,
+.red-btn-primary .badge,
 .btn-success .badge,
 .btn-info .badge,
 .btn-warning .badge,
@@ -93,6 +97,32 @@
 .btn-primary:disabled,
 .btn-primary[disabled] {
   background-color: #265a88;
+  background-image: none;
+}
+.red-btn-primary {
+  background-image: -webkit-linear-gradient(top, #ff0000 0%, #aa0000 100%);
+  background-image:      -o-linear-gradient(top, #ff0000 0%, #aa0000 100%);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#ff0000), to(#aa0000));
+  background-image:         linear-gradient(to bottom, #ff0000 0%, #aa0000 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff337ab7', endColorstr='#ff265a88', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+  background-repeat: repeat-x;
+  border-color: #aa0000;
+}
+.red-btn-primary:hover,
+.red-btn-primary:focus {
+  background-color: #aa0000;
+  background-position: 0 -15px;
+}
+.red-btn-primary:active,
+.red-btn-primary.active {
+  background-color: #aa0000;
+  border-color: #aa0000;
+}
+.red-btn-primary.disabled,
+.red-btn-primary:disabled,
+.red-btn-primary[disabled] {
+  background-color: #aa0000;
   background-image: none;
 }
 .btn-success {

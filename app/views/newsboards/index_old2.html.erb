@@ -1,29 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>GermanySky 德心應手</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Bootstrap styles -->
+    <!-- <link href="assets/css/bootstrap.css" rel="stylesheet"/> -->
+    <!-- Customize styles -->
+    <!-- <link href="style.css" rel="stylesheet"/> -->
+    <!-- font awesome styles -->
+	<!-- <link href="assets/font-awesome/css/font-awesome.css" rel="stylesheet"> -->
+		<!--[if IE 7]>
+			<link href="css/font-awesome-ie7.min.css" rel="stylesheet">
+		<![endif]-->
 
-    <div class="global-wrapper clearfix" id="global-wrapper">
-        <%= render "common/theboxheader" %>
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
 
-        <div class="container">
-            <header class="page-header" style="padding:0">
+	<!-- Favicons -->
+    <link rel="shortcut icon" href="<%= asset_path 'ico/favicon.ico' %>">
+  </head>
+<body style="background:url('<%= asset_path("white_leather.png") %>') repeat 0 0;">
+<input type="hidden" id="find_newsboard" value="<%= @newsboard_info %>">
+<!-- 
+	Upper Header Section 
+-->
+<%= render "common/topbar" %>
 
-            </header>
-            <div class="row row-col-border" data-gutter="60">
-                <div class="col-md-3">
-                    <h4 class="widget-title-sm">公佈欄管理</h4>
-                      <div class="ui center aligned icon header" >
-                        <h4 class="widget-title-sm">文章總數： <%= number_with_delimiter(@newsboards_size, :delimiter => ',') %></h4>
-                        <% if @current_user.present? && @current_user.role == 1 %>
-                            <li><button class="ui orange basic button" id = "btn_new_newsboard">新增最新消息</button></li>
-                        <%end%>
-                     </div>
+<!--
+Lower Header Section 
+-->
+<div class="container">
+<%= render "common/header" %>
+<div class="row pull-left">
+<div id="sidebar" class="span3">
 
-                    
-                <%= render "common/leftsalebanner" %>
-                </div>
-                <div class="col-md-9">
-                    <h2 class="site-font ui header">最新消息</h2>
+<div class="well well-small">
+  <ul class="nav nav-list">
+  <div class="ui center aligned icon header" style="font-size:18px;margin:20px 0 22px 0;">
+  <li> 文章總數： <%= number_with_delimiter(@newsboards_size, :delimiter => ',') %></li>
+  <li><br></li>
+ <% if @current_user.present? && @current_user.role == 1 %>
+    <li><button class="ui orange basic button" id = "btn_new_newsboard">新增最新消息</button></li>
+    <%end%>
+    </div>
+  </ul>
+</div>
+
+  </div>
+<!-- 
+Body Section 
+-->
+<div class="span9">
+<div> </div>
+<h2 class="site-font ui header">最新消息</h2>
     <% if @newsboards.present? %>
       <% if @newsboards.size != 0 %>
-        
+        <div class="infinite-table">
           <table id="newsboards_table" class="site-font ui sortable selectable orange table">
             <thead>
               <tr>
@@ -42,24 +78,24 @@
           <p class="pagination">
             <%= link_to_next_page @newsboards, 'Next Page', :params => {:filter => @search_param}%>
           </p>
-
+        </div>
       <% else %>
         <h3>未建立！</h3>
       <% end %>
       <% else %>
       <h3>未建立！</h3>
       <% end %>
+</div>
 
-                </div>
-
-
-
-        <div class="gap"></div>
-       
-        <%= render "common/footerbar" %>
-    </div>
-
-    <div class="ui small modal edit-newsboard" style="padding-top:0px;">
+</div>
+<!-- 
+Clients 
+-->
+<!--
+Footer
+-->
+<%= render "common/footerbar" %>
+<div class="ui small modal edit-newsboard" style="padding-top:0px;">
   <i class="close icon"></i>
   <div id="edit_from" style="padding:10px;">
   </div>
@@ -91,6 +127,8 @@
     </div>
   </div>
 </div>
+  </body>
+</html>
 
  <script type="text/javascript">
 $(function(){
@@ -192,5 +230,17 @@ window.location.replace("http://"+location.host+"/newsboards/"+newsboard_id);
 
   });
 
+
+
 });
 </script>
+ <style type="text/css">
+.box1{                           
+ position:absolute;    
+ bottom: 0px;              
+}
+.box2{                            
+ height: 480px;               
+ position: relative;
+}
+</style>

@@ -1,231 +1,53 @@
 
     <div class="global-wrapper clearfix" id="global-wrapper">
-        <div class="navbar-before mobile-hidden">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p class="navbar-before-sign">Everything You Need is Germanysky</p>
-                    </div>
-                    <div class="col-md-6">
-                    <ul class="nav navbar-nav navbar-right navbar-right-no-mar">
-                        <li><a href="#">關於我們</a>
-                        </li>
-                        <li><a href="#">部落格</a>
-                        </li>
-                        <li><a href="#">留言版</a>
-                        </li>
-                        <li><a href="#">購物須知</a>
-                        </li>
-                    </ul>
-                </div>
-                </div>
-            </div>
-        </div>
-    <div class="mfp-with-anim mfp-hide mfp-dialog clearfix" id="nav-login-dialog">
-        <h3 class="widget-title">Member Login</h3>
-        <p>歡迎回來，登入開始購物～</p>
-        <hr />
-        <form>
-            <div class="form-group">
-                <label>Email or Username</label>
-                <input class="form-control" type="text" />
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input class="form-control" type="text" />
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input class="i-check" type="checkbox" />Remeber Me</label>
-            </div>
-            <input class="btn btn-primary" type="submit" value="Sign In" />
-        </form>
-        <div class="gap gap-small"></div>
-        <ul class="list-inline">
-            <li><a href="#nav-account-dialog" class="popup-text">Not Member Yet</a>
-            </li>
-            <li><a href="#nav-pwd-dialog" class="popup-text">Forgot Password?</a>
-            </li>
-        </ul>
-    </div>
-        <div class="mfp-with-anim mfp-hide mfp-dialog clearfix" id="nav-account-dialog">
-            <h3 class="widget-title">Create TheBox Account</h3>
-            <p>Ready to get best offers? Let's get started!</p>
-            <hr />
-            <form>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input class="form-control" type="text" />
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input class="form-control" type="text" />
-                </div>
-                <div class="form-group">
-                    <label>Repeat Password</label>
-                    <input class="form-control" type="text" />
-                </div>
-                <div class="form-group">
-                    <label>Phone Number</label>
-                    <input class="form-control" type="text" />
-                </div>
-                <div class="checkbox">
-                    <label>
-                        <input class="i-check" type="checkbox" />Subscribe to the Newsletter</label>
-                </div>
-                <input class="btn btn-primary" type="submit" value="Create Account" />
-            </form>
-            <div class="gap gap-small"></div>
-            <ul class="list-inline">
-                <li><a href="#nav-login-dialog" class="popup-text">Already Memeber</a>
-                </li>
-            </ul>
-        </div>
-        <div class="mfp-with-anim mfp-hide mfp-dialog clearfix" id="nav-pwd-dialog">
-            <h3 class="widget-title">Password Recovery</h3>
-            <p>Enter Your Email and We Will Send the Instructions</p>
-            <hr />
-            <form>
-                <div class="form-group">
-                    <label>Your Email</label>
-                    <input class="form-control" type="text" />
-                </div>
-                <input class="btn btn-primary" type="submit" value="Recover Password" />
-            </form>
-        </div>
-        <nav class="navbar navbar-inverse navbar-main yamm">
-            <div class="container">
-                <div class="navbar-header">
-                    <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-nav-collapse" area_expanded="false"><span class="sr-only">Main Menu</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="index.html">
-                        <img src="img/logo-w.png" alt="Image Alternative text" title="Image Title" />
-                    </a>
-                </div>
-                <div class="collapse navbar-collapse" id="main-nav-collapse">
-                    <ul class="nav navbar-nav">
-                        <li class="dropdown"><a href="#"><span >商品顯示by</span>分類<i class="drop-caret" data-toggle="dropdown"></i></a>
-                        <ul class="dropdown-menu dropdown-menu-category">
-                           
-                        <% @type_ones.each do |t| %>
-                            <li><a href="#"><i class="fa fa-tags dropdown-menu-category-icon"></i><%=t.name %></a>
-                                <div class="dropdown-menu-category-section">
-                                    <div class="dropdown-menu-category-section-inner">
-                                        <div class="dropdown-menu-category-section-content">
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <h5 class="dropdown-menu-category-title"><%=t.name %></h5>
-                                                    <ul class="dropdown-menu-category-list">
-                                                    <% if t.type_twos.size>0 %>
-                                                    <% t.type_twos.each do |two| %>
-                                                        <li><a href="#"><%= two.name %></a>
-                                                            <p><%= two.description %></p>
-                                                        </li>
-                                                        <%end%>
-                                                        <%end%>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                            <%end%>
-                        </ul>
-                    </li>
-                    </ul>
-                    <form class="navbar-form navbar-left navbar-main-search" role="search">
-                        <div class="form-group">
-                            <input class="form-control" type="text" placeholder="Search the Entire Store..." />
-                        </div>
-                        <a class="fa fa-search navbar-main-search-submit" href="#"></a>
-                    </form>
-                    <ul class="nav navbar-nav navbar-right">
-                        <li><a href="#nav-login-dialog" data-effect="mfp-move-from-top" class="popup-text">Sign In</a>
-                        </li>
-                        <li><a href="#nav-account-dialog" data-effect="mfp-move-from-top" class="popup-text">Create Account</a>
-                        </li>
-                        <li class="dropdown">
-                            <a class="fa fa-shopping-cart" href="shopping-cart.html"></a>
-                            <ul class="dropdown-menu dropdown-menu-shipping-cart">
-                                <li>
-                                    <a class="dropdown-menu-shipping-cart-img" href="#">
-                                        <img src="img/100x100.png" alt="Image Alternative text" title="Image Title" />
-                                    </a>
-                                    <div class="dropdown-menu-shipping-cart-inner">
-                                        <p class="dropdown-menu-shipping-cart-price">$54</p>
-                                        <p class="dropdown-menu-shipping-cart-item"><a href="#">Gucci Patent Leather Open Toe Platform</a>
-                                        </p>
-                                    </div>
-                                </li>
-                                <li>
-                                    <a class="dropdown-menu-shipping-cart-img" href="#">
-                                        <img src="img/100x100.png" alt="Image Alternative text" title="Image Title" />
-                                    </a>
-                                    <div class="dropdown-menu-shipping-cart-inner">
-                                        <p class="dropdown-menu-shipping-cart-price">$96</p>
-                                        <p class="dropdown-menu-shipping-cart-item"><a href="#">Nikon D5200 24.1 MP Digital SLR Camera</a>
-                                        </p>
-                                    </div>
-                                </li>
-                                <li>
-                                    <a class="dropdown-menu-shipping-cart-img" href="#">
-                                        <img src="img/100x100.png" alt="Image Alternative text" title="Image Title" />
-                                    </a>
-                                    <div class="dropdown-menu-shipping-cart-inner">
-                                        <p class="dropdown-menu-shipping-cart-price">$45</p>
-                                        <p class="dropdown-menu-shipping-cart-item"><a href="#">Apple 11.6" MacBook Air Notebook </a>
-                                        </p>
-                                    </div>
-                                </li>
-                                <li>
-                                    <a class="dropdown-menu-shipping-cart-img" href="#">
-                                        <img src="img/100x100.png" alt="Image Alternative text" title="Image Title" />
-                                    </a>
-                                    <div class="dropdown-menu-shipping-cart-inner">
-                                        <p class="dropdown-menu-shipping-cart-price">$90</p>
-                                        <p class="dropdown-menu-shipping-cart-item"><a href="#">Fossil Women's Original Boyfriend</a>
-                                        </p>
-                                    </div>
-                                </li>
-                                <li>
-                                    <p class="dropdown-menu-shipping-cart-total">Total: $150</p>
-                                    <button class="dropdown-menu-shipping-cart-checkout btn btn-primary">Checkout</button>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+        <%= render "common/theboxheader" %>
 
         <div class="container">
-            <header class="page-header">
+            <header class="page-header" style="padding:0">
                 <ol class="breadcrumb page-breadcrumb">
-                    <li><a href="#">Home</a>
+                    <li><a href="#">首頁</a>
                     </li>
-                    <li><a href="#">Electronics</a>
+                    <% if @product.type_one.present? %>
+                    <li><a href="#"><%=@product.type_one.name%></a>
                     </li>
-                    <li><a href="#">Monitors, Projectors & Accs</a>
+                    <% end %>
+                     <% if @product.type_two.present? %>
+                    <li><a href="#"><%=@product.type_two.name%></a>
                     </li>
-                    <li><a href="#">Monitors</a>
+                    <% end %>
+                     <% if @product.type_three.present? %>
+                    <li><a href="#"><%=@product.type_three.name%></a>
                     </li>
-                    <li class="active">Samsung 29" 2560x1080 IPS Ultra Wide Curved Monitor</li>
+                    <% end %>
+                    <li class="active"><%= @product.name %></li>
                 </ol>
             </header>
             <div class="row row-col-border" data-gutter="60">
                 <div class="col-md-3">
-                    <h4 class="widget-title-sm">Recently Viewed</h4>
+                    <h4 class="widget-title-sm">熱門推薦</h4>
                     <ul class="product-list">
+                        <% @new_products.each do |p|%>
+                        <% surplus = 0%>
+                        <% if p.product_options.size > 1 %>
+                            <% price = [] %>
+                            <% p.product_options.each do |o| %>
+                                <% surplus += o.surplus %>
+                                <% price << o.price %>
+                            <%end%>
+                        <% else %>
+                            <% price = p.product_options.first.price %>
+                            <% surplus  = p.product_options.first.surplus %>
+                        <% end %>
                         <li>
                             <div class="product product-sm-left ">
                                 <ul class="product-labels"></ul>
                                 <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
+                                    <img class="product-img" src="<%= asset_path p.productimages.first.phourl %>" alt="Image Alternative text" title="Image Title" />
                                 </div>
-                                <a class="product-link" href="#"></a>
+                                <a class="product-link" href="/products/<%= p.id %>"></a>
                                 <div class="product-caption">
                                     <ul class="product-caption-rating">
+
                                         <li class="rated"><i class="fa fa-star"></i>
                                         </li>
                                         <li class="rated"><i class="fa fa-star"></i>
@@ -237,129 +59,48 @@
                                         <li class="rated"><i class="fa fa-star"></i>
                                         </li>
                                     </ul>
-                                    <h5 class="product-caption-title">Vintage Men's Canvas Shoulder Bag Casual School Military Messenger Travel Bag</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$52</span>
+                                    <h5 class="product-caption-title"><%= p.name %></h5>
+
+                    
+                  
+                                    <div class="product-caption-price"><span class="product-caption-price-new">
+                                        <% if p.product_options.size>1 %>
+                                            NT ＄ <%= price.min %>~<%=price.max %>
+                                        <% else %>
+                                            NT ＄ <%= price %>
+                                        <% end %>
+                                    </span>
                                     </div>
                                 </div>
                             </div>
                         </li>
-                        <li>
-                            <div class="product product-sm-left ">
-                                <ul class="product-labels"></ul>
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Citizen NightHawk EcoDrive Chronograph Black Ion-plated...</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$101</span><span class="product-caption-price-new">$51</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="product product-sm-left ">
-                                <ul class="product-labels"></ul>
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Beats by Dre urBeats In-Ear Noise Isolating Headphones with In-line Control</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$64</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
+                        <%end%>
                     </ul>
                     <div class="gap gap-small"></div>
                     <h4 class="widget-title-sm">Recommended to You</h4>
                     <ul class="product-list">
+                        <% @new_products.each do |p|%>
+                        <% surplus = 0%>
+                        <% if p.product_options.size > 1 %>
+                            <% price = [] %>
+                            <% p.product_options.each do |o| %>
+                                <% surplus += o.surplus %>
+                                <% price << o.price %>
+                            <%end%>
+                        <% else %>
+                            <% price = p.product_options.first.price %>
+                            <% surplus  = p.product_options.first.surplus %>
+                        <% end %>
                         <li>
                             <div class="product product-sm-left ">
                                 <ul class="product-labels"></ul>
                                 <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
+                                    <img class="product-img" src="<%= asset_path p.productimages.first.phourl %>" alt="Image Alternative text" title="Image Title" />
                                 </div>
-                                <a class="product-link" href="#"></a>
+                                <a class="product-link" href="/products/<%= p.id %>"></a>
                                 <div class="product-caption">
                                     <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Samsung N900 Galaxy Note 3 32GB Verizon Wireless Black...</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$121</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="product product-sm-left ">
-                                <ul class="product-labels"></ul>
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Citizen NightHawk EcoDrive Chronograph Black Ion-plated...</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$143</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="product product-sm-left ">
-                                <ul class="product-labels"></ul>
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
+
                                         <li class="rated"><i class="fa fa-star"></i>
                                         </li>
                                         <li class="rated"><i class="fa fa-star"></i>
@@ -371,225 +112,213 @@
                                         <li class="rated"><i class="fa fa-star"></i>
                                         </li>
                                     </ul>
-                                    <h5 class="product-caption-title">Vintage Men's Canvas Shoulder Bag Casual School Military Messenger Travel Bag</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$133</span>
+                                    <h5 class="product-caption-title"><%= p.name %></h5>
+
+                    
+                  
+                                    <div class="product-caption-price"><span class="product-caption-price-new">
+                                        <% if p.product_options.size>1 %>
+                                            NT ＄ <%= price.min %>~<%=price.max %>
+                                        <% else %>
+                                            NT ＄ <%= price %>
+                                        <% end %>
+                                    </span>
                                     </div>
                                 </div>
                             </div>
                         </li>
+                        <%end%>
                     </ul>
-                    <div class="gap gap-small"></div>
-                    <div class="banner banner-o-hid" style="background-image:url(img/550x292.png);">
-                        <a class="banner-link" href="#"></a>
-                        <div class="banner-caption-left">
-                            <h5 class="banner-title">New Jeans Collection</h5>
-                            <p class="banner-desc">Exeedingly Good Jeans</p>
-                            <p class="banner-shop-now">Shop Now <i class="fa fa-caret-right"></i>
-                            </p>
-                        </div>
-                        <img class="banner-img" src="img/test_banner/21-i.png" alt="Image Alternative text" title="Image Title" style="bottom: -29px; right: -51px; width: 120px;" />
-                    </div>
+                    <%= render "common/leftsalebanner" %>
                 </div>
                 <div class="col-md-9">
                     <div class="col-md-7">
                         <div class="product-page-product-wrap jqzoom-stage">
                             <div class="clearfix">
-                                <a href="img/800x800.png" id="jqzoom" data-rel="gal-1">
-                                    <img src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
+                                <a href="<%= asset_path '800x800.png' %>" id="jqzoom" data-rel="gal-1">
+                                    <img class="ui fluid image" src="<%= asset_path @product.productimages.first.phourl %>" alt="<%= @product.name %>" title="<%= @product.name %>" />
                                 </a>
                             </div>
                         </div>
                         <ul class="jqzoom-list">
+                            <% @product.productimages.each do |photo| %>
                             <li>
-                                <a class="zoomThumbActive" href="javascript:void(0)" data-rel="{gallery:'gal-1', smallimage: 'img/500x500.png', largeimage: 'img/800x800.png'}">
-                                    <img src="img/100x100.png" alt="Image Alternative text" title="Image Title" />
+                                <a class="zoomThumbActive" href="javascript:void(0)" data-rel="{gallery:'gal-1', smallimage: '<%= asset_path '500x500.png' %>', largeimage: '<%= asset_path '800x800.png' %>'}">
+                                    <img class="ui fluid image" src="<%= asset_path photo.phourl %>" alt="Image Alternative text" title="Image Title" />
                                 </a>
                             </li>
-                            <li>
-                                <a href="javascript:void(0)" data-rel="{gallery:'gal-1', smallimage: 'img/500x500.png', largeimage: 'img/800x800.png'}">
-                                    <img src="img/100x100.png" alt="Image Alternative text" title="Image Title" />
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0)" data-rel="{gallery:'gal-1', smallimage: 'img/500x500.png', largeimage: 'img/800x800.png'}">
-                                    <img src="img/100x100.png" alt="Image Alternative text" title="Image Title" />
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0)" data-rel="{gallery:'gal-1', smallimage: 'img/500x500.png', largeimage: 'img/800x800.png'}">
-                                    <img src="img/100x100.png" alt="Image Alternative text" title="Image Title" />
-                                </a>
-                            </li>
+                            <% end %>
                         </ul>
                     </div>
                     <div class="col-md-5">
                         <ul class="product-page-product-rating">
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <li class="rated"><i class="fa fa-star"></i>
-                            </li>
-                            <p class="product-page-product-rating-sign"><a href="#">238 customer reviews</a>
-                            </p>
-                            <h1>Samsung 29" 2560x1080 IPS Ultra Wide Curved Monitor</h1>
-                            <p class="product-page-price">$499.99</p>
-                            <p class="text-muted text-sm">Free Shipping</p>
-                            <p class="product-page-desc-lg">With a 4 ms response time, 2560 x 1080 resolution and MagicBright technology, this Samsung S29E790C LED Curved HD 21:9 Ultrawide monitor delivers sharp, detailed visuals.</p>
-                            <ul class="product-page-actions-list">
-                                <li><a class="btn btn-lg btn-primary" href="#"><i class="fa fa-shopping-cart"></i>Add to Cart</a>
+                            <h1><%= @product.name %></h1>
+                <form class="form-horizontal" style="padding:0">
+                 <div class="ui segments" style="padding:0">
+  <div class="ui segment">
+    <p>簡介：<p class="product-page-desc-lg"><%= @product.briefdescription %></p></p>
+  </div>
+  <% if @product.brand.present?%>
+    <div class="ui segment">
+    <p>品牌：<%= @product.brand.name %></p>
+  </div>
+  <%end%>
+  <div class="ui segment">
+    <p>單件可得點數：<%= @product.point %></p>
+  </div>
+    <% if @product.product_options.size > 1 %>
+    <div class="ui segment">
+    <input type="hidden" id="option_id" value="">
+    選擇規格：
+    <% @product.product_options.each do |o| %>
+    <a  class="ui blue basic button to_position" tabindex="0" style="margin-left:10px;" onClick="optionclick('<%=o.price%>','<%=o.surplus%>','<%=o.id%>')">
+          <div class="visible content"><%= o.option1 %></div>
+        </a>
+    <% end %>
+    </div>
+  
+  <div class="ui segment">
+    <div style="display:none" id="optionprice" value="<%=@product.price%>">售價：NT$<%= @product.price %></div>
+  </div>
+  <div class="ui segment">
+    <div style="display:none" id="optionsurplus" value="<%=@product.surplus %>">庫存：<%= @product.surplus %></div>
+  </div>
+  <div class="ui segment">
+    <div style="display:none" id="selectsum">
+      選擇數量：
+       <button id ="minus" type="button" class="btn btn-default btn-add">－</button>  <d id = "sum" size="2" value ="1">1</d>  
+       <button id = "plus" type="button" class="btn btn-default btn-add">＋</button>
+      </div>
+  </div>
+</div>
+    <% else %>
+    <input type="hidden" id="option_id" value="<%= @product.product_options.first.id %>">
+    <input type="hidden" id="optionsurplus" value="<%= @product.product_options.first.surplus %>">
+
+  <div class="ui segment">
+    <p>售價：NT$<%= @product.product_options.first.price %></p>
+  </div>
+  <div class="ui segment">
+    <p>庫存：<%= @product.product_options.first.surplus %></p>
+  </div>
+  <div class="ui segment">
+  <% if @product.product_options.first.surplus == 0%>
+  <p>選擇數量：無庫存，請進行<a id ="product_register" href="javascript: return false;" onclick="productregister(<%=@product.id%>,<%=@product.product_options.first.id%>);" class = "registerbtn" >缺貨登記</a></p>
+  <%else%>
+        <div id="selectsum">
+      選擇數量：
+       <span class="input-group-btn"><button id ="minus" type="button" class="btn btn-default btn-add">－</button>  <d id = "sum" size="2" value ="1" >1</d> <span class="input-group-btn"><button id = "plus" type="button" class="btn btn-default btn-add">＋</button>
+      </div>
+      <%end%>
+  </div>
+</div>
+
+      <% end %>
+                    <% if @current_user.present? %>
+     <% if @product.available == true %>
+      <div id = "command-btn"class="ui two buttons">
+      <a id="add_cart"  class="small ui bottom attached green button">
+        <i class="chevron circle right icon"></i>
+        加入購物車
+      </a>
+        <a id="buy_btn"  class="small ui bottom attached red button">
+        <i class="chevron circle right icon"></i>
+        直接購買
+      </a></div>
+      <% else %>
+      <div id = "command-btn">
+      <div class="ui grey inverted stacked segment" style="text-align:center;">
+      <label>此商品目前無法購買，如有意願請至留言版留言</label>
+      </div>
+      </div>
+      <%end%>
+  <%else%>
+    <li><a class="btn btn-lg red-btn-primary" href="#"><i class="fa fa-shopping-cart"></i>請先登入會員</a>
                                 </li>
-                                <li><a class="btn btn-lg btn-default" href="#"><i class="fa fa-star"></i>Wishlist</a>
-                                </li>
-                            </ul>
+  <%end%>
+                </form>
+                            
                         </ul>
                     </div>
                     <div class="gap"></div>
                     <div class="tabbable product-tabs">
+
                         <ul class="nav nav-tabs" id="myTab">
-                            <li class="active"><a href="#tab-1" data-toggle="tab">Description</a>
+                            <li class="active"><a href="#tab-1" data-toggle="tab">商品敘述</a>
                             </li>
-                            <li><a href="#tab-2" data-toggle="tab">Additional Information</a>
-                            </li>
-                            <li><a href="#tab-3" data-toggle="tab">Rating and Reviews</a>
+                            <li><a href="#tab-2" data-toggle="tab">商品留言</a>
                             </li>
                         </ul>
+
                         <div class="tab-content">
                             <div class="tab-pane fade in active" id="tab-1">
-                                <p>Luctus rutrum varius congue luctus cum ultricies pulvinar sem auctor curabitur ipsum dictumst tincidunt commodo dui senectus leo proin pulvinar lectus blandit metus bibendum eros pellentesque lacus sociosqu ac malesuada</p>
-                                <p>Urna condimentum tempus ligula vulputate litora nulla tellus blandit ad</p>
+                                <%= @product.content.html_safe %>
                             </div>
                             <div class="tab-pane fade" id="tab-2">
-                                <table class="table">
-                                    <tbody>
-                                        <tr>
-                                            <td>Weight:</td>
-                                            <td>0.3 kg</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Dimensions:</td>
-                                            <td>20 ½" W x 12" H x 10 ¾" D with 9" strap drop and 52" removable, adjustable strap</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Materials:</td>
-                                            <td>100% Cotton</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Care Tips:</td>
-                                            <td>Machine wash cold, gentle cycle, only non-chlorine bleach when needed; line dry</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="tab-pane fade" id="tab-3">
-                                <article class="product-review">
-                                    <div class="product-review-author">
-                                        <img class="product-review-author-img" src="img/70x70.png" alt="Image Alternative text" title="Image Title" />
-                                    </div>
-                                    <div class="product-review-content-full">
-                                        <h5 class="product-review-title">Terrific Buy!</h5>
-                                        <ul class="product-page-product-rating">
-                                            <li class="rated"><i class="fa fa-star"></i>
-                                            </li>
-                                            <li class="rated"><i class="fa fa-star"></i>
-                                            </li>
-                                            <li class="rated"><i class="fa fa-star"></i>
-                                            </li>
-                                            <li class="rated"><i class="fa fa-star"></i>
-                                            </li>
-                                            <li class="rated"><i class="fa fa-star"></i>
-                                            </li>
-                                        </ul>
-                                        <p class="product-review-meta">by Blake Hardacre on 08/14/2015</p>
-                                        <p class="product-review-body">Massa ultricies dignissim odio vestibulum conubia per ut maecenas auctor placerat risus in elementum feugiat id montes nibh dis lobortis eu nisi imperdiet eros leo</p>
-                                        <p class="text-success"><strong><i class="fa fa-check"></i> I would recommend this to a friend!</strong>
-                                        </p>
-                                        <ul class="list-inline product-review-actions">
-                                            <li><a href="#"><i class="fa fa-flag"></i> Flag this review</a>
-                                            </li>
-                                            <li><a href="#"><i class="fa fa-comment"></i> Comment review</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </article>
-                                <article class="product-review">
-                                    <div class="product-review-author">
-                                        <img class="product-review-author-img" src="img/70x70.png" alt="Image Alternative text" title="Image Title" />
-                                    </div>
-                                    <div class="product-review-content-full">
-                                        <h5 class="product-review-title">Too Big. Unusable.</h5>
-                                        <ul class="product-page-product-rating">
-                                            <li class="rated"><i class="fa fa-star"></i>
-                                            </li>
-                                            <li class="rated"><i class="fa fa-star"></i>
-                                            </li>
-                                            <li><i class="fa fa-star"></i>
-                                            </li>
-                                            <li><i class="fa fa-star"></i>
-                                            </li>
-                                            <li><i class="fa fa-star"></i>
-                                            </li>
-                                        </ul>
-                                        <p class="product-review-meta">by Cheryl Gustin on 08/14/2015</p>
-                                        <p class="product-review-body">Magna scelerisque lectus leo nisi auctor integer ut himenaeos mauris tempus est tortor habitant primis integer risus euismod eu sit commodo mus in magnis ligula taciti inceptos tempor</p>
-                                        <p class="text-danger"><strong><i class="fa fa-close"></i> No, I would not recommend this to a friend.</strong>
-                                        </p>
-                                        <ul class="list-inline product-review-actions">
-                                            <li><a href="#"><i class="fa fa-flag"></i> Flag this review</a>
-                                            </li>
-                                            <li><a href="#"><i class="fa fa-comment"></i> Comment review</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </article>
-                                <article class="product-review">
-                                    <div class="product-review-author">
-                                        <img class="product-review-author-img" src="img/70x70.png" alt="Image Alternative text" title="Image Title" />
-                                    </div>
-                                    <div class="product-review-content-full">
-                                        <h5 class="product-review-title">Worth it</h5>
-                                        <ul class="product-page-product-rating">
-                                            <li class="rated"><i class="fa fa-star"></i>
-                                            </li>
-                                            <li class="rated"><i class="fa fa-star"></i>
-                                            </li>
-                                            <li class="rated"><i class="fa fa-star"></i>
-                                            </li>
-                                            <li class="rated"><i class="fa fa-star"></i>
-                                            </li>
-                                            <li class="rated"><i class="fa fa-star"></i>
-                                            </li>
-                                        </ul>
-                                        <p class="product-review-meta">by Leah Kerr on 08/14/2015</p>
-                                        <p class="product-review-body">Phasellus ipsum ad tristique egestas vestibulum accumsan semper rutrum ac lectus dolor augue tincidunt ridiculus curabitur fermentum laoreet vivamus est eleifend accumsan mi orci aliquam ligula imperdiet suspendisse</p>
-                                        <p
-                                        class="text-success"><strong><i class="fa fa-check"></i> I would recommend this to a friend!</strong>
-                                            </p>
-                                            <ul class="list-inline product-review-actions">
-                                                <li><a href="#"><i class="fa fa-flag"></i> Flag this review</a>
-                                                </li>
-                                                <li><a href="#"><i class="fa fa-comment"></i> Comment review</a>
-                                                </li>
-                                            </ul>
-                                    </div>
-                                </article><a class="btn btn-primary" href="#">Write a Review</a>
+                                <!--留言-->
+                                <h2>商品留言</h2>
+            <% if @messages.size > 0 %>
+                <div class="comment" style="padding:0">
+                <% @messages.each do |r| %>
+                <div class="ui graybg segment">
+                    <a class="author">
+                    <%if r.account.role == 1 %>
+                        管理員<%= r.account_name %>：
+                    <%else%>
+                        <%= r.account_name %>：
+                    <%end%>
+                    </a>
+                <div class="text"><%= r.content %></div>
+            <div class="date"><%= r.created_at.strftime("%Y-%m-%d") %></div>
+            <% if r.reply != nil %>
+            <a class="author">
+            回覆：
+            </a>
+            <div class="text"><%= r.reply %></div>
+            <div class="date"><%= r.updated_at.strftime("%Y-%m-%d") %></div>
+            <%end%>
+                </div>
+            <% end %>
+                </div>
+            <% end %>
+            <br></br>
+            <div class="divider"></div>
+            <div class="form-check">
+            <%= form_for @message ,:html =>{:class => "ui reply form"}, :url => new_product_message_path, method: :post do |f| %>
+            <div class="field">
+                <textarea id="content" name = "content" rows= '4'></textarea>
+            </div>
+            <div id="reply-btn" class="ui primary labeled icon button reply-btn">
+                <i class="icon edit"></i> 留言
+            </div>
+            <% end %>
+            </div>
+            <!-- 留言done -->
                             </div>
                         </div>
                     </div>
                     <div class="gap"></div>
-                    <h3 class="widget-title">You Might Also Like</h3>
+                    <h3 class="widget-title">你可能喜歡..</h3>
                     <div class="row row-sm-gap" data-gutter="10">
+                    <% @new_products.each do |p|%>
+                        <% surplus = 0%>
+                        <% if p.product_options.size > 1 %>
+                            <% price = [] %>
+                            <% p.product_options.each do |o| %>
+                                <% surplus += o.surplus %>
+                                <% price << o.price %>
+                            <%end%>
+                        <% else %>
+                            <% price = p.product_options.first.price %>
+                            <% surplus  = p.product_options.first.surplus %>
+                        <% end %>
                         <div class="col-md-3">
                             <div class="product product-sm-left ">
                                 <ul class="product-labels"></ul>
                                 <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
+                                    <img class="product-img" src="<%= asset_path p.productimages.first.phourl %>" alt="Image Alternative text" title="Image Title" />
                                 </div>
-                                <a class="product-link" href="#"></a>
+                                <a class="product-link" href="/product/<%= p.id %>"></a>
                                 <div class="product-caption">
                                     <ul class="product-caption-rating">
                                         <li class="rated"><i class="fa fa-star"></i>
@@ -603,177 +332,40 @@
                                         <li><i class="fa fa-star"></i>
                                         </li>
                                     </ul>
-                                    <h5 class="product-caption-title">Lenovo ThinkPad 11e 11.6" Notebook, AMD A4-6210 1.8GHz, 4GB RAM, 500GBHDD, W7Pro</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$97</span>
+                                    <h5 class="product-caption-title"><%= p.name %></h5>
+                                    <div class="product-caption-price"><span class="product-caption-price-new"><% if p.product_options.size>1 %>
+                                            NT ＄ <%= price.min %>~<%=price.max %>
+                                        <% else %>
+                                            NT ＄ <%= price %>
+                                        <% end %></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="product product-sm-left ">
-                                <ul class="product-labels"></ul>
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">LG G3 VS985 - 32GB - Verizon Smartphone - Metallic Black or Silk White - Great</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$98</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="product product-sm-left ">
-                                <ul class="product-labels"></ul>
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">LG G Flex D959 - 32GB - Titan Silver GSM Unlocked Android Smartphone (B)</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$142</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="product product-sm-left ">
-                                <ul class="product-labels"></ul>
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Apple iPhone 5c - 16GB - GSM Factory Unlocked White Blue Green Pink Yellow</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$64</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <% end %>
+                        
+                        
                     </div>
                     <div class="row row-sm-gap" data-gutter="10">
+                        <% @new_products.each do |p|%>
+                        <% surplus = 0%>
+                        <% if p.product_options.size > 1 %>
+                            <% price = [] %>
+                            <% p.product_options.each do |o| %>
+                                <% surplus += o.surplus %>
+                                <% price << o.price %>
+                            <%end%>
+                        <% else %>
+                            <% price = p.product_options.first.price %>
+                            <% surplus  = p.product_options.first.surplus %>
+                        <% end %>
                         <div class="col-md-3">
                             <div class="product product-sm-left ">
                                 <ul class="product-labels"></ul>
                                 <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
+                                    <img class="product-img" src="<%= asset_path p.productimages.first.phourl %>" alt="Image Alternative text" title="Image Title" />
                                 </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Apple 11.6" MacBook Air Notebook Computer MJVM2LL/A (Early 2015)</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$109</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="product product-sm-left ">
-                                <ul class="product-labels"></ul>
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">HP EliteBook 8460p 2.7GHz i7 8GB 160GB DVD Win 7 Pro 64 Laptop Computer CAM B</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$104</span><span class="product-caption-price-new">$63</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="product product-sm-left ">
-                                <ul class="product-labels"></ul>
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Nikon COOLPIX L840 Digital Camera, Red - Refurbished by Nikon U.S.A. #26486 B</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$132</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="product product-sm-left ">
-                                <ul class="product-labels"></ul>
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
+                                <a class="product-link" href="/product/<%= p.id %>"></a>
                                 <div class="product-caption">
                                     <ul class="product-caption-rating">
                                         <li class="rated"><i class="fa fa-star"></i>
@@ -787,118 +379,17 @@
                                         <li><i class="fa fa-star"></i>
                                         </li>
                                     </ul>
-                                    <h5 class="product-caption-title">Apple iPhone 4S 16GB Factory Unlocked Black and White Smartphone</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$136</span>
+                                    <h5 class="product-caption-title"><%= p.name %></h5>
+                                    <div class="product-caption-price"><span class="product-caption-price-new"><% if p.product_options.size>1 %>
+                                            NT ＄ <%= price.min %>~<%=price.max %>
+                                        <% else %>
+                                            NT ＄ <%= price %>
+                                        <% end %></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row row-sm-gap" data-gutter="10">
-                        <div class="col-md-3">
-                            <div class="product product-sm-left ">
-                                <ul class="product-labels"></ul>
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Nikon D5200 24.1 MP Digital SLR Camera - Black (Kit w/ 18-55 VR Lens)</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$65</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="product product-sm-left ">
-                                <ul class="product-labels"></ul>
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Motorola XT1096 Moto X 2nd Generation 16GB Verizon Wireless gsm unlocked</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$146</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="product product-sm-left ">
-                                <ul class="product-labels"></ul>
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">GoPro HERO4 Black 4K Action Camera Hero 4 Surf Camcorder . CHDHX-401. NEW</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new">$87</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="product product-sm-left ">
-                                <ul class="product-labels"></ul>
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="img/500x500.png" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                        <li><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title">Samsung Galaxy Note 4 IV 4G FACTORY UNLOCKED Black or White</h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-old">$146</span><span class="product-caption-price-new">$103</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <% end %>
                     </div>
                 </div>
             </div>

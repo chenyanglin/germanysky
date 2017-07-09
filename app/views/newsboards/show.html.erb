@@ -1,0 +1,44 @@
+    <div class="global-wrapper clearfix" id="global-wrapper">
+        <%= render "common/theboxheader" %>
+
+        <div class="container">
+            <header class="page-header" style="padding:0">
+
+            </header>
+            <div class="row row-col-border" data-gutter="60">
+                <div class="col-md-3">          
+                <%= render "common/leftsalebanner" %>
+                </div>
+                <div class="col-md-9">
+
+                  <h2 class="site-font ui header">最新消息</h2>
+                  <div class="ui segments">
+                    <div class="ui segment" >
+                      <h2 class="site-font ui header" style="display: inline-block;"><%= @newsboard.title %></h2>
+                      <div class="pull-right"><%= @newsboard.created_at.strftime("%Y-%m-%d") %></div>
+                    </div>
+                    <div class="ui segment">
+                      <div><%= @newsboard.content.html_safe %></div>
+                    </div>
+                  </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="gap"></div>
+        <%= render "common/footerbar" %>
+    </div>
+
+
+ <style type="text/css">
+.box1{                           
+ position:absolute;    
+ bottom: 0px;              
+}
+.box2{                            
+ height: 480px;               
+ position: relative;
+}
+</style>

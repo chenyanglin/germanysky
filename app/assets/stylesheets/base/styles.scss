@@ -2010,6 +2010,29 @@ header.main {
   background: #ae8455;
   border-color: #9b754a;
 }
+.red-btn-primary {
+  color: #fff !important;
+  background: #880000;
+  border-color: #FF0000;
+}
+.red-btn-primary:hover {
+  background: #880000;
+  border-color: #FF0000;
+}
+.red-btn-primary:focus {
+  background: #880000;
+  border-color: #FF0000;
+}
+.red-btn-primary-invert {
+  background: #b79268;
+  border-color: #ae8455;
+  color: #fff;
+}
+.red-btn-primary-invert:hover {
+  color: #fff;
+  background: #ae8455;
+  border-color: #9b754a;
+}
 .btn-black {
   background: linten(#000, 15%);
   border-color: #000;

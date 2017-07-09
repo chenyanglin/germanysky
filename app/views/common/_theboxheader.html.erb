@@ -1,0 +1,219 @@
+        <div class="navbar-before mobile-hidden">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="navbar-before-sign">Everything You Need is Germanysky</p>
+                    </div>
+                    <div class="col-md-6">
+                    <ul class="nav navbar-nav navbar-right navbar-right-no-mar">
+                        <li><a href="/consoles/aboutus">關於我們</a>
+                        </li>
+                        <li><a href="#">部落格</a>
+                        </li>
+                        <li><a href="/messages/new">留言版</a>
+                        </li>
+                        <li><a href="#">購物須知</a>
+                        </li>
+                    </ul>
+                </div>
+                </div>
+            </div>
+        </div>
+    <div class="mfp-with-anim mfp-hide mfp-dialog clearfix" id="nav-login-dialog">
+        <h3 class="widget-title">Member Login</h3>
+        <p>歡迎回來，登入開始購物～</p>
+        <hr />
+        <form>
+            <div class="form-group">
+                <label>Email or Username</label>
+                <input class="form-control" type="text" />
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input class="form-control" type="text" />
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input class="i-check" type="checkbox" />Remeber Me</label>
+            </div>
+            <input class="btn btn-primary" type="submit" value="Sign In" />
+        </form>
+        <div class="gap gap-small"></div>
+        <ul class="list-inline">
+            <li><a href="#nav-account-dialog" class="popup-text">Not Member Yet</a>
+            </li>
+            <li><a href="#nav-pwd-dialog" class="popup-text">Forgot Password?</a>
+            </li>
+        </ul>
+    </div>
+        <div class="mfp-with-anim mfp-hide mfp-dialog clearfix" id="nav-account-dialog">
+            <h3 class="widget-title">Create TheBox Account</h3>
+            <p>Ready to get best offers? Let's get started!</p>
+            <hr />
+            <form>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input class="form-control" type="text" />
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input class="form-control" type="text" />
+                </div>
+                <div class="form-group">
+                    <label>Repeat Password</label>
+                    <input class="form-control" type="text" />
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input class="form-control" type="text" />
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input class="i-check" type="checkbox" />Subscribe to the Newsletter</label>
+                </div>
+                <input class="btn btn-primary" type="submit" value="Create Account" />
+            </form>
+            <div class="gap gap-small"></div>
+            <ul class="list-inline">
+                <li><a href="#nav-login-dialog" class="popup-text">Already Memeber</a>
+                </li>
+            </ul>
+        </div>
+        <div class="mfp-with-anim mfp-hide mfp-dialog clearfix" id="nav-pwd-dialog">
+            <h3 class="widget-title">Password Recovery</h3>
+            <p>Enter Your Email and We Will Send the Instructions</p>
+            <hr />
+            <form>
+                <div class="form-group">
+                    <label>Your Email</label>
+                    <input class="form-control" type="text" />
+                </div>
+                <input class="btn btn-primary" type="submit" value="Recover Password" />
+            </form>
+        </div>
+        <nav class="navbar navbar-inverse navbar-main yamm">
+            <div class="container">
+                <div class="navbar-header">
+                    <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-nav-collapse" area_expanded="false"><span class="sr-only">Main Menu</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="">
+                        <img src="<%= asset_path 'logo-w.png' %>" alt="Image Alternative text" title="Image Title" />
+                    </a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-nav-collapse">
+                    
+                    <form class="navbar-form navbar-left navbar-main-search navbar-main-search-category" role="search">
+                <select class="navbar-main-search-category-select">
+                    <option>所有分類</option>
+                     <% @type_ones.each do |t| %>
+             <option><%=t.name %></option>
+              <% if t.type_twos.size>0 %>
+                <% t.type_twos.each do |two| %>
+                <option>&nbsp;&nbsp;&nbsp;<%= two.name %></option>
+                <% end %>
+              <%end%>
+            <% end %>
+                </select>
+                <div class="form-group">
+                    <input class="form-control" type="text" size="80" placeholder="全站商品搜尋" />
+                </div>
+                <a class="fa fa-search navbar-main-search-submit" href="#"></a>
+            </form>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="#nav-login-dialog" data-effect="mfp-move-from-top" class="popup-text">Sign In</a>
+                        </li>
+                        <li><a href="#nav-account-dialog" data-effect="mfp-move-from-top" class="popup-text">Create Account</a>
+                        </li>
+
+                        
+                        <% if @current_user.present? && @current_user.role!=1%>
+                <li class="dropdown"><a href="/products/shoppingcart"><span >購物車</span>
+                
+                <i class="fa fa-shopping-cart"></i><% if @barcarts.size > 0 %><% @barcarts.size %><% else %> 0 <%end%>件商品</a>
+                <% if @barcarts.size > 0 %>
+                    <ul class="dropdown-menu dropdown-menu-shipping-cart">
+                        <%@cartprice=0%>
+                            <%@barcarts.each do |b| %>
+                        <li>
+                            <a class="dropdown-menu-shipping-cart-img" href="#">
+                                <img src="<%= asset_path '100px.png' %>" alt="Image Alternative text" title="Image Title" />
+                            </a>
+                            <div class="dropdown-menu-shipping-cart-inner">
+                                <p class="dropdown-menu-shipping-cart-price">數量：<%=b.sum %> $<%=b.product_option.price*b.sum%></p>
+                                <p class="dropdown-menu-shipping-cart-item"><a href="#"><%=b.product.name%></a>
+                                </p>
+                            </div>
+                        </li>
+                               <%@cartprice += b.product_option.price*b.sum%>
+                               <%end%>
+                        <li>
+                            <p class="dropdown-menu-shipping-cart-total">Total: $<%=@cartprice%></p>
+                            <button class="dropdown-menu-shipping-cart-checkout btn btn-primary">結帳</button>
+                        </li>
+                    </ul>
+                <%else%>
+                    <ul class="dropdown-menu dropdown-menu-shipping-cart">
+                            
+                            <li>
+                                <p class="dropdown-menu-shipping-cart-total">Total: $0</p>
+                                <button class="dropdown-menu-shipping-cart-checkout btn btn-primary">立即購物</button>
+                            </li>
+                        </ul>
+                <%end%>
+                </li>
+                <%end%>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    <nav class="navbar-defaulta navbar-main-white yamm" style="padding:0">
+        <div class="container">
+            <div class="collapse navbar-collapse navbar-collapse-no-pad" id="main-nav-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown"><a href="#"><span ></span>商品展示<i class="drop-caret" data-toggle="dropdown"></i></a>
+                        <ul class="dropdown-menu dropdown-menu-category">
+                           
+                        <% @type_ones.each do |t| %>
+                            <li><a href="/products?type=<%=t.id%>"><i class="fa fa-tags dropdown-menu-category-icon"></i><%=t.name %></a>
+                                <div class="dropdown-menu-category-section">
+                                    <div class="dropdown-menu-category-section-inner">
+                                        <div class="dropdown-menu-category-section-content">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <h5 class="dropdown-menu-category-title"><%=t.name %></h5>
+                                                    <ul class="dropdown-menu-category-list">
+                                                    <% if t.type_twos.size>0 %>
+                                                    <% t.type_twos.each do |two| %>
+                                                        <li><a href="/products?type2=<%=two.id%>"><%= two.name %></a>
+                                                            <p><%= two.description %></p>
+                                                        </li>
+                                                        <%end%>
+                                                        <%end%>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <%end%>
+                        </ul>
+                    </li>
+
+                    <li class="dropdown"><a href="/newsboards"><span ></span>最新消息</a>
+                    </li>
+                    <li class="dropdown"><a href="#"><span ></span>促銷活動</a>
+                    </li>
+                    <li class="dropdown"><a href="/consoles/aboutus"><span ></span>關於我們</a>
+                    </li>
+                    <li class="dropdown"><a href="#"><span ></span>購物流程</a>
+                    </li>
+                    <li class="dropdown"><a href="#"><span ></span>注意事項</a>
+                    </li>
+                    <li class="dropdown"><a href="#"><span ></span>留言版</a>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>

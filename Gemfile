@@ -22,13 +22,13 @@ gem 'therubyracer'
 gem 'sprockets-rails', '2.3.3'
 
 gem 'activeadmin', github: "gregbell/active_admin"
-gem "redactor-rails"
+# gem "redactor-rails"
 gem "uploader"
 gem "css_splitter" ,'0.4.6'
 
 # gem 'rmagick'
 # gem 'rails_12factor'
-gem 'font-awesome-rails'
+gem 'font-awesome-rails', '4.3.0.0'
 gem 'bcrypt', '3.1.10'
 gem 'web-console', '~> 2.0'
 gem 'paperclip', '4.3.0'
@@ -53,12 +53,7 @@ gem 'geocoder', '1.2.9' #googlemap使用
 gem "cancancan", '1.12.0'
 
 gem 'aws-sdk', '< 2.0'
-gem 'bootstrap-modal-rails'
-gem 'bootstrap-table-rails'
-gem 'bootstrap-multiselect-rails'
-gem 'bootstrap-tooltip-rails'
 gem 'react-rails', '~> 1.6', '>= 1.6.2'
-gem 'smart_listing'
 gem 'bootstrap-sass'
 gem 'js_cookie_rails'
 
@@ -70,7 +65,6 @@ gem 'htmlbeautifier'
 
 gem 'semantic-ui-sass', github: 'doabit/semantic-ui-sass' #new ui framework
 gem 'clipboard-rails', '~> 1.3', '>= 1.3.1.1' # 剪貼簿功能
-gem 'jquery-infinite-pages'
 gem 'omniauth'
 gem 'omniauth-facebook'
 gem 'omniauth-google-oauth2'

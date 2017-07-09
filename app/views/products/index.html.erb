@@ -1,169 +1,127 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>GermanySky 德心應手</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <!-- Bootstrap styles -->
-    <!-- <link href="assets/css/bootstrap.css" rel="stylesheet"/> -->
-    <!-- Customize styles -->
-    <!-- <link href="style.css" rel="stylesheet"/> -->
-    <!-- font awesome styles -->
-	<!-- <link href="assets/font-awesome/css/font-awesome.css" rel="stylesheet"> -->
-		<!--[if IE 7]>
-			<link href="css/font-awesome-ie7.min.css" rel="stylesheet">
-		<![endif]-->
+    <div class="global-wrapper clearfix" id="global-wrapper">
+        <%= render "common/theboxheader" %>
 
-		<!--[if lt IE 9]>
-			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-		<![endif]-->
-
-	<!-- Favicons -->
-    <link rel="shortcut icon" href="<%= asset_path 'ico/favicon.ico' %>">
-  </head>
-<body style="background:url('<%= asset_path("white_leather.png") %>') repeat 0 0;">
-<!-- 
-	Upper Header Section 
--->
-<%= render "common/topbar" %>
-
-<!--
-Lower Header Section 
--->
 <div class="container">
-<%= render "common/header" %>
-<%= render "common/leftmenu" %>
-<!-- 
-Body Section 
--->
-<div class="span9">
-<!-- 
-New Products
--->
-<% if @brand.present? %>
-<h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
- 
-    <div class="content">
-      品牌商品
+            <header class="page-header">
+                <% if @type.present? %>
+                <h1 class="page-title"><%=@type.name%></h1>
+                <% else %>
+                <h1 class="page-title">All Products</h1>
+                <% end %>
+                <ol class="breadcrumb page-breadcrumb">
+                    <li><a href="#">Home</a>
+                    </li>
+                    <li><a href="#">Fashion</a>
+                    </li>
+                    <li class="active">Man</li>
+                </ol>
+            </header>
+            <div class="row">
+                <div class="col-md-3">
+                    <aside class="category-filters">
+                        <div class="category-filters-section">
+                            <h3 class="widget-title-sm">Category</h3>
+                            <ul class="cateogry-filters-list">
+                                <li><a href="#">Clothing</a>
+                                </li>
+                                <li><a href="#">Shoes</a>
+                                </li>
+                                <li><a href="#">Accessories</a>
+                                </li>
+                                <li><a href="#">Jewerly</a>
+                                </li>
+                                <li><a href="#">Watches</a>
+                                </li>
+                                <li><a href="#">Fine Jewerly</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+                <div class="col-md-9">
+                <% if @products.size > 0 %>
+                  <% i = 1 %>
+                  <% @products.each do |p|%>
+                  <% surplus = 0%>
+                  <% if p.product_options.size > 1 %>
+                  <% price = [] %>
+                  <% p.product_options.each do |o| %>
+                  <% surplus += o.surplus %>
+                  <% price << o.price %>
+                  <%end%>
+                <% else %>
+                  <% price = p.product_options.first.price %>
+                  <% surplus  = p.product_options.first.surplus %>
+                <% end %>
+                <% if i%3 == 1%>
+                    <div class="row" data-gutter="15">
+                <% end%>
+                        <div class="col-md-4">
+                            <div class="product product-sm-left ">
+                                <ul class="product-labels"></ul>
+                                <div class="product-img-wrap">
+                                    <img class="product-img" src="<%= asset_path p.productimages.first.phourl %>" alt="<%= p.name %>" title="<%= p.name %>" />
+                                </div>
+                                <a class="product-link" href="/products/<%= p.id %>"></a>
+                                <div class="product-caption">
+                                    <ul class="product-caption-rating">
+                                        <li class="rated"><i class="fa fa-star"></i>
+                                        </li>
+                                        <li class="rated"><i class="fa fa-star"></i>
+                                        </li>
+                                        <li class="rated"><i class="fa fa-star"></i>
+                                        </li>
+                                        <li class="rated"><i class="fa fa-star"></i>
+                                        </li>
+                                        <li><i class="fa fa-star"></i>
+                                        </li>
+                                    </ul>
+                                    <h5 class="product-caption-title"><%= p.name %></h5>
+                                    <div class="product-caption-price"><span class="product-caption-price-new"><% if p.product_options.size>1 %>
+                                      NT ＄ <%= price.min %>~<%=price.max %>
+                                      <%else%>
+                                      NT ＄ <%= price %>
+                                      <%end%></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% if i%3==0 %>                
+                    </div>
+                    <% end %>
+                    <% i += 1%>
+                    <% end %>
+                    <%else%>
+                    <%end%>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="category-pagination-sign">58 items found in Cell Phones. Showing 1 - 12</p>
+                        </div>
+                        <div class="col-md-6">
+                            <nav>
+                                <ul class="pagination category-pagination pull-right">
+                                    <li class="active"><a href="#">1</a>
+                                    </li>
+                                    <li><a href="#">2</a>
+                                    </li>
+                                    <li><a href="#">3</a>
+                                    </li>
+                                    <li><a href="#">4</a>
+                                    </li>
+                                    <li><a href="#">5</a>
+                                    </li>
+                                    <li class="last"><a href="#"><i class="fa fa-long-arrow-right"></i></a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="gap"></div>
+        <%= render "common/footerbar" %>
     </div>
-  </h1>
-
-<div class="ui top attached black info message">
-<%begin%>
-  <div class="image">
-    <img class="ui centered image" src="<%= asset_path @brand.brandimage.phourl %>">
-  </div>
-  <%rescue%>
-    <div class="image">
-    <img class="ui centered image" src="<%= asset_path '100px.png' %>">
-  </div>
-  <%end%>
-  <div class="content">
-    <label><%=@brand.name%></label>
-    <div class="description">
-      <%=@brand.detaildescription%>
-    </div>
-  </div>
-</div>
-
-<br></br>
-<%elsif @type.present?%>
-<h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
- 
-    <div class="content">
-      <%=@type.name%>類商品
-    </div>
-  </h1>
-    <%else%>
-<h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
- 
-    <div class="content">
-      商品展示
-    </div>
-  </h1>
-<% end %>
-	<div class="well well-small">	
- 	<% if @products.size > 0 %>
-		<% i = 1 %>
-		<% @products.each do |p|%>
-		<% surplus = 0%>
-		<% if p.product_options.size > 1 %>
-    		<% price = [] %>
-    		<% p.product_options.each do |o| %>
-    			<% surplus += o.surplus %>
-    			<% price << o.price %>
-      		<%end%>
-       	<% else %>
-    		<% price = p.product_options.first.price %>
-    		<% surplus  = p.product_options.first.surplus %>
-    	<% end %>
-		<% if i%3 == 1%>
-		<div class="row-fluid">
-		  <ul class="thumbnails">
-		<% end%>
-			<li class="span4">
-			  <div class="thumbnail">
-				<a href="product_details.html" class="overlay"></a>
-				<a class="zoomTool" href="/products/<%= p.id %>" title="add to cart"><i class="search icon"></i>前往商品</a>
-				<a href="/products/<%= p.id %>">
-
-  <img class="ui centered small image" src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" style='height: 180px; width: 100%; object-fit: contain'>
-</a>
-				<div class="caption cntr">
-					<p><strong><%= p.name %></strong></p>
-					<p>
-					
-					庫存：<%= surplus %></br> 
-					<% if p.product_options.size>1 %>
-        				NT ＄ <%= price.min %>~<%=price.max %>
-  					<%else%>
-        				NT ＄ <%= price %>
-  					<%end%>
-					</p>
-					
-				</div>
-			  </div>
-			</li>
-		<% if i%3==0 %>
-		  </ul>
-		</div>
-		<% end %>
-		<% i += 1%>
-		<% end %>
-			</div>
-		<%else%>
-		<h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
- 
-    <div class="content">
-      沒有商品
-    </div>
-  </h1>
-
-		<%end%>
-
-	</div>
-	</div>
-	</div>
-<!-- 
-Clients 
--->
-<!--
-Footer
--->
-<%= render "common/footerbar" %>
-
-  </body>
-</html>
-
- <style type="text/css">
-.box1{                           
- position:absolute;    
- bottom: 0px;              
-}
-.box2{                            
- height: 480px;               
- position: relative;
-}
-</style>

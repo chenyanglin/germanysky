@@ -227,7 +227,7 @@ def show
 
   @messages = @product.product_messages
   @message = ProductMessage.new
-  @new_products = Product.includes(:productimages).where(on_store: true).limit(3)
+  @new_products = Product.includes(:productimages).where(on_store: true).limit(4)
     @new_products = @new_products.order("created_at desc")
   if @product.on_store == false
     redirect_to "/"
