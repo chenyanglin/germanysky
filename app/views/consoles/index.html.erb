@@ -95,9 +95,9 @@
             </ul>
             <div class="tab-content">
                 <div class="tab-pane fade in active" id="tab-1">
-                    <% if @new_products.size > 0 %>
-                    <div class="row" data-gutter="15">
-                        <% @new_products.each do |p|%>
+                    <% if @products.size > 0 %>
+                    <% i = 1 %>
+                    <% @products.each do |p|%>
                         <% surplus = 0%>
                         <% if p.product_options.size > 1 %>
                             <% price = [] %>
@@ -109,12 +109,15 @@
                             <% price = p.product_options.first.price %>
                             <% surplus  = p.product_options.first.surplus %>
                         <% end %>
+                    <% if i%6 == 1%>
+                    <div class="row" data-gutter="15">
+                    <% end %>
                         <div class="col-md-2">
                             <div class="product product-sm ">
                                 <div class="product-img-wrap">
-                                    <img class="product-img" src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt="Shop Now" title="hot sales" />
+                                    <img class="ui fluid image" style='height: 120px; width: 150px; object-fit: contain' src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt="Shop Now" title="hot sales" />
                                 </div>
-                                <a class="product-link" href="#"></a>
+                                <a class="product-link" href="/products/<%= p.id %>"></a>
                                 <div class="product-caption">
                                     <ul class="product-caption-rating">
                                         <li class="rated"><i class="fa fa-star"></i>
@@ -128,63 +131,26 @@
                                         <li class="rated"><i class="fa fa-star"></i>
                                         </li>
                                     </ul>
-                                    <h5 class="product-caption-title"><%= p.name %></h5>
+                                    <h5 class="product-caption-title"><%= p.name+i.to_s %></h5>
                                     <div class="product-caption-price"><span class="product-caption-price-new"><% if p.product_options.size>1 %>NT ＄ <%= price.min %>~<%=price.max %><%else%>NT ＄ <%= price %><%end%></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <%end%>
+                        
+                    <% if i%6 == 0 or i ==@products.size %>
+
                     </div>
+                    <% end %>
+                    <% i += 1%>
                     <%end%>
-                    <% if @last_products.size > 0 %>
-                    <div class="row" data-gutter="15">
-                        <% @last_products.each do |p|%>
-                        <% surplus = 0%>
-                        <% if p.product_options.size > 1 %>
-                            <% price = [] %>
-                            <% p.product_options.each do |o| %>
-                            <% surplus += o.surplus %>
-                            <% price << o.price %>
-                            <%end%>
-                        <% else %>
-                            <% price = p.product_options.first.price %>
-                            <% surplus  = p.product_options.first.surplus %>
-                        <% end %>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title"><%= p.name %></h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new"><% if p.product_options.size>1 %>NT ＄ <%= price.min %>~<%=price.max %><%else%>NT ＄ <%= price %><%end%></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <%end%>
-                    </div>
                     <%end%>
                 </div>
 
-                <div class="tab-pane fade" id="tab-3">
-                    <% if @new_products.size > 0 %>
-                    <div class="row" data-gutter="15">
-                        <% @new_products.each do |p|%>
+                <div class="tab-pane fade" id="tab-2">
+                    <% if @products.size > 0 %>
+                    <% i = 1 %>
+                    <% @products.each do |p|%>
                         <% surplus = 0%>
                         <% if p.product_options.size > 1 %>
                             <% price = [] %>
@@ -196,12 +162,15 @@
                             <% price = p.product_options.first.price %>
                             <% surplus  = p.product_options.first.surplus %>
                         <% end %>
+                    <% if i%6 == 1%>
+                    <div class="row" data-gutter="15">
+                    <% end %>
                         <div class="col-md-2">
                             <div class="product product-sm ">
                                 <div class="product-img-wrap">
-                                    <img class="product-img" src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt="Shop Now" title="hot sales" />
+                                    <img class="ui fluid image" style='height: 120px; width: 150px; object-fit: contain' src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt="Shop Now" title="hot sales" />
                                 </div>
-                                <a class="product-link" href="#"></a>
+                                <a class="product-link" href="/products/<%= p.id %>"></a>
                                 <div class="product-caption">
                                     <ul class="product-caption-rating">
                                         <li class="rated"><i class="fa fa-star"></i>
@@ -215,18 +184,25 @@
                                         <li class="rated"><i class="fa fa-star"></i>
                                         </li>
                                     </ul>
-                                    <h5 class="product-caption-title"><%= p.name %></h5>
+                                    <h5 class="product-caption-title"><%= p.name+i.to_s %></h5>
                                     <div class="product-caption-price"><span class="product-caption-price-new"><% if p.product_options.size>1 %>NT ＄ <%= price.min %>~<%=price.max %><%else%>NT ＄ <%= price %><%end%></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <%end%>
+                        
+                    <% if i%6 == 0 or i ==@products.size %>
+
                     </div>
+                    <% end %>
+                    <% i += 1%>
                     <%end%>
-                    <% if @last_products.size > 0 %>
-                    <div class="row" data-gutter="15">
-                        <% @last_products.each do |p|%>
+                    <%end%>
+                </div>
+                <div class="tab-pane fade" id="tab-3">
+                    <% if @products.size > 0 %>
+                    <% i = 1 %>
+                    <% @products.each do |p|%>
                         <% surplus = 0%>
                         <% if p.product_options.size > 1 %>
                             <% price = [] %>
@@ -238,12 +214,15 @@
                             <% price = p.product_options.first.price %>
                             <% surplus  = p.product_options.first.surplus %>
                         <% end %>
+                    <% if i%6 == 1%>
+                    <div class="row" data-gutter="15">
+                    <% end %>
                         <div class="col-md-2">
                             <div class="product product-sm ">
                                 <div class="product-img-wrap">
-                                    <img class="product-img" src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt="Image Alternative text" title="Image Title" />
+                                    <img class="ui fluid image" style='height: 120px; width: 150px; object-fit: contain' src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt="Shop Now" title="hot sales" />
                                 </div>
-                                <a class="product-link" href="#"></a>
+                                <a class="product-link" href="/products/<%= p.id %>"></a>
                                 <div class="product-caption">
                                     <ul class="product-caption-rating">
                                         <li class="rated"><i class="fa fa-star"></i>
@@ -257,20 +236,25 @@
                                         <li class="rated"><i class="fa fa-star"></i>
                                         </li>
                                     </ul>
-                                    <h5 class="product-caption-title"><%= p.name %></h5>
+                                    <h5 class="product-caption-title"><%= p.name+i.to_s %></h5>
                                     <div class="product-caption-price"><span class="product-caption-price-new"><% if p.product_options.size>1 %>NT ＄ <%= price.min %>~<%=price.max %><%else%>NT ＄ <%= price %><%end%></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <%end%>
+                        
+                    <% if i%6 == 0 or i ==@products.size %>
+
                     </div>
+                    <% end %>
+                    <% i += 1%>
+                    <%end%>
                     <%end%>
                 </div>
                 <div class="tab-pane fade" id="tab-4">
-                    <% if @new_products.size > 0 %>
-                    <div class="row" data-gutter="15">
-                        <% @new_products.each do |p|%>
+                    <% if @products.size > 0 %>
+                    <% i = 1 %>
+                    <% @products.each do |p|%>
                         <% surplus = 0%>
                         <% if p.product_options.size > 1 %>
                             <% price = [] %>
@@ -282,12 +266,15 @@
                             <% price = p.product_options.first.price %>
                             <% surplus  = p.product_options.first.surplus %>
                         <% end %>
+                    <% if i%6 == 1%>
+                    <div class="row" data-gutter="15">
+                    <% end %>
                         <div class="col-md-2">
                             <div class="product product-sm ">
                                 <div class="product-img-wrap">
-                                    <img class="product-img" src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt="Shop Now" title="hot sales" />
+                                    <img class="ui fluid image" style='height: 120px; width: 150px; object-fit: contain' src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt="Shop Now" title="hot sales" />
                                 </div>
-                                <a class="product-link" href="#"></a>
+                                <a class="product-link" href="/products/<%= p.id %>"></a>
                                 <div class="product-caption">
                                     <ul class="product-caption-rating">
                                         <li class="rated"><i class="fa fa-star"></i>
@@ -301,142 +288,19 @@
                                         <li class="rated"><i class="fa fa-star"></i>
                                         </li>
                                     </ul>
-                                    <h5 class="product-caption-title"><%= p.name %></h5>
+                                    <h5 class="product-caption-title"><%= p.name+i.to_s %></h5>
                                     <div class="product-caption-price"><span class="product-caption-price-new"><% if p.product_options.size>1 %>NT ＄ <%= price.min %>~<%=price.max %><%else%>NT ＄ <%= price %><%end%></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <%end%>
+                        
+                    <% if i%6 == 0 or i ==@products.size %>
+
                     </div>
+                    <% end %>
+                    <% i += 1%>
                     <%end%>
-                    <% if @last_products.size > 0 %>
-                    <div class="row" data-gutter="15">
-                        <% @last_products.each do |p|%>
-                        <% surplus = 0%>
-                        <% if p.product_options.size > 1 %>
-                            <% price = [] %>
-                            <% p.product_options.each do |o| %>
-                            <% surplus += o.surplus %>
-                            <% price << o.price %>
-                            <%end%>
-                        <% else %>
-                            <% price = p.product_options.first.price %>
-                            <% surplus  = p.product_options.first.surplus %>
-                        <% end %>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title"><%= p.name %></h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new"><% if p.product_options.size>1 %>NT ＄ <%= price.min %>~<%=price.max %><%else%>NT ＄ <%= price %><%end%></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <%end%>
-                    </div>
-                    <%end%>
-                </div>
-                <div class="tab-pane fade" id="tab-2">
-                    <% if @new_products.size > 0 %>
-                    <div class="row" data-gutter="15">
-                        <% @new_products.each do |p|%>
-                        <% surplus = 0%>
-                        <% if p.product_options.size > 1 %>
-                            <% price = [] %>
-                            <% p.product_options.each do |o| %>
-                            <% surplus += o.surplus %>
-                            <% price << o.price %>
-                            <%end%>
-                        <% else %>
-                            <% price = p.product_options.first.price %>
-                            <% surplus  = p.product_options.first.surplus %>
-                        <% end %>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt="Shop Now" title="hot sales" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title"><%= p.name %></h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new"><% if p.product_options.size>1 %>NT ＄ <%= price.min %>~<%=price.max %><%else%>NT ＄ <%= price %><%end%></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <%end%>
-                    </div>
-                    <%end%>
-                    <% if @last_products.size > 0 %>
-                    <div class="row" data-gutter="15">
-                        <% @last_products.each do |p|%>
-                        <% surplus = 0%>
-                        <% if p.product_options.size > 1 %>
-                            <% price = [] %>
-                            <% p.product_options.each do |o| %>
-                            <% surplus += o.surplus %>
-                            <% price << o.price %>
-                            <%end%>
-                        <% else %>
-                            <% price = p.product_options.first.price %>
-                            <% surplus  = p.product_options.first.surplus %>
-                        <% end %>
-                        <div class="col-md-2">
-                            <div class="product product-sm ">
-                                <div class="product-img-wrap">
-                                    <img class="product-img" src="<%begin%><%= asset_path p.productimages.first.phourl %><%rescue%><%=asset_path '100px.png' %><%end%>" alt="Image Alternative text" title="Image Title" />
-                                </div>
-                                <a class="product-link" href="#"></a>
-                                <div class="product-caption">
-                                    <ul class="product-caption-rating">
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                        <li class="rated"><i class="fa fa-star"></i>
-                                        </li>
-                                    </ul>
-                                    <h5 class="product-caption-title"><%= p.name %></h5>
-                                    <div class="product-caption-price"><span class="product-caption-price-new"><% if p.product_options.size>1 %>NT ＄ <%= price.min %>~<%=price.max %><%else%>NT ＄ <%= price %><%end%></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <%end%>
-                    </div>
                     <%end%>
                 </div>
             </div>

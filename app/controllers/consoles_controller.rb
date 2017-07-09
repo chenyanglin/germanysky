@@ -3,8 +3,8 @@ class ConsolesController < ApplicationController
   before_filter :setting
 	def index
 		# @console_user ||= ManagerAccount.find(1)
-    @product = Product.includes(:productimages).where(on_store: true).limit(4)
-    @product = @product.order("created_at desc")
+    @products = Product.all.includes(:productimages).where(on_store: true)
+    @products = @products.order("created_at desc")
     @new_products = Product.includes(:productimages).where(on_store: true).limit(8)
     @new_products = @new_products.order("created_at desc")
     @last_products = @new_products[4..8]
