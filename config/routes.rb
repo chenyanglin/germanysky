@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
 
-  mount RedactorRails::Engine => '/redactor_rails'
+  # mount RedactorRails::Engine => '/redactor_rails'
   
   
   # get '/login', :to => 'accounts#new', :as => :login

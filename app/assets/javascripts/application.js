@@ -23,7 +23,6 @@
 //= require components
 //= require semantic-ui
 //= require jquery-fileupload
-//= require jquery.infinite-pages
 //= require react
 //= require react_ujs
 //= require js.cookie
