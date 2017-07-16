@@ -309,7 +309,7 @@
         <div class="row" data-gutter="15">
             <div class="col-md-6">
                 <div class="banner banner-o-hid" style="background-color:#D2D2D2;">
-                    <a class="banner-link" href="#"></a>
+                    
                     <div class="banner-caption-left banner-caption-dark">
                         <h5 class="banner-title">最新消息</h5>
                          <% if @newsboards.present? %>
@@ -318,18 +318,10 @@
                             <p class="banner-desc"><i class="browser icon"></i><a href="/newsboards/<%=n.id%>"><%= n.title %></a>
                                 <font size="0.1" ><%= n.created_at.strftime("%Y-%m-%d") %></font></p>
                             </div>
-                            <div id="<%= n.id %>">
-                            <p class="banner-desc"><i class="browser icon"></i><a href="/newsboards/<%=n.id%>"><%= n.title %></a>
-                                <font size="0.1" ><%= n.created_at.strftime("%Y-%m-%d") %></font></p>
-                            </div>
-                            <div id="<%= n.id %>">
-                            <p class="banner-desc"><i class="browser icon"></i><a href="/newsboards/<%=n.id%>"><%= n.title %></a>
-                                <font size="0.1" ><%= n.created_at.strftime("%Y-%m-%d") %></font></p>
-                            </div>
     </br>
     <%end%>
 <%end%>
-                        <p class="banner-shop-now">查看更多 <i class="fa fa-caret-right"></i>
+                        <p  class="banner-shop-now"><a href="/newsboards">查看更多 <i class="fa fa-caret-right"></i></a>
                         </p>
                     </div>
                     <img class="banner-img" src="<%=asset_path '28-i.png' %>" alt="Image Alternative text" title="Image Title" style="bottom: 0px; right: 0px; width: 240px;" />

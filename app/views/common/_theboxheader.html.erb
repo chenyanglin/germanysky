@@ -19,78 +19,9 @@
                 </div>
             </div>
         </div>
-    <div class="mfp-with-anim mfp-hide mfp-dialog clearfix" id="nav-login-dialog">
-        <h3 class="widget-title">Member Login</h3>
-        <p>歡迎回來，登入開始購物～</p>
-        <hr />
-        <form>
-            <div class="form-group">
-                <label>Email or Username</label>
-                <input class="form-control" type="text" />
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input class="form-control" type="text" />
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input class="i-check" type="checkbox" />Remeber Me</label>
-            </div>
-            <input class="btn btn-primary" type="submit" value="Sign In" />
-        </form>
-        <div class="gap gap-small"></div>
-        <ul class="list-inline">
-            <li><a href="#nav-account-dialog" class="popup-text">Not Member Yet</a>
-            </li>
-            <li><a href="#nav-pwd-dialog" class="popup-text">Forgot Password?</a>
-            </li>
-        </ul>
-    </div>
-        <div class="mfp-with-anim mfp-hide mfp-dialog clearfix" id="nav-account-dialog">
-            <h3 class="widget-title">Create TheBox Account</h3>
-            <p>Ready to get best offers? Let's get started!</p>
-            <hr />
-            <form>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input class="form-control" type="text" />
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input class="form-control" type="text" />
-                </div>
-                <div class="form-group">
-                    <label>Repeat Password</label>
-                    <input class="form-control" type="text" />
-                </div>
-                <div class="form-group">
-                    <label>Phone Number</label>
-                    <input class="form-control" type="text" />
-                </div>
-                <div class="checkbox">
-                    <label>
-                        <input class="i-check" type="checkbox" />Subscribe to the Newsletter</label>
-                </div>
-                <input class="btn btn-primary" type="submit" value="Create Account" />
-            </form>
-            <div class="gap gap-small"></div>
-            <ul class="list-inline">
-                <li><a href="#nav-login-dialog" class="popup-text">Already Memeber</a>
-                </li>
-            </ul>
-        </div>
-        <div class="mfp-with-anim mfp-hide mfp-dialog clearfix" id="nav-pwd-dialog">
-            <h3 class="widget-title">Password Recovery</h3>
-            <p>Enter Your Email and We Will Send the Instructions</p>
-            <hr />
-            <form>
-                <div class="form-group">
-                    <label>Your Email</label>
-                    <input class="form-control" type="text" />
-                </div>
-                <input class="btn btn-primary" type="submit" value="Recover Password" />
-            </form>
-        </div>
+
+        
+        
         <nav class="navbar navbar-inverse navbar-main yamm">
             <div class="container">
                 <div class="navbar-header">
@@ -120,11 +51,15 @@
                 <a class="fa fa-search navbar-main-search-submit" href="#"></a>
             </form>
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a href="#nav-login-dialog" data-effect="mfp-move-from-top" class="popup-text">Sign In</a>
+                    <% if @current_user.present? %>
+                        <li><a href="" data-effect="mfp-move-from-top" class="popup-text"><%= @current_user.name %>您好</a>
                         </li>
-                        <li><a href="#nav-account-dialog" data-effect="mfp-move-from-top" class="popup-text">Create Account</a>
+                        <li><a href="/consoles/logout" >登出</a>
                         </li>
-
+                    <% else %>
+                        <li><a href="/consoles/login" >登入/註冊</a>
+                        </li>
+                    <% end %>
                         
                         <% if @current_user.present? && @current_user.role!=1%>
                 <li class="dropdown"><a href="/products/shoppingcart"><span >購物車</span>
@@ -166,11 +101,38 @@
                 </div>
             </div>
         </nav>
+    <% if @current_user != nil && @current_user.role == 1 %>
+        <nav class="navbar-defaulta navbar-main-white yamm" style="padding:0">
+        <div class="container">
+            <div class="collapse navbar-collapse navbar-collapse-no-pad" id="main-nav-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown"><a href="/newsboards"><span ></span>公佈欄設定</a>
+                    </li>
+                    <li class="dropdown"><a href="#"><span ></span>商品管理</a>
+                    </li>
+                    <li class="dropdown"><a href="#"><span ></span>分類管理</a>
+                    </li>
+                    <li class="dropdown"><a href="#"><span ></span>付款運送</a>
+                    </li>
+                    <li class="dropdown"><a href="#"><span ></span>訂單管理</a>
+                    </li>
+                    <li class="dropdown"><a href="#"><span ></span>使用者管理</a>
+                    </li>
+                    <li class="dropdown"><a href="#"><span ></span>電子報發送</a>
+                    </li>
+                    <li class="dropdown"><a href="#"><span ></span>系統設定</a>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+    <% else %>
     <nav class="navbar-defaulta navbar-main-white yamm" style="padding:0">
         <div class="container">
             <div class="collapse navbar-collapse navbar-collapse-no-pad" id="main-nav-collapse">
                 <ul class="nav navbar-nav">
-                    <li class="dropdown"><a href="#"><span ></span>商品展示<i class="drop-caret" data-toggle="dropdown"></i></a>
+                    <li class="dropdown"><a href="/products"><span ></span>商品展示<i class="drop-caret" data-toggle="dropdown"></i></a>
                         <ul class="dropdown-menu dropdown-menu-category">
                            
                         <% @type_ones.each do |t| %>
@@ -217,3 +179,4 @@
             </div>
         </div>
     </nav>
+    <% end %>
