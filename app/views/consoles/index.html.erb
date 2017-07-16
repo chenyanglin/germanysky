@@ -24,13 +24,13 @@
                             <h4 class="slider-item-caption-title">GermanySky</h4>
                             <p class="slider-item-caption-desc">德心應手</p><a class="btn btn-lg btn-ghost btn-white" href="#">Shop Now</a>
                         </div>
-                        <img class="slider-item-img-left" src="<%= asset_path '2-i.png' %>" alt="Image Alternative text" title="Image Title" style="transform:translateY(-50%) rotate(14deg); width: 55%;" />
+                        <!-- <img class="slider-item-img-left" src="<%= asset_path '2-i.png' %>" alt="Image Alternative text" title="Image Title" style="transform:translateY(-50%) rotate(14deg); width: 55%;" /> -->
                     </div>
                 </div>
             </div>
         </div>
         <div class="owl-item">
-            <div class="slider-item" style="background-color:#93282B;">
+            <div class="slider-item" style="background-image:url(<%= asset_path '1400x5002.png' %>);">
                 <div class="container">
                     <div class="slider-item-inner">
                         <div class="slider-item-caption-left slider-item-caption-white">
@@ -80,6 +80,44 @@
             </div>
         </div>
     </div>
+
+        <div class="gap"></div>
+        <div class="row" data-gutter="15">
+            <div class="col-md-6">
+                <div class="banner banner-o-hid" style="background-color:#D2D2D2;">
+                    
+                    <div class="banner-caption-left banner-caption-dark">
+                        <h5 class="banner-title">最新消息</h5>
+                         <% if @newsboards.present? %>
+                            <% @newsboards.each do |n| %>
+                            <div id="<%= n.id %>">
+                            <p class="banner-desc"><i class="browser icon"></i><a href="/newsboards/<%=n.id%>"><%= n.title %></a>
+                                <font size="0.1" ><%= n.created_at.strftime("%Y-%m-%d") %></font></p>
+                            </div>
+    </br>
+    <%end%>
+<%end%>
+                        <p  class="banner-shop-now"><a href="/newsboards">查看更多 <i class="fa fa-caret-right"></i></a>
+                        </p>
+                    </div>
+                    <img class="banner-img" src="<%=asset_path '28-i.png' %>" alt="Image Alternative text" title="Image Title" style="bottom: 0px; right: 0px; width: 240px;" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="banner banner-o-hid" style="background-color:#0290C7;">
+                    <a class="banner-link" href="#"></a>
+                    <div class="banner-caption-left">
+                        <h5 class="banner-title">促銷活動放送中</h5>
+                        <p class="banner-desc">多種促銷優惠組合買越多賺越多</p>
+                        <p class="banner-shop-now">前往查看 <i class="fa fa-caret-right"></i>
+                        </p>
+                    </div>
+                    <img class="banner-img" src="<%=asset_path '13-i.png' %>" alt="Image Alternative text" title="Image Title" style="bottom: -76px; right: 0; width: 238px;" />
+                </div>
+            </div>
+        </div>
+  
+    
     <div class="gap"></div>
     <div class="container">
         <div class="tabbable category-tabs">
@@ -305,42 +343,7 @@
                 </div>
             </div>
         </div>
-        <div class="gap"></div>
-        <div class="row" data-gutter="15">
-            <div class="col-md-6">
-                <div class="banner banner-o-hid" style="background-color:#D2D2D2;">
-                    
-                    <div class="banner-caption-left banner-caption-dark">
-                        <h5 class="banner-title">最新消息</h5>
-                         <% if @newsboards.present? %>
-                            <% @newsboards.each do |n| %>
-                            <div id="<%= n.id %>">
-                            <p class="banner-desc"><i class="browser icon"></i><a href="/newsboards/<%=n.id%>"><%= n.title %></a>
-                                <font size="0.1" ><%= n.created_at.strftime("%Y-%m-%d") %></font></p>
-                            </div>
-    </br>
-    <%end%>
-<%end%>
-                        <p  class="banner-shop-now"><a href="/newsboards">查看更多 <i class="fa fa-caret-right"></i></a>
-                        </p>
-                    </div>
-                    <img class="banner-img" src="<%=asset_path '28-i.png' %>" alt="Image Alternative text" title="Image Title" style="bottom: 0px; right: 0px; width: 240px;" />
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="banner banner-o-hid" style="background-color:#0290C7;">
-                    <a class="banner-link" href="#"></a>
-                    <div class="banner-caption-left">
-                        <h5 class="banner-title">促銷活動放送中</h5>
-                        <p class="banner-desc">多種促銷優惠組合買越多賺越多</p>
-                        <p class="banner-shop-now">前往查看 <i class="fa fa-caret-right"></i>
-                        </p>
-                    </div>
-                    <img class="banner-img" src="<%=asset_path '13-i.png' %>" alt="Image Alternative text" title="Image Title" style="bottom: -76px; right: 0; width: 238px;" />
-                </div>
-            </div>
-        </div>
-  
+
         
         <div class="gap"></div>
         <h3 class="widget-title">強打分類商品</h3>
@@ -348,7 +351,7 @@
         <% if @type_ones.size > 0 %>
         <% @type_ones.each do |t| %>
             <div class="owl-item">
-                <a class="banner-category owl-item-slide" href="#">
+                <a class="banner-category owl-item-slide" href="/products?type=<%=t.id%>">
                     <img class="banner-category-img-full" src="<%=asset_path '100px.png' %>" alt="Image Alternative text" title="Image Title" />
                     <h5 class="banner-category-title"><%= t.name%></h5>
                     <p class="banner-category-desc"><%= t.products.size%> products</p>
