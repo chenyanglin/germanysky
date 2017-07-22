@@ -1,4 +1,6 @@
 class ProductsController < ApplicationController
+# protect_from_forgery with: :null_session
+skip_before_action :verify_authenticity_token
 before_filter :current_user
 before_filter :setting
 before_action :set_product, only: [:edit, :update, :destroy]
@@ -224,7 +226,6 @@ def new
   end
 def show
   @product = Product.find(params[:id])#.includes(:product_options)
-
   @messages = @product.product_messages
   @message = ProductMessage.new
   @new_products = Product.includes(:productimages).where(on_store: true).limit(4)
@@ -303,6 +304,7 @@ def add_to_shoppingcart
     option_id = params[:option_id]
     @product = Product.find(product_id)
     sum = params[:sum]
+
     if @current_user
     @shoppingcart = Shoppingcart.new
     @shoppingcart.account_id = @current_user.id

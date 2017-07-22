@@ -1,0 +1,14 @@
+<div class="global-wrapper clearfix" id="global-wrapper">
+        <%= render "common/theboxheader" %>
+
+<div class="container">
+
+
+
+
+</div>
+
+
+  <div class="gap"></div>
+    <%= render "common/footerbar" %>
+</div>

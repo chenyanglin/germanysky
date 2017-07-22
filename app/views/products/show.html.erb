@@ -3,6 +3,8 @@
         <%= render "common/theboxheader" %>
 
         <div class="container">
+<input type="hidden" id="product_id" value="<%=@product.id%>">
+<input type="hidden" id="option_size" value="<%=@product.product_options.size%>">
             <header class="page-header" style="padding:0">
                 <ol class="breadcrumb page-breadcrumb">
                     <li><a href="#">首頁</a>
@@ -207,7 +209,7 @@
   <%else%>
         <div id="selectsum">
       選擇數量：
-       <span class="input-group-btn"><button id ="minus" type="button" class="btn btn-default btn-add">－</button>  <d id = "sum" size="2" value ="1" >1</d> <span class="input-group-btn"><button id = "plus" type="button" class="btn btn-default btn-add">＋</button>
+      <div id ="minus" type="button" class="btn btn-default">－</div>  <d id = "sum" size="2" value ="1" >1</d> <div id = "plus" type="button" class="btn btn-default">＋</div>
       </div>
       <%end%>
   </div>
@@ -399,3 +401,277 @@
         <%= render "common/footerbar" %>
     </div>
 
+ <style type="text/css">
+.box1{                           
+ position:absolute;    
+ bottom: 0px;              
+}
+.box2{                            
+ height: 480px;               
+ position: relative;
+}
+</style>
+<script type="text/javascript">
+
+var on =false;
+function optionclick(price,surplus,id) {
+  product_id = document.getElementById('optionprice').value;
+  $("#selectsum").empty();
+   if (on == false){
+   $("#selectsum").on("click",".btn-add",function(){ 
+    var sum = Number(document.getElementById("sum").innerHTML);
+    var surplus = document.getElementById("optionsurplus").value;
+    if (sum+1 > surplus)
+      {alert("不得大於庫存量");}
+    else
+    {document.getElementById("sum").innerHTML = sum +1;}
+  });
+  $("#selectsum").on("click",".btn-minus",function(){ 
+  var sum = Number(document.getElementById("sum").innerHTML);
+  if (sum == 1)
+    {alert("無法低於1");}
+  else
+    {document.getElementById("sum").innerHTML = sum - 1;}
+  });
+  $("#selectsum").on("click",".registerbtn",function(){ 
+    productregister(product_id,id);
+  });
+  on = true;
+  }
+
+  document.getElementById('optionprice').style.display = '';
+  document.getElementById("optionsurplus").style.display = '';
+  
+  document.getElementById('optionprice').innerHTML = '售價：NT$'+price;
+  document.getElementById("optionprice").value = price;
+  document.getElementById('optionsurplus').innerHTML = '庫存：'+surplus;
+  document.getElementById("optionsurplus").value = surplus;
+  document.getElementById("option_id").value = id;
+  if(surplus>0){
+  $("#selectsum").append('選擇數量：<span class="input-group-btn"><button id ="minus" type="button" class="btn btn-default btn-minus">－</button>  <d id = "sum" size="2" value ="1">1</d>  <span class="input-group-btn"><button id = "plus" type="button" class="btn btn-default btn-add">＋</button>');
+    document.getElementById("sum").innerHTML =1;
+}
+  else{
+    $("#selectsum").append('選擇數量：此規格無庫存，請進行<a id ="product_register" href="javascript: product_register(); return false;" class = "registerbtn" >缺貨登記</a>');
+  }
+  document.getElementById('selectsum').style.display = '';
+}
+$(function(){
+
+// search functions
+  $('#products_table').tablesort();
+
+function ValidateSurplus(e, point)
+{
+    var surplus = document.getElementById("optionsurplus").value;
+    if (!/^\d+$/.test(point))
+    {
+        $(e).val(/^\d+/.exec($(e).val('1')));
+        return false;
+    }
+    if(Number(point)>surplus)
+    {
+       $(e).val('1');
+       {alert("不得大於庫存量");}
+    }
+    return false;
+}
+
+
+$("#plus").click(function(){
+var sum = Number(document.getElementById("sum").innerHTML);
+
+var surplus = document.getElementById("optionsurplus").value;
+
+if (sum+1 > surplus)
+  {alert("不得大於庫存量");}
+else
+{document.getElementById("sum").innerHTML = sum +1;}
+  });
+
+$("#minus").click(function(){
+  var sum = Number(document.getElementById("sum").innerHTML);
+  if (sum == 1)
+    {alert("無法低於1");}
+  else
+{document.getElementById("sum").innerHTML = sum - 1;}
+  });
+
+
+});
+function changephoto(click_id) {
+  
+　document.getElementById("productimage").src= click_id;
+}
+
+function productregister(product_id,option_id)
+{
+    $('.ui.dimmer.main').dimmer('show');
+    $.get( "/products/register?product_id="+product_id+"&product_option_id="+option_id, function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $('.ui.dimmer.main').dimmer('hide');
+
+      $('.ui.modal.product-register').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $('.ui.dimmer.main').dimmer('hide');
+      alert( "error" );
+    });
+}
+
+$("#add_cart").click(function(){
+    var product_id = document.getElementById("product_id").value;
+    var option_id = document.getElementById("option_id").value;
+    if (option_id =="")
+      alert("請先選擇規格");
+    else
+    {
+    var sum = Number(document.getElementById("sum").innerHTML);
+    var surplus = document.getElementById("optionsurplus").value;
+    if (sum > surplus)
+    {alert("不得大於庫存量");}
+    else
+    {
+    var request = "/products/add_to_shoppingcart";
+    var aj = $.ajax({
+          url: request,
+          type: 'post',
+          data:{
+             product_id: product_id,
+             option_id: option_id,
+             sum: sum,
+           },
+          dataType: 'text'
+        }).success(function (upload_result) {
+          if(upload_result == "success" ){
+          alert( "已加入購物車" );
+        }else{alert(upload_result);}
+          
+        }).fail(function (e) {
+            alert( "尚未登入" );
+        });
+      }
+    }
+  });
+$("#buy_btn").click(function(){
+    var product_id = document.getElementById("product_id").value;
+    var option_id = document.getElementById("option_id").value;
+    if (option_id =="")
+      alert("請先選擇規格");
+    else
+    {
+    var sum = Number(document.getElementById("sum").innerHTML);
+    var surplus = document.getElementById("optionsurplus").value;
+    if (sum > surplus)
+    {alert("不得大於庫存量");}
+    else
+    {
+    var request = "/products/add_to_shoppingcart";
+    var aj = $.ajax({
+          url: request,
+          type: 'post',
+          data:{
+             product_id: product_id,
+             option_id: option_id,
+             sum: sum,
+           },
+          dataType: 'text'
+        }).success(function (upload_result) {
+          if(upload_result == "success" ){
+          window.location.replace("http://"+location.host+"/products/shoppingcart");
+        }else{alert(upload_result);}
+          
+        }).fail(function (e) {
+            alert( "尚未登入" );
+        });
+      }
+    }
+  });
+$('.form-check form').on('click','.reply-btn',function(){
+    var product_id = document.getElementById("product_id").value;
+    var replycontent = document.getElementById("content").value;
+    var request = "/product_messages";
+
+      var aj = $.ajax({
+          url: request,
+          type: 'post',
+          data:{
+             product_id: product_id,
+             replycontent: replycontent
+           },
+          dataType: 'json'
+        }).success(function(upload_result) {
+          if(upload_result == "success" ){
+            window.location.reload();
+          }
+        }).fail(function(data) {
+       window.location.reload();
+        });
+    return false; // prevents normal behaviour
+  });
+</script>
+<script type="text/javascript">
+  $(function(){
+    // 先取得必要的元素並用 jQuery 包裝
+    // 再來取得 $block 的高度及設定動畫時間
+    var $block = $('#abgneBlock'),
+      $slides = $('ul.list', $block),
+      _width = $block.width(),
+      $li = $('li', $slides),
+      _animateSpeed = 600, 
+      // 加入計時器, 輪播時間及控制開關
+      timer, _showSpeed = 2500, _stop = false;
+
+    // 產生 li 選項
+    var _str = '';
+    for(var i=0, j=$li.length;i<j;i++){
+      // 每一個 li 都有自己的 className = playerControl_號碼
+      _str += '<li class="playerControl_' + (i+1) + '"></li>';
+    }
+
+    // 產生 ul 並把 li 選項加到其中
+    var $playerControl = $('<ul class="playerControl"></ul>').html(_str).appendTo($slides.parent()).css('left', function(){
+      // 把 .playerControl 移到置中的位置
+      // return (_width - $(this).width()) / 2;
+      return
+    });
+    
+    // 幫 li 加上 click 事件
+    var $playerControlLi = $playerControl.find('li').click(function(){
+      var $this = $(this);
+      $this.addClass('current').siblings('.current').removeClass('current');
+
+      clearTimeout(timer);
+      // 移動位置到相對應的號碼
+      $slides.stop().animate({
+        left: _width * $this.index() * -1
+      }, _animateSpeed, function(){
+        // 當廣告移動到正確位置後, 依判斷來啟動計時器
+        if(!_stop) timer = setTimeout(move, _showSpeed);
+      });
+
+      return false;
+    }).eq(0).click().end();
+
+    // 如果滑鼠移入 $block 時
+    $block.hover(function(){
+      // 關閉開關及計時器
+      _stop = true;
+      clearTimeout(timer);
+    }, function(){
+      // 如果滑鼠移出 $block 時
+      // 開啟開關及計時器
+      _stop = false;
+      timer = setTimeout(move, _showSpeed);
+    });
+    
+    // 計時器使用
+    function move(){
+      var _index = $('.current').index();
+      $playerControlLi.eq((_index + 1) % $playerControlLi.length).click();
+    }
+  });
+</script>

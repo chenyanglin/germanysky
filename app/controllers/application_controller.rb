@@ -12,6 +12,7 @@ class ApplicationController < ActionController::Base
     else
       @current_user = nil
     end
+
     #@current_user ||= User.find_by_auth_token!(cookies[:auth_token]) if cookies[:auth_token]
   end
   def manager_account

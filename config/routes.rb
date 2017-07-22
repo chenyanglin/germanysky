@@ -90,7 +90,6 @@ Rails.application.routes.draw do
       get :outofstock
       get :del_register
       get :copy
-      post :confirm, :to => :confirmed
       post :add_to_shoppingcart
       get :shoppingcart
       get :shoppingcart_del
