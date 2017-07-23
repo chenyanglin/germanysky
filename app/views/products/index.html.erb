@@ -16,25 +16,61 @@
             </header>
             <div class="row">
                 <div class="col-md-3">
+                    <% if @type.present? %>
                     <aside class="category-filters">
                         <div class="category-filters-section">
-                            <h3 class="widget-title-sm">Category</h3>
+                            <h3 class="widget-title-sm">分類</h3>
                             <ul class="cateogry-filters-list">
-                                <li><a href="#">Clothing</a>
+                                <% @type_ones.each do |t| %>
+                                <li><a href="/products?type=<%=t.id%>"><%=t.name%></a>
                                 </li>
-                                <li><a href="#">Shoes</a>
-                                </li>
-                                <li><a href="#">Accessories</a>
-                                </li>
-                                <li><a href="#">Jewerly</a>
-                                </li>
-                                <li><a href="#">Watches</a>
-                                </li>
-                                <li><a href="#">Fine Jewerly</a>
-                                </li>
+                                    <% if @type == t%>
+                                        <% @type.type_twos.each do |t2| %>
+                                        <li><a href="/products?type2=<%=t2.id%>">&nbsp;<%=t2.name%></a>
+                                        </li>
+                                        <%end%>
+                                    <% end %>
+                                <% end %>
                             </ul>
                         </div>
                     </aside>
+                    <%elsif @type2.present?%>
+                    <aside class="category-filters">
+                        <div class="category-filters-section">
+                            <h3 class="widget-title-sm">分類</h3>
+                            <ul class="cateogry-filters-list">
+                                <% @type_ones.each do |t| %>
+                                <li><a href="/products?type=<%=t.id%>"><%=t.name%></a>
+                                </li>
+                                    <% if @type2.type_one == t%>
+                                        <% t.type_twos.each do |t2| %>
+                                        <li><a href="/products?type2=<%=t2.id%>">&nbsp;<%=t2.name%></a>
+                                        </li>
+                                            <% if t2 == @type2%>
+                                                <% t2.type_threes.each do |t3|%>
+                                                    <li><a href="/products?type3=<%=t3.id%>">&nbsp;&nbsp;<%=t3.name%></a>
+                                        </li>
+                                                <%end%>
+                                            <% end %>
+                                        <%end%>
+                                    <% end %>
+                                <% end %>
+                            </ul>
+                        </div>
+                    </aside>
+                    <%else%>
+                        <aside class="category-filters">
+                        <div class="category-filters-section">
+                            <h3 class="widget-title-sm">分類</h3>
+                            <ul class="cateogry-filters-list">
+                                <% @type_ones.each do |t| %>
+                                <li><a href="/products?type=<%=t.id%>"><%=t.name%></a>
+                                </li>
+                                <% end %>
+                            </ul>
+                        </div>
+                    </aside>
+                    <% end %>
                 </div>
                 <div class="col-md-9">
                 <% if @products.size > 0 %>

@@ -24,7 +24,12 @@ before_action :set_product, only: [:edit, :update, :destroy]
         if params[:type2].present?
           @products = @products.where("type_two_id = ?",params[:type2])
           @products_size = @products.size
-          @type = TypeTwo.find(params[:type2]).type_one
+          @type2 = TypeTwo.find(params[:type2])
+        end
+        if params[:type3].present?
+          @products = @products.where("type_three_id = ?",params[:type3])
+          @products_size = @products.size
+          @type3 = TypeThree.find(params[:type3])
         end
         @product_info = false
 
