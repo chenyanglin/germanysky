@@ -93,15 +93,6 @@
  <script type="text/javascript">
 $(function(){
 
-  $(document).on('keypress', function(e) {
-    if(e.which == 13) {
-      start_search();
-    }
-  });
-
-  $( "#filter" ).focus(function() {
-    search_msg.popup('hide');
-  });
   $('body').on('click','.newsboard_info',function(){
     var row_id = $(this).data("value");
     show_info(row_id);
@@ -160,7 +151,7 @@ window.location.replace("http://"+location.host+"/newsboards/"+newsboard_id);
     $('.delete-check').modal({
         onApprove : function() {
           $.ajax({
-            type: "get",
+            type: "delete",
             method: "delete",
             url: href
           });

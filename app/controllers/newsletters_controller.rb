@@ -56,7 +56,7 @@ def destroy
     params.require(:newsletter).permit(:subject,:content)
   end
 
-    def set_newsboard
+    def set_newsletter
     @newsletter = Newsletter.find(params[:id])
   end
 end

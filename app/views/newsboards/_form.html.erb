@@ -33,9 +33,7 @@
 <% end %>
 <script type="text/javascript">
 $(function(){
-  $('select.dropdown')
-    .dropdown()
-  ;
+
   $('form').submit(function() {
     var valuesToSubmit = $(this).serialize();
     $("#newsboard_form_submit").addClass("loading");

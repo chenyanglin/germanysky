@@ -40,13 +40,15 @@ def new
       render :text => "error"
     end
   end
-def show
-  @newsboard = Newsboard.find(params[:id])
-end
-def destroy
-    @newsboard.destroy
-
-    redirect_to accounts_path
+  def show
+    @newsboard = Newsboard.find(params[:id])
+  end
+  def destroy
+    if @newsboard.destroy
+      render :text => "success"
+    else
+      render :text => "error"
+    end
   end
 
 

@@ -205,7 +205,7 @@
   </div>
   <div class="ui segment">
   <% if @product.product_options.first.surplus == 0%>
-  <p>選擇數量：無庫存，請進行<a id ="product_register" href="javascript: return false;" onclick="productregister(<%=@product.id%>,<%=@product.product_options.first.id%>);" class = "registerbtn" >缺貨登記</a></p>
+  <p>選擇數量：無庫存，請進行<a id ="product_register"  onclick="productregister(<%=@product.id%>,<%=@product.product_options.first.id%>);" class = "registerbtn" >缺貨登記</a></p>
   <%else%>
         <div id="selectsum">
       選擇數量：
@@ -400,7 +400,11 @@
        
         <%= render "common/footerbar" %>
     </div>
-
+<div class="ui small modal product-register" style="padding-top:0px;">
+  <i class="close icon"></i>
+  <div id="edit_from" style="padding:10px;">
+  </div>
+</div>
  <style type="text/css">
 .box1{                           
  position:absolute;    
@@ -415,7 +419,7 @@
 
 var on =false;
 function optionclick(price,surplus,id) {
-  product_id = document.getElementById('optionprice').value;
+  product_id = document.getElementById('product_id').value;
   $("#selectsum").empty();
    if (on == false){
    $("#selectsum").on("click",".btn-add",function(){ 

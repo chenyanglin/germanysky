@@ -1,5 +1,6 @@
 class PaymentsController < ApplicationController
 before_filter :current_user
+before_filter :setting
 before_action :set_payment, only: [:edit, :update, :destroy]
   def index
         @payments = Payment.all

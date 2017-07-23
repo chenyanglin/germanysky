@@ -1,14 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>GermanySky 德心應手</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Bootstrap styles -->
+    <!-- <link href="assets/css/bootstrap.css" rel="stylesheet"/> -->
+    <!-- Customize styles -->
+    <!-- <link href="style.css" rel="stylesheet"/> -->
+    <!-- font awesome styles -->
+	<!-- <link href="assets/font-awesome/css/font-awesome.css" rel="stylesheet"> -->
+		<!--[if IE 7]>
+			<link href="css/font-awesome-ie7.min.css" rel="stylesheet">
+		<![endif]-->
 
-    <div class="global-wrapper clearfix" id="global-wrapper">
-        <%= render "common/theboxheader" %>
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+
+	<!-- Favicons -->
+    <link rel="shortcut icon" href="<%= asset_path 'ico/favicon.ico' %>">
+  </head>
+<body style="background:url('<%= asset_path("white_leather.png") %>') repeat 0 0;">
+<!-- 
+	Upper Header Section 
+-->
+<%= render "common/topbar" %>
+
+<!--
+Lower Header Section 
+-->
 
 <div class="container">
+<%= render "common/header" %>
 
-      <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
+
+<!-- 
+Body Section 
+-->
+
+  <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
     <div class="content">商品管理</div>
   </h1>
 
-<div style="height:80px;margin:0 auto;">
+<div style="width:550px;height:80px;margin:0 auto;">
 
   <div class="ui center aligned icon header" style="font-size:18px;margin:20px 0 22px 0;">
  商品總數： <%= number_with_delimiter(@products_size, :delimiter => ',') %>
@@ -18,7 +55,7 @@
   <% end %>
     </div>
     </div>
-<div style="margin:0px 0 10px 0;">
+<div style="width:800px;margin:0px auto;">
 <select id = "type" name="type" >
   <option value="" disabled selected>分類</option>
   <% @type_ones.each do |t| %>
@@ -67,15 +104,14 @@ or
         <h3>未建立分類！</h3>
       <% end %>
     <% end %>
-
-</div>
-
-
-
-        <div class="gap"></div>
-       
-        <%= render "common/footerbar" %>
-    </div>
+    
+<!-- 
+Clients 
+-->
+<!--
+Footer
+-->
+<%= render "common/footerbar" %>
 <div class="ui small modal edit-product" style="padding-top:0px;">
   <i class="close icon"></i>
   <div id="edit_from" style="padding:10px;">
@@ -108,6 +144,9 @@ or
     </div>
   </div>
 </div>
+  </body>
+</html>
+
 <script type="text/javascript">
 $(function(){
 

@@ -84,7 +84,150 @@ or
         <%= render "common/footerbar" %>
     </div>
 
+<div class="ui small modal edit-order" style="padding-top:0px;">
+  <i class="close icon"></i>
+  <div id="edit_from" style="padding:10px;">
+  </div>
+</div>
 
+<div class="ui basic modal delete-check">
+  <i class="close icon"></i>
+  <div class="header">
+    刪除訂單 <span class="primary-orange target_order"></span>
+  </div>
+  <div class="image content">
+    <div class="image">
+      <i class="announcement icon"></i>
+    </div>
+    <div class="description">
+      <p>確定要刪除訂單<span class="primary-orange target_order"></span>嗎?</p>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="two fluid ui inverted buttons">
+      <div class="ui ok red basic inverted button">
+        <i class="remove icon"></i>
+        刪除
+      </div>
+      <div class="ui cancel blue basic inverted button">
+        <i class="checkmark icon"></i>
+        取消
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ui basic modal confirmpay-check">
+  <i class="close icon"></i>
+  <div class="header">
+    確認匯款 <span class="primary-orange target_order"></span>
+  </div>
+  <div class="image content">
+    <div class="image">
+      <i class="announcement icon"></i>
+    </div>
+    <div class="description">
+      <p>確定更改訂單<span class="primary-orange target_order"></span>狀態為已匯款？</p>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="two fluid ui inverted buttons">
+      <div class="ui ok red basic inverted button">
+        <i class="checkmark icon"></i>
+        確認
+      </div>
+      <div class="ui cancel blue basic inverted button">
+        <i class="remove icon"></i>
+        取消
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ui basic modal confirmdelivery-check">
+  <i class="close icon"></i>
+  <div class="header">
+    確認出貨 <span class="primary-orange target_order"></span>
+  </div>
+  <div class="image content">
+    <div class="image">
+      <i class="announcement icon"></i>
+    </div>
+    <div class="description">
+    <p>確定更改訂單<span class="primary-orange target_order"></span>狀態為已出貨？</p>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="two fluid ui inverted buttons">
+      <div class="ui ok red basic inverted button">
+        <i class="checkmark icon"></i>
+        確認
+      </div>
+      <div class="ui cancel blue basic inverted button">
+        <i class="remove icon"></i>
+        取消
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ui basic modal takeproduct-check">
+  <i class="close icon"></i>
+  <div class="header">
+    確認取貨 <span class="primary-orange target_order"></span>
+  </div>
+  <div class="image content">
+    <div class="image">
+      <i class="announcement icon"></i>
+    </div>
+    <div class="description">
+      <% if @current_user.role==1%>
+    <p>確定更改訂單<span class="primary-orange target_order"></span>狀態為已取貨？(此步驟為消費者功能項，請再次確認是否執行此操作。</p>
+    <%else%>
+    <p>確定更改訂單<span class="primary-orange target_order"></span>狀態為已取貨？</p>
+    <%end%>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="two fluid ui inverted buttons">
+      <div class="ui ok red basic inverted button">
+        <i class="checkmark icon"></i>
+        確認
+      </div>
+      <div class="ui cancel blue basic inverted button">
+        <i class="remove icon"></i>
+        取消
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ui basic modal orderdone-check">
+  <i class="close icon"></i>
+  <div class="header">
+    確認訂單完成 <span class="primary-orange target_order"></span>
+  </div>
+  <div class="image content">
+    <div class="image">
+      <i class="announcement icon"></i>
+    </div>
+    <div class="description">
+      <p>確定更改訂單<span class="primary-orange target_order"></span>狀態為完成狀態？</p>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="two fluid ui inverted buttons">
+      <div class="ui ok red basic inverted button">
+        <i class="checkmark icon"></i>
+        確認
+      </div>
+      <div class="ui cancel blue basic inverted button">
+        <i class="remove icon"></i>
+        取消
+      </div>
+    </div>
+  </div>
+</div>
 
 <script type="text/javascript">
 

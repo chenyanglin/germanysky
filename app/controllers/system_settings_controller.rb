@@ -1,5 +1,6 @@
 class SystemSettingsController < ApplicationController
 before_filter :current_user
+before_filter :setting
 before_filter :manager_account
   def index
         @systemsetting = SystemSetting.find(1)

@@ -343,9 +343,7 @@ $(document).on('change','#type_select', function () {
     var typeone_id = $('#type_select').val();
     var request = "/type_ones/type_two_get?typeone_id="+ typeone_id;
     $.get(request, function(data) {
-      $("#typetwo_select").append(//add in an option for each major
-                $("<option></option>").attr("value", '').text('')
-            );
+
        if(data.length != 0){
         for(i = 0;i<data.length;i++){
            $("#typetwo_select").append(//add in an option for each major

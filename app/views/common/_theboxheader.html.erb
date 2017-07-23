@@ -102,25 +102,39 @@
             </div>
         </nav>
     <% if @current_user != nil && @current_user.role == 1 %>
-        <nav class="navbar-defaulta navbar-main-white yamm" style="padding:0">
+        <nav class="navbar-defaulta navbar-main-white yamm" style="padding:0;">
         <div class="container">
             <div class="collapse navbar-collapse navbar-collapse-no-pad" id="main-nav-collapse">
                 <ul class="nav navbar-nav">
                     <li class="dropdown"><a href="/newsboards"><span ></span>公佈欄設定</a>
                     </li>
-                    <li class="dropdown"><a href="#"><span ></span>商品管理</a>
+                    <li class="dropdown"><a ><span ></span>商品管理</a>
+                        <ul class="dropdown-menu dropdown-menu">
+                            <li><a href="/products/console_index">商品管理</a></li>
+                            <li><a href="/products/outofstock">缺貨管理</a></li>
+                            <li><a href='/specialoffers'>促銷管理</a></li>
+                        </ul>
                     </li>
-                    <li class="dropdown"><a href="#"><span ></span>分類管理</a>
+                    <li class="dropdown"><a href="/type_ones"><span ></span>分類管理</a>
                     </li>
-                    <li class="dropdown"><a href="#"><span ></span>付款運送</a>
+                    <li class="dropdown"><a ><span ></span>付款運送</a>
+                        <ul class="dropdown-menu dropdown-menu">
+                            <li><a href="/payments">付款管理</a></li>
+                            <li><a href="/deliveries">運送管理</a></li>
+                        </ul>
                     </li>
-                    <li class="dropdown"><a href="#"><span ></span>訂單管理</a>
+                    <li class="dropdown"><a href="/orders"><span ></span>訂單管理</a>
                     </li>
-                    <li class="dropdown"><a href="#"><span ></span>使用者管理</a>
+                    <li class="dropdown"><a ><span ></span>使用者管理</a>
+                        <ul class="dropdown-menu dropdown-menu">
+                            <li><a href="/accounts">會員管理</a></li>
+                            <li><a href="/account_levels">等級管理</a></li>
+                            <li><a href="/messages">問答管理</a></li>
+                        </ul>
                     </li>
-                    <li class="dropdown"><a href="#"><span ></span>電子報發送</a>
+                    <li class="dropdown"><a href="/newsletters"><span ></span>電子報發送</a>
                     </li>
-                    <li class="dropdown"><a href="#"><span ></span>系統設定</a>
+                    <li class="dropdown"><a href="/system_settings"><span ></span>系統設定</a>
                     </li>
                 </ul>
 
@@ -128,7 +142,7 @@
         </div>
     </nav>
     <% else %>
-    <nav class="navbar-defaulta navbar-main-white yamm" style="padding:0">
+    <nav class="navbar-defaulta navbar-main-white yamm" style="padding:0;z-index:0;position: relative;">
         <div class="container">
             <div class="collapse navbar-collapse navbar-collapse-no-pad" id="main-nav-collapse">
                 <ul class="nav navbar-nav">

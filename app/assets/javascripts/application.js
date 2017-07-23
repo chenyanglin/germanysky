@@ -20,15 +20,20 @@
 //= require base/magnific.js
 //= require base/owl-carousel.js
 //= require base/custom.js
-//= require components
-//= require semantic-ui
-//= require jquery-fileupload
+//= require jquery
+//= require jquery_ujs
 //= require react
 //= require react_ujs
+//= require components
+//= require_tree
 //= require js.cookie
+//= require semantic-ui
 //= require clipboard
 //= require shop
-//= require_tree .
+//= require bootstrap
+//= require bootstrap.min
+//= require bootstrap/dropdown
+//= require bootstrap/alert
 
  $("#search_go").click(function(){
     start_search();
