@@ -10,7 +10,7 @@
                     <div class="slider-item-inner">
                         <div class="slider-item-caption-right slider-item-caption-white">
                             <h4 class="slider-item-caption-title">GermanySky</h4>
-                            <p class="slider-item-caption-desc">專業德國代購、團購服務</p><a class="btn btn-lg btn-ghost btn-white" href="#">Shop Now</a>
+                            <p class="slider-item-caption-desc">專業德國代購、團購服務</p><a class="btn btn-lg btn-ghost btn-white" href="/products">Shop Now</a>
                         </div>
                     </div>
                 </div>
@@ -22,7 +22,7 @@
                     <div class="slider-item-inner">
                         <div class="slider-item-caption-right slider-item-caption-white">
                             <h4 class="slider-item-caption-title">GermanySky</h4>
-                            <p class="slider-item-caption-desc">德心應手</p><a class="btn btn-lg btn-ghost btn-white" href="#">Shop Now</a>
+                            <p class="slider-item-caption-desc">德心應手</p><a class="btn btn-lg btn-ghost btn-white" href="/products">Shop Now</a>
                         </div>
                         <!-- <img class="slider-item-img-left" src="<%= asset_path '2-i.png' %>" alt="Image Alternative text" title="Image Title" style="transform:translateY(-50%) rotate(14deg); width: 55%;" /> -->
                     </div>
@@ -35,7 +35,7 @@
                     <div class="slider-item-inner">
                         <div class="slider-item-caption-left slider-item-caption-white">
                             <h4 class="slider-item-caption-title">全新促銷活動</h4>
-                            <p class="slider-item-caption-desc">On Sale！Shop Right Now！</p><a class="btn btn-lg btn-ghost btn-white" href="#">Shop Now</a>
+                            <p class="slider-item-caption-desc">On Sale！Shop Right Now！</p><a class="btn btn-lg btn-ghost btn-white" href="/products">Shop Now</a>
                         </div>
 <!--                         <img class="slider-item-img-right" src="<%= asset_path '3-i.png' %>" alt="text" title="Image Title" /> -->
                     </div>
@@ -50,7 +50,7 @@
                 <div class="banner-caption-left">
                     <h5 class="banner-title">Discover The Mountains</h5>
                     <p class="banner-desc">Pro Backpacks 70% Off.</p>
-                    <p class="banner-shop-now">Shop Now <i class="fa fa-caret-right"></i>
+                    <p class="banner-shop-now" href="/products">Shop Now <i class="fa fa-caret-right"></i>
                     </p>
                 </div>
 <!--                 <img class="banner-img" src="<%= asset_path '16-i.png' %>" alt="Image Alternative text" title="Image Title" style="bottom: -68px; right: -32px; width: 200px;" /> -->
@@ -62,7 +62,7 @@
                 <div class="banner-caption-left">
                     <h5 class="banner-title">iPhone 6s</h5>
                     <p class="banner-desc">The Only One</p>
-                    <p class="banner-shop-now">Shop Now <i class="fa fa-caret-right"></i>
+                    <p class="banner-shop-now" href="/products">Shop Now <i class="fa fa-caret-right"></i>
                     </p>
                 </div>
 <!--                 <img class="banner-img" src="<%= asset_path '27-i.png' %>" alt="Image Alternative text" title="Image Title" style="top: 10px; right: 20px; width: 120px;" /> -->
@@ -74,7 +74,7 @@
                 <div class="banner-caption-left banner-caption-dark">
                     <h5 class="banner-title">Winter is Comming</h5>
                     <p class="banner-desc">Outwear Collection</p>
-                    <p class="banner-shop-now">Shop Now <i class="fa fa-caret-right"></i>
+                    <p class="banner-shop-now" href="/products">Shop Now <i class="fa fa-caret-right"></i>
                     </p>
                 </div>
             </div>
@@ -94,18 +94,7 @@
                             <p class="banner-desc"><i class="browser icon"></i><a href="/newsboards/<%=n.id%>"><%= n.title %></a>
                                 <font size="0.1" ><%= n.created_at.strftime("%Y-%m-%d") %></font></p>
                             </div>
-    <div id="<%= n.id %>">
-                            <p class="banner-desc"><i class="browser icon"></i><a href="/newsboards/<%=n.id%>"><%= n.title %></a>
-                                <font size="0.1" ><%= n.created_at.strftime("%Y-%m-%d") %></font></p>
-                            </div>
-                            <div id="<%= n.id %>">
-                            <p class="banner-desc"><i class="browser icon"></i><a href="/newsboards/<%=n.id%>"><%= n.title %></a>
-                                <font size="0.1" ><%= n.created_at.strftime("%Y-%m-%d") %></font></p>
-                            </div>
-                            <div id="<%= n.id %>">
-                            <p class="banner-desc"><i class="browser icon"></i><a href="/newsboards/<%=n.id%>"><%= n.title %></a>
-                                <font size="0.1" ><%= n.created_at.strftime("%Y-%m-%d") %></font></p>
-                            </div>
+                        
     </br>
     <%end%>
 <%end%>
@@ -117,7 +106,7 @@
             </div>
             <div class="col-md-6">
                 <div class="banner banner-o-hid" style="background-color:#0290C7;">
-                    <a class="banner-link" href="#"></a>
+                    <a class="banner-link" href="/specialoffers"></a>
                     <div class="banner-caption-left">
                         <h5 class="banner-title">促銷活動放送中</h5>
                         <p class="banner-desc">多種促銷優惠組合買越多賺越多</p>
