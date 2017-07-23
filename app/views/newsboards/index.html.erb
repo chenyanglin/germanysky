@@ -15,42 +15,40 @@
                             <li><button class="ui orange basic button" id = "btn_new_newsboard">新增最新消息</button></li>
                         <%end%>
                      </div>
-
-                    
-                <%= render "common/leftsalebanner" %>
+                    <%= render "common/leftsalebanner" %>
                 </div>
                 <div class="col-md-9">
-                    <h2 class="site-font ui header">最新消息</h2>
-    <% if @newsboards.present? %>
-      <% if @newsboards.size != 0 %>
+                  <h2 class="site-font ui header">最新消息</h2>
+                  <% if @newsboards.present? %>
+                  <% if @newsboards.size != 0 %>
         
-          <table id="newsboards_table" class="site-font ui sortable selectable orange table">
-            <thead>
-              <tr>
-                <th>標題</th>
-                <th>內容</th>
-                <th>日期</th>
-                <% if @current_user.present? && @current_user.role == 1 %>
-                <th style="margin: 0 10px 0 10px;">Function</th>
-                <% end %>
-              </tr>
-            </thead>
-            <tbody>
-              <%= render :partial => 'newsboards', :object => @newsboards %>
-            </tbody>
-          </table>
-          <p class="pagination">
-            <%= link_to_next_page @newsboards, 'Next Page', :params => {:filter => @search_param}%>
-          </p>
-
-      <% else %>
-        <h3>未建立！</h3>
-      <% end %>
-      <% else %>
-      <h3>未建立！</h3>
-      <% end %>
-
-                </div>
+                  <table id="newsboards_table" class="site-font ui sortable selectable orange table">
+                    <thead>
+                      <tr>
+                        <th>標題</th>
+                        <th>內容</th>
+                        <th>日期</th>
+                        <% if @current_user.present? && @current_user.role == 1 %>
+                        <th style="margin: 0 10px 0 10px;">Function</th>
+                        <% end %>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <%= render :partial => 'newsboards', :object => @newsboards %>
+                    </tbody>
+                  </table>
+                  <p class="pagination">
+                    <%= link_to_next_page @newsboards, 'Next Page', :params => {:filter => @search_param}%>
+                  </p>
+                  <% else %>
+                    <h3>未建立！</h3>
+                  <% end %>
+                  <% else %>
+                    <h3>未建立！</h3>
+                  <% end %>
+              </div>
+            </div>
+</div>
 
 
 

@@ -1,9 +1,46 @@
-<div class="global-wrapper clearfix" id="global-wrapper">
-  <%= render "common/theboxheader" %>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>GermanySky 德心應手</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Bootstrap styles -->
+    <!-- <link href="assets/css/bootstrap.css" rel="stylesheet"/> -->
+    <!-- Customize styles -->
+    <!-- <link href="style.css" rel="stylesheet"/> -->
+    <!-- font awesome styles -->
+	<!-- <link href="assets/font-awesome/css/font-awesome.css" rel="stylesheet"> -->
+		<!--[if IE 7]>
+			<link href="css/font-awesome-ie7.min.css" rel="stylesheet">
+		<![endif]-->
 
-  <div class="container">
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
 
-  <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
+	<!-- Favicons -->
+    <link rel="shortcut icon" href="<%= asset_path 'ico/favicon.ico' %>">
+  </head>
+<body style="background:url('<%= asset_path("white_leather.png") %>') repeat 0 0;">
+<!-- 
+	Upper Header Section 
+-->
+<%= render "common/topbar" %>
+
+<!--
+Lower Header Section 
+-->
+<div class="container">
+<%= render "common/header" %>
+<%= render "common/leftmenu" %>
+<!-- 
+Body Section 
+-->
+<div class="span9">
+<h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
+ 
     <div class="content">
       建立訂單
     </div>
@@ -26,34 +63,35 @@
               </tr>
             </thead>
             <tbody>
-              <% @shoppingcarts.each do |shoppingcart| %>
-              <input type="hidden" id="surplus<%= shoppingcart.id%>" value="<%=shoppingcart.product_option.surplus %>">
-              <% price = shoppingcart.product_option.price%>
-              <tr>
-                <td><%= shoppingcart.product.name %></td>
-                <td><%= shoppingcart.option_id %></td>
-                <td>
-                  <div class="item">
-                  <img class="ui centered tiny image" src="<%= asset_path shoppingcart.product.productimages.first.phourl %>">
-                  </div>
-                </td>
-                <td>$<%= price%></td>
-                <td><div  id="selectsum">
-                  <%= shoppingcart.sum %>
-                  </div>
-                </td>
-                <td><%= @get_point %>點</td>
-                <td>$<%= price*shoppingcart.sum %></td>  
-              </tr>
-              <% end %>
-              <% if @salecarts.present?%>
-                <tr>
-                  <thead>
-                      <th colspan="7" >
-                        <h4>・促銷商品 ↓</h4>
-                      </th>
-                  </thead>
-                </tr>
+            <% @shoppingcarts.each do |shoppingcart| %>
+            <input type="hidden" id="surplus<%= shoppingcart.id%>" value="<%=shoppingcart.product_option.surplus %>">
+            <% price = shoppingcart.product_option.price%>
+<tr>
+  <td><%= shoppingcart.product.name %></td>
+  <td><%= shoppingcart.option_id %></td>
+  <td><div class="item">
+      <img class="ui centered tiny image" src="<%= asset_path shoppingcart.product.productimages.first.phourl %>">
+    </div></td>
+  <td>$<%= price%></td>
+  <td><div  id="selectsum">
+      <%= shoppingcart.sum %>
+      </div></td>
+  <td><%= @get_point %>點</td>
+  <td>$<%= price*shoppingcart.sum %></td>
+  
+</tr>
+
+<% end %>
+<% if @salecarts.present?%>
+<tr>
+  <thead>
+        <th colspan="7" >
+    <h4>
+        ・促銷商品 ↓
+    </h4>
+        </th>
+        </thead>
+</tr>
 <%@salecarts.each do |carts|%>
 
 <tr>
@@ -183,30 +221,37 @@
 
         <div class="divider"></div>
           
+
           
       <% else %>
         <h3>購物車沒有商品。</h3>
       <% end %>
+    
+  </div>
 
 
 <% else %>
 <h3 class="ui center aligned icon header">購物車是空的，快去選購吧！</h3>
 <% end %>
 <%end%>
-
-
-  </div>
-
-
-
-  <div class="gap"></div>
-       
-  <%= render "common/footerbar" %>
 </div>
+</div>
+<!-- 
+Clients 
+-->
+<!--
+Footer
+-->
+<%= render "common/footerbar" %>
+
+  </body>
+</html>
 
  <script type="text/javascript">
 $(function(){
-
+  $('select.dropdown')
+    .dropdown()
+  ;
   $('form').submit(function() {
     var valuesToSubmit = $(this).serialize();
     $("#to_order").addClass("loading");

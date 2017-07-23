@@ -2,52 +2,212 @@
         <%= render "common/theboxheader" %>
 
 <div class="container">
+            <header class="page-header" style="padding:0">
 
-<div class="row pull-left">
-<div id="sidebar" class="span3">
+            </header>
+           <div class="row row-col-border" data-gutter="60">
+                <div class="col-md-3">
+  					<ul class="nav nav-list">
+  					<div class="ui center aligned icon header" style="font-size:18px;margin:20px 0 22px 0;">
+  					<li> 留言總數： <%= number_with_delimiter(@messages_size, :delimiter => ',') %></li>
+  					<li><br></li>
+    				<li><a style="color:black;" href="/messages">一般留言</a></li>
+    				<li><a style="color:black;" href="/messages?product=1">商品留言</a></li>
+    				<li><a style="color:black;" href="/messages?order=1">訂單留言</a></li>
+    				</div>
+  					</ul>
+                </div>
+                <div class="col-md-9">
+    				<h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 16px 0;">
+    				<div class="content">留言管理</div>
+  					</h1>
+  					<div class="ui horizontal divider">Messages</div>
 
-<div class="well well-small">
-  <ul class="nav nav-list">
-  <div class="ui center aligned icon header" style="font-size:18px;margin:20px 0 22px 0;">
-  <li> 留言總數： <%= number_with_delimiter(@messages_size, :delimiter => ',') %></li>
-  <li><br></li>
-    <li><a style="color:black;" href="/messages">一般留言</a></li>
-    <li><a style="color:black;" href="/messages?product=1">商品留言</a></li>
-    <li><a style="color:black;" href="/messages?order=1">訂單留言</a></li>
-    </div>
-  </ul>
-</div>
+    				<% if @messages.present? %>
+      					<% if @messages.size != 0 %>
+        					<% if params[:order].present? %>
+        						<%= render :partial => 'order_messages', :object => @messages %>
+        					<%elsif params[:product].present? %>
+        						<%= render :partial => 'product_messages', :object => @messages %>
+        					<% else %>
+          						<%= render :partial => 'messages', :object => @messages %>
+        					<% end %>       
+      					<% else %>
+        					<h3>未建立！</h3>
+      					<% end %>
+    				<% end %>
 
-  </div>
-<!-- 
-Body Section 
--->
-<div class="span9">
-  <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 16px 0;">
-    <div class="content">留言管理</div>
-  </h1>
+				  </div>
 
-    <% if @messages.present? %>
-      <% if @messages.size != 0 %>
-        <% if params[:order].present? %>
-        <%= render :partial => 'order_messages', :object => @messages %>
-        <%elsif params[:product].present? %>
-        <%= render :partial => 'product_messages', :object => @messages %>
-        <% else %>
-          <%= render :partial => 'messages', :object => @messages %>
-        <% end %>       
-      <% else %>
-        <h3>未建立！</h3>
-      <% end %>
-    <% end %>
-    
-</div>
-</div>
-
-
+			</div>
 </div>
 
 
   <div class="gap"></div>
     <%= render "common/footerbar" %>
 </div>
+<div class="ui small modal edit-account" style="padding-top:0px;">
+  <i class="close icon"></i>
+  <div id="edit_from" style="padding:10px;">
+  </div>
+</div>
+
+<div class="ui basic modal delete-check">
+  <i class="close icon"></i>
+  <div class="header">
+    刪除留言 <span class="primary-orange target_message"></span>
+  </div>
+  <div class="image content">
+    <div class="image">
+      <i class="announcement icon"></i>
+    </div>
+    <div class="description">
+      <p>確定要刪除留言<span class="primary-orange target_message"></span>嗎?</p>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="two fluid ui inverted buttons">
+      <div class="ui ok red basic inverted button">
+        <i class="remove icon"></i>
+        刪除
+      </div>
+      <div class="ui cancel blue basic inverted button">
+        <i class="checkmark icon"></i>
+        取消
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){
+
+  $('#messages_table').tablesort();
+
+  $('body').on('click','.message_edit',function(){
+    $('.ui.dimmer.main').dimmer('show');
+
+    var row_id = $(this).data("value");
+    $.get( "/messages/"+row_id+"/edit", function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $('.ui.dimmer.main').dimmer('hide');
+
+      $('.ui.modal.edit-account').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $('.ui.dimmer.main').dimmer('hide');
+      alert( "error" );
+    });
+  });
+
+  $('body').on('click', '.message_del',function(){
+    var href = this.href;
+    var orign_link = $(this);
+    var message_id = $(this).data("id");
+    console.log(message_id);
+
+    $(".target_message").text(message_id);
+
+    $('.delete-check').modal({
+        onApprove : function() {
+          $.ajax({
+            type: "get",
+            method: "delete",
+            url: href
+          });
+          $('.ui.dimmer.main').dimmer('show');
+          location.reload();
+        }
+      }).modal('refresh').modal('show');
+
+    return false;
+  });
+
+
+  $('body').on('click','.message_content',function(){
+    $('.ui.dimmer.main').dimmer('show');
+
+    var row_id = $(this).data("value");
+    $.get( "/messages/"+row_id, function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $('.ui.dimmer.main').dimmer('hide');
+
+      $('.ui.modal.edit-account').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $('.ui.dimmer.main').dimmer('hide');
+      alert( "error" );
+    });
+  });
+  $('body').on('click','.order_message_content',function(){
+    $('.ui.dimmer.main').dimmer('show');
+
+    var row_id = $(this).data("value");
+    $.get( "/messages/order_message?id="+row_id, function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $('.ui.dimmer.main').dimmer('hide');
+
+      $('.ui.modal.edit-account').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $('.ui.dimmer.main').dimmer('hide');
+      alert( "error" );
+    });
+  });
+  $('body').on('click','.product_message_content',function(){
+    $('.ui.dimmer.main').dimmer('show');
+
+    var row_id = $(this).data("value");
+    $.get( "/messages/product_message?id="+row_id, function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $('.ui.dimmer.main').dimmer('hide');
+
+      $('.ui.modal.edit-account').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $('.ui.dimmer.main').dimmer('hide');
+      alert( "error" );
+    });
+  });
+  //   $('body').on('click','.reply-btn',function(){
+  //     alert("dd");
+  //   $.ajax({
+  //       url: $(this).attr('action'), //sumbits it to the given url of the form
+  //       type: 'POST',
+  //       processData: false,
+  //       contentType: false,
+  //       data: new FormData(this)
+  //   }).success(function(upload_result){
+  //       console.log(upload_result);
+  //       if(upload_result == "success" ){
+  //         $("#edit_from").empty();
+  //         $("#edit_from").append(html);
+  //         $('.ui.dimmer.main').dimmer('hide');
+
+  //         $('.ui.modal.edit-account').modal({
+  //           observeChanges: true
+  //     }).modal('refresh').modal('show');
+  //       }
+  //   }).fail(function(e) {
+  //     $('.ui.dimmer.main').dimmer('hide');
+  //       console.log(e);
+  //   }).done(function(){
+      
+  //   });
+  //   return false; // prevents normal behaviour
+  // });
+
+
+});
+</script>

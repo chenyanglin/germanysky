@@ -48,7 +48,7 @@
                 <div class="form-group">
                     <input class="form-control" type="text" size="80" placeholder="全站商品搜尋" />
                 </div>
-                <a class="fa fa-search navbar-main-search-submit" href="#"></a>
+                <a class="navbar-main-search-submit" href="#"><i class="search icon"></i></a>
             </form>
                     <ul class="nav navbar-nav navbar-right">
                     <% if @current_user.present? %>
@@ -61,7 +61,7 @@
                         </li>
                     <% end %>
                         
-                        <% if @current_user.present? && @current_user.role!=1%>
+                <% if @current_user.present? && @current_user.role!=1%>
                 <li class="dropdown"><a href="/products/shoppingcart"><span >購物車</span>
                 
                 <i class="fa fa-shopping-cart"></i><% if @barcarts.size > 0 %><% @barcarts.size %><% else %> 0 <%end%>件商品</a>

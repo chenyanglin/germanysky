@@ -448,7 +448,7 @@ function optionclick(price,surplus,id) {
   document.getElementById("optionsurplus").value = surplus;
   document.getElementById("option_id").value = id;
   if(surplus>0){
-  $("#selectsum").append('選擇數量：<span class="input-group-btn"><button id ="minus" type="button" class="btn btn-default btn-minus">－</button>  <d id = "sum" size="2" value ="1">1</d>  <span class="input-group-btn"><button id = "plus" type="button" class="btn btn-default btn-add">＋</button>');
+  $("#selectsum").append('選擇數量：<button id ="minus" type="button" class="btn btn-default btn-minus">－</button>  <d id = "sum" size="2" value ="1">1</d><button id = "plus" type="button" class="btn btn-default btn-add">＋</button>');
     document.getElementById("sum").innerHTML =1;
 }
   else{

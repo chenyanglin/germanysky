@@ -1,21 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>GermanySky 德心應手</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Bootstrap styles -->
+    <!-- <link href="assets/css/bootstrap.css" rel="stylesheet"/> -->
+    <!-- Customize styles -->
+    <!-- <link href="style.css" rel="stylesheet"/> -->
+    <!-- font awesome styles -->
+	<!-- <link href="assets/font-awesome/css/font-awesome.css" rel="stylesheet"> -->
+		<!--[if IE 7]>
+			<link href="css/font-awesome-ie7.min.css" rel="stylesheet">
+		<![endif]-->
 
-    <div class="global-wrapper clearfix" id="global-wrapper">
-        <%= render "common/theboxheader" %>
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
 
-    <div class="container">
-          <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
+	<!-- Favicons -->
+    <link rel="shortcut icon" href="<%= asset_path 'ico/favicon.ico' %>">
+
+  </head>
+<body style="background:url('<%= asset_path("white_leather.png") %>') repeat 0 0;">
+<!-- 
+	Upper Header Section 
+-->
+<%= render "common/topbar" %>
+
+<!--
+Lower Header Section 
+-->
+<div class="container">
+<%= render "common/header" %>
+
+  <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
     <div class="content">訂單管理</div>
   </h1>
-  <div style="margin:0 auto;">
+  <div style="width:550px;height:80px;margin:0 auto;">
 
-  <div class="ui center aligned icon header" style="font-size:18px;margin:10px 0 10px 0;">
+  <div class="ui center aligned icon header" style="font-size:18px;margin:20px 0 22px 0;">
  訂單總數： <%= number_with_delimiter(@orders_size, :delimiter => ',') %>
+  <br>
   <% if @current_user.role == 1 %>
     <button class="ui small orange button" id = "checkorder">建立檢貨單</button>
   <% end %>
     </div>
     </div>
-<div style="margin:10px 0 10px 0;">
+<div style="width:800px;margin:0px auto;">
 <select id = "p_status" name="p_status" >
   <option value="" disabled selected>付款狀態</option>
   <option value="1">未付款</option>
@@ -74,22 +108,216 @@ or
       <% end %>
     <% end %>
 
+<!-- 
+Clients 
+-->
+<!--
+Footer
+-->
+<%= render "common/footerbar" %>
+  </div>
+<div class="ui small modal edit-order" style="padding-top:0px;">
+  <i class="close icon"></i>
+  <div id="edit_from" style="padding:10px;">
+  </div>
+</div>
 
+<div class="ui basic modal delete-check">
+  <i class="close icon"></i>
+  <div class="header">
+    刪除訂單 <span class="primary-orange target_order"></span>
+  </div>
+  <div class="image content">
+    <div class="image">
+      <i class="announcement icon"></i>
     </div>
-
-
-
-        <div class="gap"></div>
-       
-        <%= render "common/footerbar" %>
+    <div class="description">
+      <p>確定要刪除訂單<span class="primary-orange target_order"></span>嗎?</p>
     </div>
+  </div>
+  <div class="actions">
+    <div class="two fluid ui inverted buttons">
+      <div class="ui ok red basic inverted button">
+        <i class="remove icon"></i>
+        刪除
+      </div>
+      <div class="ui cancel blue basic inverted button">
+        <i class="checkmark icon"></i>
+        取消
+      </div>
+    </div>
+  </div>
+</div>
 
+<div class="ui basic modal confirmpay-check">
+  <i class="close icon"></i>
+  <div class="header">
+    確認匯款 <span class="primary-orange target_order"></span>
+  </div>
+  <div class="image content">
+    <div class="image">
+      <i class="announcement icon"></i>
+    </div>
+    <div class="description">
+      <p>確定更改訂單<span class="primary-orange target_order"></span>狀態為已匯款？</p>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="two fluid ui inverted buttons">
+      <div class="ui ok red basic inverted button">
+        <i class="checkmark icon"></i>
+        確認
+      </div>
+      <div class="ui cancel blue basic inverted button">
+        <i class="remove icon"></i>
+        取消
+      </div>
+    </div>
+  </div>
+</div>
 
+<div class="ui basic modal confirmdelivery-check">
+  <i class="close icon"></i>
+  <div class="header">
+    確認出貨 <span class="primary-orange target_order"></span>
+  </div>
+  <div class="image content">
+    <div class="image">
+      <i class="announcement icon"></i>
+    </div>
+    <div class="description">
+    <p>確定更改訂單<span class="primary-orange target_order"></span>狀態為已出貨？</p>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="two fluid ui inverted buttons">
+      <div class="ui ok red basic inverted button">
+        <i class="checkmark icon"></i>
+        確認
+      </div>
+      <div class="ui cancel blue basic inverted button">
+        <i class="remove icon"></i>
+        取消
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ui basic modal takeproduct-check">
+  <i class="close icon"></i>
+  <div class="header">
+    確認取貨 <span class="primary-orange target_order"></span>
+  </div>
+  <div class="image content">
+    <div class="image">
+      <i class="announcement icon"></i>
+    </div>
+    <div class="description">
+      <% if @current_user.role==1%>
+    <p>確定更改訂單<span class="primary-orange target_order"></span>狀態為已取貨？(此步驟為消費者功能項，請再次確認是否執行此操作。</p>
+    <%else%>
+    <p>確定更改訂單<span class="primary-orange target_order"></span>狀態為已取貨？</p>
+    <%end%>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="two fluid ui inverted buttons">
+      <div class="ui ok red basic inverted button">
+        <i class="checkmark icon"></i>
+        確認
+      </div>
+      <div class="ui cancel blue basic inverted button">
+        <i class="remove icon"></i>
+        取消
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ui basic modal orderdone-check">
+  <i class="close icon"></i>
+  <div class="header">
+    確認訂單完成 <span class="primary-orange target_order"></span>
+  </div>
+  <div class="image content">
+    <div class="image">
+      <i class="announcement icon"></i>
+    </div>
+    <div class="description">
+      <p>確定更改訂單<span class="primary-orange target_order"></span>狀態為完成狀態？</p>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="two fluid ui inverted buttons">
+      <div class="ui ok red basic inverted button">
+        <i class="checkmark icon"></i>
+        確認
+      </div>
+      <div class="ui cancel blue basic inverted button">
+        <i class="remove icon"></i>
+        取消
+      </div>
+    </div>
+  </div>
+</div>
+  </body>
+</html>
 
 <script type="text/javascript">
 
 $(function(){
+  $('.ui.sticky.control-menu')
+  .sticky({
+    offset            : 81,
+    observeChanges    : true,
+    context: '#content_part'
+  });
 
+// search functions
+  var search_msg = $('#filter')
+    .popup({
+      inline   : true,
+      hoverable: false,
+      position : 'top center',
+      delay: {
+        show: 100,
+        hide: 800
+      },
+      on: 'manual'
+    })
+  ;
+
+  $("#search_go").click(function(){
+    start_search();
+  });
+
+  $(document).on('keypress', function(e) {
+    if(e.which == 13) {
+      start_search();
+    }
+  });
+
+  $( "#filter" ).focus(function() {
+    search_msg.popup('hide');
+  });
+
+  function start_search(){
+    var search_string = $("#filter").val();
+    if(search_string == ""){
+      search_msg.popup('toggle');
+    }else{
+      var target_url = "";
+      if(window.location.href == "http://"+location.host+"/payments"){
+        target_url = window.location.href+"?filter="+search_string;
+      }else if(window.location.href.indexOf('filter') > -1){
+        target_url = "http://"+location.host+"/payments?filter="+search_string;
+      }else{
+        target_url = window.location.href+"&filter="+search_string;
+      }
+      window.location.replace(target_url);
+    }
+  }
+// search functions
 
   $('.master.checkbox')
     .checkbox({

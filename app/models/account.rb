@@ -6,6 +6,7 @@ class Account < ActiveRecord::Base
 	has_many :product_register
 	has_many :replies
 	has_many :product_messages, :dependent => :destroy
+	has_many :order_messages, :dependent => :destroy
 	has_one :newsletter_email, foreign_key: "email", primary_key: "email"
 	belongs_to :account_level
 	# validates :email, presence: true, format: /@/ , uniqueness: true
