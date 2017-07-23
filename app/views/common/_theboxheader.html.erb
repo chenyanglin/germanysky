@@ -188,6 +188,16 @@
                     </li>
                     <li class="dropdown"><a href="/messages/new"><span ></span>留言版</a>
                     </li>
+                    <% if @current_user && @current_user.role !=1 %>
+                    <li class="dropdown"><a ><span ></span>個人中心</a>
+                        <ul class="dropdown-menu dropdown-menu">
+                            <li><a href="/accounts/myaccount">・基本資料</a></li>
+                            <li><a href="/order">・我的訂單</a></li>
+                            <li><a href="/products/shoppingcart">・購物車</a></li>
+                            <li><a href="/messages">・我的留言</a></li>
+                        </ul>
+                    </li>
+                    <%end%>
                 </ul>
 
             </div>

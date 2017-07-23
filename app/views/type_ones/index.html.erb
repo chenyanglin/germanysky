@@ -8,13 +8,22 @@
             </header>
             <div class="row row-col-border" data-gutter="60">
                 <div class="col-md-3">
-                  <ul class="nav nav-list">
-                    <div class="ui center aligned icon header" style="font-size:18px;margin:20px 0 22px 0;">
-                    <li> 分類總數： <%= number_with_delimiter(@types_size, :delimiter => ',') %></li>
-                    <li><br></li>
-                    <li><button class="ui orange basic button" id = "btn_new_type">新增分類</button></li>
-                    </div>
-                  </ul>
+                <div class="banner banner-o-hid" style="background-color:#E0E0E0;">
+                   
+                   <div class="banner-caption-center banner-caption-dark">
+                   
+                    
+                  <p class="banner-desc " >
+                   <button class="ui black button" id = "btn_new_type">新增分類</button>
+                   </p>
+                 <!--   <p class="banner-desc">
+                   <button class="ui black button" id = "btn_new_type2">2.新增品牌</button>
+                   </p>
+                   <p class="banner-desc">
+                    <button class="ui black button" id = "btn_new_type3">3.新增品牌分類</button>
+                    </p> -->
+                   </div>
+                   </div>
                 </div>
                 <div class="col-md-9">
                   <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
@@ -216,7 +225,40 @@ $(function(){
     });
 
   });
+  $("#btn_new_type2").click(function(){
+    $("#btn_new_type2").addClass("loading");
+    $.get( "/type_ones/new2", function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $("#btn_new_type2").removeClass("loading");
 
+      $('.ui.modal.edit-account').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $("#btn_new_type2").removeClass("loading");
+      alert( "error" );
+    });
+
+  });
+    $("#btn_new_type3").click(function(){
+    $("#btn_new_type3").addClass("loading");
+    $.get( "/type_ones/new3", function(html) {
+      $("#edit_from").empty();
+      $("#edit_from").append(html);
+      $("#btn_new_type3").removeClass("loading");
+
+      $('.ui.modal.edit-account').modal({
+        observeChanges: true
+      }).modal('refresh').modal('show');
+
+    }).fail(function() {
+      $("#btn_new_type3").removeClass("loading");
+      alert( "error" );
+    });
+
+  });
 
 
 });
