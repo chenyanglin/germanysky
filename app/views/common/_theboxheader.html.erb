@@ -142,12 +142,12 @@
         </div>
     </nav>
     <% else %>
-    <nav class="navbar-defaulta navbar-main-white yamm" style="padding:0;z-index:0;position: relative;">
+    <nav class="navbar-defaulta navbar-main-white yamm" style="padding:0;z-index:1;position: relative;">
         <div class="container">
             <div class="collapse navbar-collapse navbar-collapse-no-pad" id="main-nav-collapse">
                 <ul class="nav navbar-nav">
                     <li class="dropdown"><a href="/products"><span ></span><b>商品展示</b><i class="drop-caret" data-toggle="dropdown"></i></a>
-                        <ul class="dropdown-menu dropdown-menu-category">
+                        <ul class="dropdown-menu dropdown-menu-category" >
                            
                         <% @type_ones.each do |t| %>
                             <li><a href="/products?type=<%=t.id%>"><i class="fa fa-tags dropdown-menu-category-icon"></i><%=t.name %></a>
