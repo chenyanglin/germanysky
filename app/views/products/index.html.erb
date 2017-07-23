@@ -9,6 +9,24 @@
                     <li><a href="/products?type=<%=@type.id%>"><%=@type.name%></a>
                     </li>
                 </ol>
+                <% elsif @type2.present?%>
+                <h1 class="page-title"><%=@type2.name%></h1>
+                <ol class="breadcrumb page-breadcrumb">
+                    <li><a href="/products?type=<%=@type2.type_one.id%>"><%=@type2.type_one.name%></a>
+                    </li>
+                    <li><a href="/products?type2=<%=@type2.id%>"><%=@type2.name%></a>
+                    </li>
+                </ol>
+                <% elsif @type3.present? %>
+                    <h1 class="page-title"><%=@type3.name%></h1>
+                <ol class="breadcrumb page-breadcrumb">
+                    <li><a href="/products?type=<%=@type3.type_two.type_one.id%>"><%=@type3.type_two.type_one.name%></a>
+                    </li>
+                    <li><a href="/products?type2=<%=@type3.type_two.id%>"><%=@type3.type_two.name%></a>
+                    </li>
+                    <li><a href="/products?type3=<%=@type3.id%>"><%=@type3.name%></a>
+                    </li>
+                </ol>
                 <% else %>
                 <h1 class="page-title">All Products</h1>
                 <% end %>
