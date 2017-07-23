@@ -283,16 +283,20 @@
             <% end %>
                 </div>
             <% end %>
-            <br></br>
-            <div class="divider"></div>
+        
+    
             <div class="form-check">
             <%= form_for @message ,:html =>{:class => "ui reply form"}, :url => new_product_message_path, method: :post do |f| %>
             <div class="field">
                 <textarea id="content" name = "content" rows= '4'></textarea>
             </div>
+            <% if @current_user.present? %>
             <div id="reply-btn" class="ui primary labeled icon button reply-btn">
                 <i class="icon edit"></i> 留言
             </div>
+            <%else%>
+            <a class="btn btn-lg red-btn-primary" href="/consoles/login"><i class="fa fa-shopping-cart"></i>請先登入會員</a>
+            <% end %>
             <% end %>
             </div>
             <!-- 留言done -->
@@ -462,8 +466,6 @@ function optionclick(price,surplus,id) {
 }
 $(function(){
 
-// search functions
-  $('#products_table').tablesort();
 
 function ValidateSurplus(e, point)
 {
