@@ -1,17 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>GermanySky 德心應手</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Bootstrap styles -->
+    <!-- <link href="assets/css/bootstrap.css" rel="stylesheet"/> -->
+    <!-- Customize styles -->
+    <!-- <link href="style.css" rel="stylesheet"/> -->
+    <!-- font awesome styles -->
+	<!-- <link href="assets/font-awesome/css/font-awesome.css" rel="stylesheet"> -->
+		<!--[if IE 7]>
+			<link href="css/font-awesome-ie7.min.css" rel="stylesheet">
+		<![endif]-->
 
-    <div class="global-wrapper clearfix" id="global-wrapper">
-        <%= render "common/theboxheader" %>
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
 
-        <div class="container">
-            <header class="page-header" style="padding:0">
+	<!-- Favicons -->
+    <link rel="shortcut icon" href="<%= asset_path 'ico/favicon.ico' %>">
+  </head>
+<body style="background:url('<%= asset_path("white_leather.png") %>') repeat 0 0;">
+<!-- 
+	Upper Header Section 
+-->
+<%= render "common/topbar" %>
 
-            </header>
-            <div class="row row-col-border" data-gutter="60">
-                <div class="col-md-3">
-                    <%= render "common/leftsalebanner" %>
-                </div>
-                <div class="col-md-9">
-                 <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
+<!--
+Lower Header Section 
+-->
+<div class="container">
+<%= render "common/header" %>
+<%= render "common/leftmenu" %>
+<!-- 
+Body Section 
+-->
+<div class="span9">
+<!-- 
+New Products
+-->
+<h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
  
     <div class="content">
       <%= @specialoffer.name %>
@@ -46,35 +77,35 @@
               <br>
     </div>
     <%end%>
-  <div class="well well-small"> 
-  <% if @products.size > 0 %>
-    <% i = 1 %>
-    <% @products.each do |p|%>
-    <% if i%3 == 1%>
-    <div class="row-fluid">
-      <ul class="thumbnails">
-    <% end%>
-      <li class="span4">
-        <div class="thumbnail">
-        <a href="/products/<%= p.id %>" class="overlay"></a>
-        <a class="zoomTool" href="/products/<%= p.id %>" title="add to cart"><i class="search icon"></i>前往商品</a>
-        <a href="/products/<%= p.id %>">
+	<div class="well well-small">	
+ 	<% if @products.size > 0 %>
+		<% i = 1 %>
+		<% @products.each do |p|%>
+		<% if i%3 == 1%>
+		<div class="row-fluid">
+		  <ul class="thumbnails">
+		<% end%>
+			<li class="span4">
+			  <div class="thumbnail">
+				<a href="/products/<%= p.id %>" class="overlay"></a>
+				<a class="zoomTool" href="/products/<%= p.id %>" title="add to cart"><i class="search icon"></i>前往商品</a>
+				<a href="/products/<%= p.id %>">
 
   <img class="ui centered small image" src="<%= asset_path p.product.productimages.first.phourl %>" style='height: 180px; width: 100%; object-fit: contain'>
 </a>
-        <div class="caption cntr">
-          <p><strong><%= p.product.name %></strong></p>
+				<div class="caption cntr">
+					<p><strong><%= p.product.name %></strong></p>
           <p><%= p.option1%></p>
-          <p>
-          庫存：<%= p.surplus %></br> 
-          <s>NT ＄ <%= p.price %></s></br>
+					<p>
+					庫存：<%= p.surplus %></br> 
+        	<s>NT ＄ <%= p.price %></s></br>
           <% if @specialoffer.offertype == "1" %>
           <font color="red"><b>NT ＄ <%= @specialoffer.saleprice %></b></font>
           <%elsif @specialoffer.offertype == "2" %>
           <font color="red"><b>NT ＄ <%if @specialoffer.discount>10%><%=(p.price*@specialoffer.discount/100.00).round%><%else%><%=(p.price*@specialoffer.discount/10.00).round%><%end%></b></font>
-          <%end%>
+					<%end%>
           </p>
-        <select id="sum<%=p.id%>" style="width:100%;">
+				<select id="sum<%=p.id%>" style="width:100%;">
                     <% for x in 1..p.surplus %>
                       <option value="<%=x%>" ><%=x%></option>
                     <%end%>
@@ -89,34 +120,37 @@
                <div class="shopBtn" style='cursor: pointer;' onClick="optionclick('<%=p.id%>','<%=p.product.name%>','<%=p.option1%>','<%=p.price%>','<%if @specialoffer.discount>10%><%=(p.price*@specialoffer.discount/100.00).round%><%else%><%=(p.price*@specialoffer.discount/10.00).round%><%end%>',<%=p.surplus%>)">選購</div>
             <%end%>
             <%end%>
-        </div>
-        </div>
-      </li>
-    <% if i%3==0 %>
-      </ul>
-    </div>
-    <% end %>
-    <% i += 1%>
-    <% end %>
-      </div>
-    <%else%>
-    <h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
+				</div>
+			  </div>
+			</li>
+		<% if i%3==0 %>
+		  </ul>
+		</div>
+		<% end %>
+		<% i += 1%>
+		<% end %>
+			</div>
+		<%else%>
+		<h1 class="ui center aligned icon header" style="font-size:28px;margin:20px 0 22px 0;">
  
     <div class="content">
       沒有商品
     </div>
   </h1>
-    <%end%>
-                </div>
-            </div>
-</div>
+		<%end%>
+	</div>
+	</div>
+	</div>
+<!-- 
+Clients 
+-->
+<!--
+Footer
+-->
+<%= render "common/footerbar" %>
 
-
-
-        <div class="gap"></div>
-       
-        <%= render "common/footerbar" %>
-    </div>
+  </body>
+</html>
 <script type="text/javascript">
 
       count=1;
