@@ -11,16 +11,7 @@
 // about supported directives.
 //
 
-//= require base/jquery.js
-//= require base/bootstrap.js
-//= require base/card-payment.js
-//= require base/icheck.js
-//= require base/ionrangeslider.js
-//= require base/jqzoom.js
-//= require base/magnific.js
-//= require base/owl-carousel.js
-//= require base/custom.js
-//= require base/tablesort.js
+
 //= require jquery
 //= require jquery_ujs
 //= require react
