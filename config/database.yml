@@ -24,7 +24,7 @@ development:
   database: germanysky
   host: localhost
   username: root
-  password: "iii"
+  password: "771205"
 
   # #Linode
   # adapter: mysql2
