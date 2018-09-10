@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170312080751) do
+ActiveRecord::Schema.define(version: 20180910202207) do
 
   create_table "account_levels", force: :cascade do |t|
     t.string   "level_name",  limit: 255
@@ -45,6 +45,19 @@ ActiveRecord::Schema.define(version: 20170312080751) do
     t.string   "googleid",         limit: 255
   end
 
+  create_table "bet_data", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.string   "game",       limit: 255
+    t.string   "play",       limit: 255
+    t.string   "goal",       limit: 255
+    t.string   "team",       limit: 255
+    t.string   "money",      limit: 255
+    t.string   "status",     limit: 255
+    t.string   "challenger", limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "brandimages", force: :cascade do |t|
     t.string   "name",                limit: 255
     t.string   "phourl",              limit: 255
@@ -72,6 +85,12 @@ ActiveRecord::Schema.define(version: 20170312080751) do
     t.boolean  "available"
     t.datetime "created_at",              null: false
     t.datetime "updated_at",              null: false
+  end
+
+  create_table "games", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
   end
 
   create_table "manager_accounts", force: :cascade do |t|
@@ -136,12 +155,12 @@ ActiveRecord::Schema.define(version: 20170312080751) do
     t.string   "order_id",     limit: 255
     t.string   "account_id",   limit: 255
     t.string   "content",      limit: 255
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
     t.string   "reply",        limit: 255
     t.integer  "status",       limit: 4
     t.string   "account_name", limit: 255
-    t.integer  "user_read",    limit: 1
+    t.integer  "user_read",    limit: 4,   default: 0
   end
 
   create_table "order_products", force: :cascade do |t|
@@ -383,12 +402,19 @@ ActiveRecord::Schema.define(version: 20170312080751) do
   end
 
   create_table "system_settings", force: :cascade do |t|
-    t.integer  "free_shipping_switch", limit: 4
-    t.integer  "free_shipping_limit",  limit: 4
-    t.integer  "point_switch",         limit: 4
+    t.integer  "free_shipping_switch", limit: 4,    default: 1
+    t.integer  "free_shipping_limit",  limit: 4,    default: 0
+    t.integer  "point_switch",         limit: 4,    default: 1
     t.string   "notice",               limit: 5000
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
+    t.datetime "created_at",                                    null: false
+    t.datetime "updated_at",                                    null: false
+  end
+
+  create_table "teams", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.string   "game_id",    limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
   end
 
   create_table "type_ones", force: :cascade do |t|
