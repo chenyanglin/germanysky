@@ -6,8 +6,8 @@
 set :application, 'germanysky'
 # set :repo_url, 'ssh://git@gitlab.ideas.iii.org.tw:10022/150642/beaconserver.git'
 set :repo_url, 'git@github.com:chenyanglin/germanysky.git'
-set :git_https_username, 'chenyanglin'
-set :git_https_password, 'xup6yaya'
+# set :git_https_username, 'chenyanglin'
+# set :git_https_password, 'xup6yaya'
 
 current_branch = `git branch`.match(/\* (\S+)\s/m)[1]
 set :branch, ENV['branch'] || current_branch || "master"
