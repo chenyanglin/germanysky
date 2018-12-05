@@ -5,7 +5,7 @@
 
 set :application, 'germanysky'
 # set :repo_url, 'ssh://git@gitlab.ideas.iii.org.tw:10022/150642/beaconserver.git'
-set :repo_url, 'ssh://git@github.com:chenyanglin/germanysky.git'
+set :repo_url, 'git@github.com:chenyanglin/germanysky.git'
 set :git_https_username, 'chenyanglin'
 set :git_https_password, 'xup6yaya'
 
