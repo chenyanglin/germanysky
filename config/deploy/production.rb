@@ -30,12 +30,12 @@ server '45.33.24.241',
   # role :web, %w{chenyang@45.33.24.241}
   # role :db,  %w{chenyang@45.33.24.241}
 
-  # set :ssh_options, {
-  #   forward_agent: false,
-  #   auth_methods: %w(password),
-  #   password: 'xup6yaya',
-  #   user: 'chenyang'
-  # }
+  set :ssh_options, {
+    forward_agent: false,
+    auth_methods: %w(password),
+    password: 'xup6yaya',
+    user: 'chenyang'
+  }
 
 # Configuration
 # =============
