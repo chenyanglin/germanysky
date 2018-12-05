@@ -1,0 +1,25 @@
+<% if @bets.present? %>
+      <% if @bets.size != 0 %>
+        <div class="infinite-table">
+          <table id="deliveries_table" class="site-font ui sortable selectable teal table">
+            <thead>
+              <tr>
+                <th>決鬥者</th>
+                <th>賽種</th>
+                <th>玩法</th>
+                <th>隊伍</th>
+                <th style="margin: 0 10px 0 10px;">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <%= render :partial => 'bets', :object => @bets %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <h3>未建立！</h3>
+      <% end %>
+    <% end %>
+                </div>
+            </div>
+</div>

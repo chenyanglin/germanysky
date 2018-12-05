@@ -1,0 +1,12 @@
+<% @bets.each do |bet| %>
+<tr>
+  <td><%= bet.name %></td>
+  <td><%= Game.find(bet.game).name%></td>
+  <td><%= bet.play %></td>
+  <td><%= bet.team %></td>
+ 
+  <td class="collapsing">
+    <button class="ui blue basic button bet_edit" data-value="<%= bet.id %>">認領</button>
+  </td>
+</tr>
+<% end %>
